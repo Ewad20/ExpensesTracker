@@ -1,4 +1,4 @@
-namespace Projekt_zespołowy;
+namespace _2023pz_trrepo;
 
 public class WeatherForecast
 {

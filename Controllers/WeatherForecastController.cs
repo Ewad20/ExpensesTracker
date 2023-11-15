@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Projekt_zespołowy.Controllers;
+namespace _2023pz_trrepo.Controllers;
 
 [ApiController]
 [Route("[controller]")]

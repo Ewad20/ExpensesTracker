@@ -3,15 +3,15 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:36385",
-      "sslPort": 44351
+      "applicationUrl": "http://localhost:37652",
+      "sslPort": 44350
     }
   },
   "profiles": {
-    "Projekt_zespołowy": {
+    "_2023pz_trrepo": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7049;http://localhost:5259",
+      "applicationUrl": "https://localhost:7102;http://localhost:5172",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
