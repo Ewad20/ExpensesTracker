@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Projekt_zespołowy.Model
+namespace _2023pz_trrepo.Model
 {
     public class ETDbContext : DbContext
     {

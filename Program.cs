@@ -1,5 +1,6 @@
+using _2023pz_trrepo.Model;
 using Microsoft.EntityFrameworkCore;
-using Projekt_zespo³owy.Model;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
