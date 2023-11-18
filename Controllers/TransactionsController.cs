@@ -21,5 +21,12 @@ namespace _2023pz_trrepo.Controllers
             _dbContext.Add(Exp);
             _dbContext.SaveChanges();
         }
+
+        [HttpPost("addExpenditure")]
+        public void Expenditure([FromBody] Expenditure Exp)
+        {
+            _dbContext.Add(Exp);
+            _dbContext.SaveChanges();
+        }
     }
 }
