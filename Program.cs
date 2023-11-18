@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ETDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -20,9 +21,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
+
 app.UseRouting();
 
+//app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
