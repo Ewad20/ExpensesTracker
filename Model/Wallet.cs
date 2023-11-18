@@ -13,6 +13,8 @@ namespace _2023pz_trrepo.Model
 
         public string Icon { get; set; }
 
+        public int AccountBalance { get; set; }
+
         public int UserId { get; set; } 
     }
 
