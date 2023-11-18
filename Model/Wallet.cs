@@ -1,21 +1,19 @@
 using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace _2023pz_trrepo.Model
 {
-public class Wallet
+    public class Wallet
     {
-        //Transakcje do zrobienia w ramach śledzenia wydatków
+        [Key]
+        public int WalletId { get; set; }
+
+        [Required]
         public string Name { get; set; }
-        //public List<Transaction> Transactions { get; set; }
 
-        public Wallet(string name)
-        {
-            Name = name;
-           // Transactions = new List<Transaction>();
-        }
+        public string Icon { get; set; }
 
-      
+        public int UserId { get; set; } 
     }
 
 }
