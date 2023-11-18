@@ -4,7 +4,7 @@ namespace _2023pz_trrepo.Model
 {
     public abstract class AbstractTransaction
     {
-        protected AbstractTransaction(string title, string description, int amount, long walletId, long iconId)
+        protected AbstractTransaction(string title, int amount, long walletId, long iconId, string? description="")
         {
             Title = title;
             Description = description;
@@ -15,7 +15,7 @@ namespace _2023pz_trrepo.Model
         [Key]
         public long Id { get; set; }
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int Amount { get; set; }
         public long WalletId { get; set; }
         public long IconId { get; set; }
