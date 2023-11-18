@@ -6,16 +6,24 @@ namespace _2023pz_trrepo.Model
     public class Wallet
     {
         [Key]
-        public int WalletId { get; set; }
+        public int Id { get; set; }
 
-        [Required]
         public string Name { get; set; }
 
-        public string Icon { get; set; }
+        public long IconId { get; set; }
 
         public int AccountBalance { get; set; }
 
         public int UserId { get; set; } 
+
+        public Wallet(int id, string name, long iconId, int accountBalance, int userId)
+        {
+            Id = id;
+            Name = name;
+            IconId = iconId;
+            AccountBalance = accountBalance;
+            UserId = userId;
+        }
     }
 
 }

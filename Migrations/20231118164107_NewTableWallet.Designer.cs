@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _2023pz_trrepo.Model;
 
@@ -10,9 +11,11 @@ using _2023pz_trrepo.Model;
 namespace _2023pz_trrepo.Migrations
 {
     [DbContext(typeof(ETDbContext))]
-    partial class ETDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231118164107_NewTableWallet")]
+    partial class NewTableWallet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,17 +55,18 @@ namespace _2023pz_trrepo.Migrations
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("WalletId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WalletId"));
 
                     b.Property<int>("AccountBalance")
                         .HasColumnType("int");
 
-                    b.Property<long>("IconId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -71,7 +75,7 @@ namespace _2023pz_trrepo.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("WalletId");
 
                     b.ToTable("Wallets");
                 });
