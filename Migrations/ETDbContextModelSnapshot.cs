@@ -47,7 +47,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Expenditures");
+                    b.ToTable("Expenditures", (string)null);
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Income", b =>
@@ -76,7 +76,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Incomes");
+                    b.ToTable("Incomes", (string)null);
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.User", b =>
@@ -112,7 +112,7 @@ namespace _2023pz_trrepo.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
@@ -138,7 +138,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Wallets");
+                    b.ToTable("Wallets", (string)null);
                 });
 #pragma warning restore 612, 618
         }

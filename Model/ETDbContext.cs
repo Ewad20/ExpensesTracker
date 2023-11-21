@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Transactions;
+using Microsoft.EntityFrameworkCore;
 
 namespace _2023pz_trrepo.Model
 {
@@ -14,6 +15,22 @@ namespace _2023pz_trrepo.Model
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasMany(user => user.wallets)
+                .WithOne(wallet => wallet.User)
+                .HasForeignKey(Wallet => Wallet.UserId);
+
+            modelBuilder.Entity<Wallet>()
+                .HasMany(wallet => wallet.Incomes)
+                .WithOne(income => income.Wallet)
+                .HasForeignKey(income => income.WalletId);
+
+            modelBuilder.Entity<Wallet>()
+                .HasMany(wallet => wallet.Expenditures)
+                .WithOne(expenditure => expenditure.Wallet)
+                .HasForeignKey(expenditure => expenditure.WalletId);
+                
             base.OnModelCreating(modelBuilder);
         }
     }
