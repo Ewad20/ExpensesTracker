@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _2023pz_trrepo.Model;
 
@@ -10,9 +11,11 @@ using _2023pz_trrepo.Model;
 namespace _2023pz_trrepo.Migrations
 {
     [DbContext(typeof(ETDbContext))]
-    partial class ETDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231121215416_finalFixForRelations")]
+    partial class finalFixForRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Expenditures", (string)null);
+                    b.ToTable("Expenditures");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Income", b =>
@@ -80,7 +83,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Incomes", (string)null);
+                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.User", b =>
@@ -116,7 +119,7 @@ namespace _2023pz_trrepo.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
@@ -144,7 +147,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wallets", (string)null);
+                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Expenditure", b =>

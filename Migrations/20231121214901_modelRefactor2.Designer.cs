@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _2023pz_trrepo.Model;
 
@@ -10,9 +11,11 @@ using _2023pz_trrepo.Model;
 namespace _2023pz_trrepo.Migrations
 {
     [DbContext(typeof(ETDbContext))]
-    partial class ETDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231121214901_modelRefactor2")]
+    partial class modelRefactor2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("Expenditures", (string)null);
+                    b.ToTable("Expenditures");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Income", b =>
@@ -78,9 +79,7 @@ namespace _2023pz_trrepo.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("Incomes", (string)null);
+                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.User", b =>
@@ -116,17 +115,11 @@ namespace _2023pz_trrepo.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
                     b.Property<int>("AccountBalance")
                         .HasColumnType("int");
 
@@ -137,53 +130,10 @@ namespace _2023pz_trrepo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Wallets", (string)null);
-                });
-
-            modelBuilder.Entity("_2023pz_trrepo.Model.Expenditure", b =>
-                {
-                    b.HasOne("_2023pz_trrepo.Model.Wallet", null)
-                        .WithMany("expenditures")
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("_2023pz_trrepo.Model.Income", b =>
-                {
-                    b.HasOne("_2023pz_trrepo.Model.Wallet", null)
-                        .WithMany("incomes")
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
-                {
-                    b.HasOne("_2023pz_trrepo.Model.User", null)
-                        .WithMany("wallets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("_2023pz_trrepo.Model.User", b =>
-                {
-                    b.Navigation("wallets");
-                });
-
-            modelBuilder.Entity("_2023pz_trrepo.Model.Wallet", b =>
-                {
-                    b.Navigation("expenditures");
-
-                    b.Navigation("incomes");
+                    b.ToTable("Wallets");
                 });
 #pragma warning restore 612, 618
         }

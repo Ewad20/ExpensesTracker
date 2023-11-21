@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace _2023pz_trrepo.Model
 {
@@ -14,10 +13,8 @@ namespace _2023pz_trrepo.Model
 
         public int AccountBalance { get; set; }
         public long UserId { get; set; }
-        public User User { get; set; }
-        public ICollection<Income> Incomes;
-        public ICollection<Expenditure> Expenditures;
-
+        public ICollection<Income> incomes { get; } = new List<Income>();
+        public ICollection<Expenditure> expenditures { get; } = new List<Expenditure>();
     }
 
 }

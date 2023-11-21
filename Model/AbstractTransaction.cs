@@ -12,7 +12,6 @@ namespace _2023pz_trrepo.Model
         public double Amount { get; set; }
         public long WalletId { get; set; }
         public long CategoryId { get; set; }
-        public Wallet Wallet { get; set; }
         public abstract string TransactionType();
     }
 }
