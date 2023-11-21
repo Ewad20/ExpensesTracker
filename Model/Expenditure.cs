@@ -2,7 +2,7 @@
 {
     public class Expenditure : AbstractTransaction
     {
-        public Expenditure(string title, int amount, long walletId, long iconId, string? description = "") : base(title, amount, walletId, iconId, description)
+        public Expenditure(string title, double amount, long walletId, long CategoryId, string? description = "") : base(title, amount, walletId, CategoryId, description)
         {
 
         }
