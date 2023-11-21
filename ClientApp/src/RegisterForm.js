@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const RegisterForm = () => {
@@ -7,7 +7,6 @@ const RegisterForm = () => {
     const [userName, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
     const [passwordError, setPasswordError] = useState('');
 
     const handlePasswordChange = (e) => {
@@ -94,7 +93,7 @@ const RegisterForm = () => {
                     </div>
 
                     <div className="col-md-6 mb-3">
-                        <label htmlFor="userName" className="form-label">User Name:</label>
+                        <label htmlFor="userName" className="form-label">Username:</label>
                         <input
                             type="text"
                             className="form-control"

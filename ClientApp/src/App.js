@@ -1,12 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import RegisterForm from './RegisterForm';
+import RootElement from './RootElement';
 
 const App = () => {
     return (
         <Router>
+            <RootElement/>
             <div>
-                <h1>Expenses Tracker app</h1>
                 <Routes>
                     <Route path="/register" element={<RegisterForm />} />
                 </Routes>

@@ -1,26 +1,26 @@
-using _2023pz_trrepo.Model;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace _2023pz_trrepo.Model
 {
     public class User
     {
-       public User(string firstName, string lastName, string userName, string email, string password)
+        [Key]
+        public long Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public User(string firstName, string lastName, string username, string email, string password)
         {
             FirstName = firstName;
             LastName = lastName;
-            UserName = userName;
+            Username = username;
             Email = email;
             Password = password;
         }
-        [Key]
-        public long UserId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+
     }
 }
 

@@ -1,7 +1,6 @@
 ﻿using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace _2023pz_trrepo.Controllers
 {
     [ApiController]
@@ -15,16 +14,16 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("addIncome")]
-        public void Income([FromBody] Income Exp)
+        public void AddIncome([FromBody] Income income)
         {
-            _dbContext.Add(Exp);
+            _dbContext.Incomes.Add(income);
             _dbContext.SaveChanges();
         }
 
         [HttpPost("addExpenditure")]
-        public void Expenditure([FromBody] Expenditure Exp)
+        public void AddExpenditure([FromBody] Expenditure expenditure)
         {
-            _dbContext.Add(Exp);
+            _dbContext.Expenditures.Add(expenditure);
             _dbContext.SaveChanges();
         }
     }

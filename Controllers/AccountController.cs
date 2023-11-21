@@ -16,9 +16,16 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("register")]
-        public void Register([FromBody] User user)
+        public void AddUser([FromBody] User user)
         {
             _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
+        }
+        
+        [HttpPost("addWallet")]
+        public void AddWallet([FromBody] Wallet wallet)
+        {
+            _dbContext.Wallets.Add(wallet);
             _dbContext.SaveChanges();
         }
     }

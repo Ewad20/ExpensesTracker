@@ -1,5 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace _2023pz_trrepo.Model
 {
@@ -13,6 +13,7 @@ namespace _2023pz_trrepo.Model
         public long IconId { get; set; }
 
         public int AccountBalance { get; set; }
+        [ForeignKey("Users")]
 
         public int UserId { get; set; } 
 
