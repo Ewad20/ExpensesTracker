@@ -4,7 +4,7 @@ using _2023pz_trrepo.Model;
 namespace _2023pz_trrepo.Controllers
 {
     [ApiController]
-    [Route("api/register")]
+    [Route("api/account")]
     public class AccountController : ControllerBase
     {
         private readonly ETDbContext _dbContext;
@@ -16,9 +16,8 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("register")]
-        public void Register([FromBody] User userData)
+        public void Register([FromBody] User user)
         {
-            var user = new User { FirstName = userData.FirstName, LastName = userData.LastName, UserName = userData.UserName, Email = userData.Email, Password = userData.Password };
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
         }

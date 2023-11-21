@@ -20,7 +20,7 @@ const RegisterForm = () => {
         };
 
         try {
-            const response = await fetch('https://localhost:44485/register', {
+            const response = await fetch('https://localhost:7088/api/account/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

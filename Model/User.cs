@@ -6,10 +6,7 @@ namespace _2023pz_trrepo.Model
 {
     public class User
     {
-        public User()
-        {
-        }
-        protected User(string firstName, string lastName, string userName, string email, string password)
+       public User(string firstName, string lastName, string userName, string email, string password)
         {
             FirstName = firstName;
             LastName = lastName;
