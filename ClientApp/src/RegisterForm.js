@@ -8,8 +8,33 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const [passwordError, setPasswordError] = useState('');
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        setPasswordError('');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let valid = true;
+
+        if (!password) {
+            setPasswordError('Please enter your password.');
+            valid = false;
+        } else if (password.length < 8) {
+            setPasswordError('Your password has to be at least 8 characters long.');
+            valid = false;
+        } else if (!/[A-Z]/.test(password)) {
+            setPasswordError('Your password has to contain at least one big letter.');
+            valid = false;
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            setPasswordError('Your password has to contain at least one special sign.');
+            valid = false;
+        } else {
+            setPasswordError('');
+        }
 
         const userData = {
             firstName,
@@ -19,22 +44,24 @@ const RegisterForm = () => {
             password,
         };
 
-        try {
-            const response = await fetch('https://localhost:44485/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            });
+        if (valid) {
+            try {
+                const response = await fetch('https://localhost:44485/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData),
+                });
 
-            if (response.ok) {
-                console.log('Registration successful!');
-            } else {
-                console.error('Registration failed');
+                if (response.ok) {
+                    console.log('Registration successful!');
+                } else {
+                    console.error('Registration failed');
+                }
+            } catch (error) {
+                console.error('Error during registration', error);
             }
-        } catch (error) {
-            console.error('Error during registration', error);
         }
     };
 
@@ -98,9 +125,10 @@ const RegisterForm = () => {
                             className="form-control"
                             id="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={handlePasswordChange}
                             required
                         />
+                        {passwordError && <div className="error">{passwordError}</div>}
                     </div>
                 </div>
 
