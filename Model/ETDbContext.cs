@@ -19,12 +19,6 @@ namespace _2023pz_trrepo.Model
             modelBuilder.Entity<User>().HasMany(u => u.wallets);
             modelBuilder.Entity<Wallet>().HasMany(u => u.incomes);
             modelBuilder.Entity<Wallet>().HasMany(u => u.expenditures);
-
-			modelBuilder.Entity<Expenditure>()
-				.HasOne(e => e.ExpenseCategory)
-				.WithMany()
-				.HasForeignKey(e => e.CategoryId);
-
 			base.OnModelCreating(modelBuilder);
         }
     }
