@@ -13,6 +13,12 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpPost("importWallet")]
+        public IActionResult ExportWallet(string userName, string filePath){
+        
+            return Ok();
+        }
+
         [HttpPost("test")]
         public void Test()
         {

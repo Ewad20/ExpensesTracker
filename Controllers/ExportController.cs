@@ -1,5 +1,6 @@
 using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Numerics;
 using System.Text.Json;
 
 namespace _2023pz_trrepo.Controllers
@@ -14,29 +15,40 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
-        private void saveJsonFile(string filePath, object outcome){
+        //TODO restun file to front end, now saves to server 
+        private Boolean saveJsonFile(string filePath, object outcome){
             string serializedOutcome = JsonSerializer.Serialize(outcome);
 
             using (StreamWriter writer = new StreamWriter(filePath))
             {
-                writer.WriteLine(outcome);
+                try{
+                    writer.WriteLine(outcome);
+                }catch(Exception e){
+                    Console.WriteLine("Nie duało się zapisać JSON'a" + e.StackTrace);
+                    return false;
+                }
             }
+            return true;
         }
 
         [HttpPost("exportWallet")]
         public IActionResult ExportWallet(string userName, string filePath){
         
-
-            List<Wallet> walletsList = _dbContext.Wallets.ToList();
-            List<User> userList = _dbContext.Users.ToList();
-
-            var foundUser = userList.FirstOrDefault(user => user.Username == userName);
-
-            if(foundUser == null)
+            User user;
+            try{
+                user = _dbContext.Users.Where(x => x.Username.Equals(userName)).First();
+            }catch(Exception e){
+                Console.WriteLine("Brak usera na liście!" + e.StackTrace);
                 return BadRequest("Brak usera na liście!");
-            
-            var userWallets = walletsList.Where(wallet => wallet.UserId.ToString() == foundUser.ToString());
-            saveJsonFile(filePath, userWallets);
+            }
+
+            List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId == user.Id).ToList();
+
+            //if(!saveJsonFile(filePath, userWallets))
+            //    return BadRequest("Nie udało się wyeksortować");
+            foreach(Wallet wallet in userWalletList){
+                Console.WriteLine(wallet.Name);
+            }
             return Ok();
         }
 
