@@ -9,12 +9,20 @@ namespace _2023pz_trrepo.Model
         public DbSet<User> Users { get; set; }
         public DbSet<Expenditure> Expenditures { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		public DbSet<Category> Categories { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
-            base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<Expenditure>()
+				.HasOne(e => e.ExpenseCategory)
+				.WithMany()
+				.HasForeignKey(e => e.CategoryId);
+
+			base.OnModelCreating(modelBuilder);
         }
     }
 }
