@@ -15,6 +15,11 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpGet("get")]
+        public Wallet get(){
+            return _dbContext.Wallets.First();
+        }
+
         [HttpPost("register")]
         public void AddUser([FromBody] User user)
         {
