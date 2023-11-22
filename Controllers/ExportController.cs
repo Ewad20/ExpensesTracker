@@ -38,6 +38,7 @@ namespace _2023pz_trrepo.Controllers
             try{
                 user = _dbContext.Users.Where(x => x.Username.Equals(userName)).First();
             }catch(Exception e){
+                Console.WriteLine("Brak usera na liście!" + e.StackTrace);
                 return BadRequest("Brak usera na liście!");
             }
 
