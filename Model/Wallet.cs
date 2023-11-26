@@ -13,8 +13,8 @@ namespace _2023pz_trrepo.Model
 
         public int AccountBalance { get; set; }
         public long UserId { get; set; }
-        public ICollection<Income> incomes { get; } = new List<Income>();
-        public ICollection<Expenditure> expenditures { get; } = new List<Expenditure>();
+        public ICollection<Income> Incomes { get; } = new List<Income>();
+        public ICollection<Expenditure> Expenditures { get; } = new List<Expenditure>();
     }
 
 }
