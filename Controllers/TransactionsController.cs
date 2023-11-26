@@ -54,9 +54,9 @@ namespace _2023pz_trrepo.Controllers
 
                 return Ok("Expenditure added successfully."); 
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred."); 
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
     }
