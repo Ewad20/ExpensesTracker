@@ -26,7 +26,7 @@ namespace _2023pz_trrepo.Controllers
                     return NotFound("Wallet not found");
                 }
 
-                wallet.Incomes.Add(income);_dbContext.SaveChanges();
+                wallet.incomes.Add(income);_dbContext.SaveChanges();
 
                 return Ok("Income added successfully.");
             }
@@ -49,7 +49,7 @@ namespace _2023pz_trrepo.Controllers
                     return NotFound("Wallet not found");
                 }
 
-                wallet.Expenditures.Add(expenditure);
+                wallet.expenditures.Add(expenditure);
                 _dbContext.SaveChanges();
 
                 return Ok("Expenditure added successfully."); 
