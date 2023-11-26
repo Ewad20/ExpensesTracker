@@ -14,17 +14,50 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("addIncome")]
-        public void AddIncome([FromBody] Income income)
+        public IActionResult AddIncome([FromBody] Income income)
         {
-            _dbContext.Incomes.Add(income);
-            _dbContext.SaveChanges();
+            try
+            {
+        
+                var wallet = _dbContext.Wallets.FirstOrDefault(w => w.Id == income.WalletId);
+
+                if (wallet == null)
+                {
+                    return NotFound("Wallet not found");
+                }
+
+                wallet.Incomes.Add(income);_dbContext.SaveChanges();
+
+                return Ok("Income added successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
+      
         [HttpPost("addExpenditure")]
-        public void AddExpenditure([FromBody] Expenditure expenditure)
+        public IActionResult AddExpenditure([FromBody] Expenditure expenditure)
         {
-            _dbContext.Expenditures.Add(expenditure);
-            _dbContext.SaveChanges();
+            try
+            {
+                var wallet = _dbContext.Wallets.FirstOrDefault(w => w.Id == expenditure.WalletId);
+
+                if (wallet == null)
+                {
+                    return NotFound("Wallet not found");
+                }
+
+                wallet.Expenditures.Add(expenditure);
+                _dbContext.SaveChanges();
+
+                return Ok("Expenditure added successfully."); 
+            }
+            catch
+            {
+                return StatusCode(500, "An error occurred."); 
+            }
         }
     }
 }
