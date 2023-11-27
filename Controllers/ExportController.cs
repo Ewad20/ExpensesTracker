@@ -32,12 +32,16 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("exportWallet")]
-        public IActionResult ExportWallet(string userName, string filePath){
-        
+        public IActionResult ExportWallet(string userName, string filePath)
+        {
+
             User user;
-            try{
-                user = _dbContext.Users.Where(x => x.Username.Equals(userName)).First();
-            }catch(Exception e){
+            try
+            {
+                user = _dbContext.Users.Where(x => x.UserName.Equals(userName)).First();
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine("Brak usera na liście!" + e.StackTrace);
                 return BadRequest("Brak usera na liście!");
             }
@@ -46,16 +50,11 @@ namespace _2023pz_trrepo.Controllers
 
             //if(!saveJsonFile(filePath, userWallets))
             //    return BadRequest("Nie udało się wyeksortować");
-            foreach(Wallet wallet in userWalletList){
+            foreach (Wallet wallet in userWalletList)
+            {
                 Console.WriteLine(wallet.Name);
             }
             return Ok();
-        }
-
-        [HttpPost("test")]
-        public void Test()
-        {
-            Console.WriteLine("TEST XD");
         }
     }
 }
