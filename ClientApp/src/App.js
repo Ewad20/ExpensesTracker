@@ -37,6 +37,7 @@ const App = () => {
                     <Route path="/import" element={<Import />} />
                     <Route path="/account/settings/twoFactorAuthentication" element={<TwoFactorAuthentication />} />
                 </Routes>
+
             </div>
         </Router>
     );
