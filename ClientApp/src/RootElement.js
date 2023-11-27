@@ -19,6 +19,10 @@ export default function RootElement() {
                         <li className="nav-item">
                             <a className="nav-link" href="/register">Register</a>
                         </li>
+                        <li className="nav-item">
+                            <a className="nav-link" href="/login">Login</a>
+                        </li>
+
                         {/* <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" id="dropdownId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                             <div className="dropdown-menu" aria-labelledby="dropdownId">
