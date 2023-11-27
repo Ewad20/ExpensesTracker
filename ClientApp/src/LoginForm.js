@@ -2,8 +2,8 @@
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LoginForm = ({ onLogin }) => {
-    const [loginIdentifier, setLoginIdentifier] = useState('');
+const LoginForm = () => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ const LoginForm = ({ onLogin }) => {
         e.preventDefault();
 
         const credentials = {
-            login: loginIdentifier,
+            login: username,
             password: password,
         };
 
