@@ -207,5 +207,30 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+       [HttpGet("transactionsForWallet/{walletId}")]
+        public IActionResult GetTransactionsForWallet(long walletId)
+        {
+            try
+            {
+                
+             var incomes = _dbContext.Incomes
+            .Where(i => i.WalletId == walletId)
+            .ToList();
+
+            
+             var expenditures = _dbContext.Expenditures
+            .Where(e => e.WalletId == walletId)
+            .ToList();
+
+        
+        var transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+
+        return Ok(transactions);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"An error occurred: {ex.Message}");
+    }
+}
     }
 }
