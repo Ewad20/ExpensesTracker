@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Transactions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace _2023pz_trrepo.Model
@@ -18,7 +16,6 @@ namespace _2023pz_trrepo.Model
         {
             modelBuilder.Entity<User>().HasKey(x => x.Id);
             modelBuilder.Entity<User>().Property(x => x.Id).ValueGeneratedOnAdd();
-            modelBuilder.Entity<User>().HasIndex(x => x.UserName).IsUnique();
             modelBuilder.Entity<User>().HasMany(u => u.wallets);
             modelBuilder.Entity<Wallet>().HasMany(u => u.incomes);
             modelBuilder.Entity<Wallet>().HasMany(u => u.expenditures);
