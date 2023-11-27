@@ -12,8 +12,8 @@ using _2023pz_trrepo.Model;
 namespace _2023pz_trrepo.Migrations
 {
     [DbContext(typeof(ETDbContext))]
-    [Migration("20231127191809_Init")]
-    partial class Init
+    [Migration("20231127194424_Init1")]
+    partial class Init1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -275,13 +275,9 @@ namespace _2023pz_trrepo.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("Users");
                 });

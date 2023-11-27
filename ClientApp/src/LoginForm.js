@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginForm = () => {
-    const [username, setUsername] = useState('');
+    const [loginIdentifier, setLoginIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ const LoginForm = () => {
         e.preventDefault();
 
         const credentials = {
-            login: username,
+            login: loginIdentifier, 
             password: password,
         };
 
@@ -27,7 +27,7 @@ const LoginForm = () => {
 
             if (response.ok) {
                 console.log('Login successful!');
-                navigate('/'); 
+                navigate('/');
             } else {
                 console.error('Login failed');
                 setLoginError('Invalid username or password');
@@ -43,13 +43,13 @@ const LoginForm = () => {
             <h2 className="mt-4">Login</h2>
             <form onSubmit={handleLogin} className="row g-3">
                 <div className="col-md-6">
-                    <label htmlFor="username" className="form-label">Username:</label>
+                    <label htmlFor="loginIdentifier" className="form-label">Username or Email:</label>
                     <input
                         type="text"
                         className="form-control"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        id="loginIdentifier"
+                        value={loginIdentifier}
+                        onChange={(e) => setLoginIdentifier(e.target.value)}
                         required
                     />
                 </div>
