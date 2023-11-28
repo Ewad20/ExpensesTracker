@@ -4,6 +4,7 @@ import RegisterForm from './RegisterForm';
 import RootElement from './RootElement';
 import TransactionList from './TransactionList';
 import LoginForm from './LoginForm';
+import WalletPage from './WalletPage';
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
                     <Route path="/register" element={<RegisterForm />} />
                     <Route path="/transaction" element={<TransactionList />} />
                     <Route path="/login" element={<LoginForm />} />
+                    <Route path="/wallet" element={<WalletPage />} />
                 </Routes>
 
             </div>
