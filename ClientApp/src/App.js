@@ -4,8 +4,7 @@ import RegisterForm from './RegisterForm';
 import RootElement from './RootElement';
 import TransactionList from './TransactionList';
 import LoginForm from './LoginForm';
-import Export from './Export';
-import Import from './Import';import WalletPage from './WalletPage';
+import WalletPage from './WalletPage';
 
 
 const App = () => {
