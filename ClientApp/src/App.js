@@ -5,7 +5,8 @@ import RootElement from './RootElement';
 import TransactionList from './TransactionList';
 import LoginForm from './LoginForm';
 import Export from './Export';
-import Import from './Import';
+import Import from './Import';import WalletPage from './WalletPage';
+
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                     <Route path="/login" element={<LoginForm />} />
                     <Route path="/export" element={<Export />} />
                     <Route path="/import" element={<Import />} />
+                    <Route path="/wallet" element={<WalletPage />} />
                 </Routes>
             </div>
         </Router>
