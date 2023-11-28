@@ -5,7 +5,7 @@
 namespace _2023pz_trrepo.Migrations
 {
     /// <inheritdoc />
-    public partial class FinalWalletUpdate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

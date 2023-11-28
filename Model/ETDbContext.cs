@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Transactions;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace _2023pz_trrepo.Model
@@ -15,11 +14,35 @@ namespace _2023pz_trrepo.Model
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+            modelBuilder.Entity<User>().HasKey(x => x.Id);
+            modelBuilder.Entity<User>().Property(x => x.Id).ValueGeneratedOnAdd();
             modelBuilder.Entity<User>().HasMany(u => u.wallets);
             modelBuilder.Entity<Wallet>().HasMany(u => u.incomes);
             modelBuilder.Entity<Wallet>().HasMany(u => u.expenditures);
-			base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+
+            modelBuilder.Entity<IdentityUserRole<string>>(b =>
+            {
+                b.HasKey(ur => new { ur.UserId, ur.RoleId });
+                b.ToTable("UserRoles");
+            });
+
+            modelBuilder.Entity<IdentityUserLogin<string>>(b =>
+            {
+                b.HasKey(x => new { x.LoginProvider, x.ProviderKey });
+                b.ToTable("UserLogins");
+            });
+
+            modelBuilder.Entity<IdentityUserToken<string>>(b =>
+            {
+                b.HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name });
+                b.ToTable("UserTokens");
+            });
+
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+            modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
