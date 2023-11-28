@@ -1,6 +1,7 @@
 ﻿using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -78,6 +79,16 @@ namespace _2023pz_trrepo.Controllers
 
 
                 var transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+                    WriteIndented = true // Opcjonalne - czy czytelnie sformatować JSON
+                };
+
+                options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                options.Converters.Add(new JsonStringDateTimeConverter());
 
                 return JsonSerializer.Serialize(transactions);
             }
