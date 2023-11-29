@@ -294,5 +294,43 @@ namespace _2023pz_trrepo.Controllers
                 return "";
             }
         }
-    }
+
+		[HttpGet("monthlySummary/{walletId}/{year}/{month}")]
+		public IActionResult GetMonthlySummary(long walletId, int year, int month)
+		{
+			try
+			{
+				var startDate = new DateTime(year, month, 1);
+				var endDate = startDate.AddMonths(1).AddDays(-1);
+
+				var incomes = _dbContext.Incomes
+					.Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+					.ToList();
+
+				var expenditures = _dbContext.Expenditures
+					.Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+					.ToList();
+
+				var totalIncome = incomes.Sum(i => i.Amount);
+				var totalExpenditure = expenditures.Sum(e => e.Amount);
+
+				var monthlySummary = new
+				{
+					WalletId = walletId,
+					Year = year,
+					Month = month,
+					TotalIncome = totalIncome,
+					TotalExpenditure = totalExpenditure,
+					NetBalance = totalIncome - totalExpenditure
+				};
+
+				return Ok(monthlySummary);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"An error occurred: {ex.Message}");
+			}
+		}
+
+	}
 }
