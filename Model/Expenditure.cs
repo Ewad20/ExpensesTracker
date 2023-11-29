@@ -2,7 +2,9 @@
 {
     public class Expenditure : AbstractTransaction
     {
-        public override string TransactionType()
+		public DateTime Date { get; set; }
+		public decimal Amount { get; set; }
+		public override string TransactionType()
         {
             return "Expenditure";
         }
