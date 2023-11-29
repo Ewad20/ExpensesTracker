@@ -2,7 +2,7 @@
 {
     public class Expenditure : AbstractTransaction
     {
-        public override string TransactionType()
+		public override string TransactionType()
         {
             return "Expenditure";
         }
