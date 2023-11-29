@@ -9,7 +9,7 @@ import LoginForm from './LoginForm';
 const App = () => {
     return (
         <Router>
-            <RootElement/>
+            <RootElement />
             <div>
                 <Routes>
                     <Route path="/register" element={<RegisterForm />} />

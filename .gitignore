@@ -230,3 +230,5 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+/Migrations/20231128102321_init.cs
+/Migrations/20231129191507_Init.cs
