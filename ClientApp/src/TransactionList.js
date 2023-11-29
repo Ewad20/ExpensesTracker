@@ -5,8 +5,7 @@ const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
-    const [filteredTransactions, setFilteredTransactions] = useState([]);
-    const walletId = 1; //Id testowe
+    const walletId = 2; //Id testowe
 
     const handleStartingDateChange = (event) => {
         setStartingDate(event.target.value);
@@ -17,34 +16,39 @@ const TransactionList = () => {
     };
 
     const handleFilterClick = () => {
-        if (!startingDate && !endingDate) {
-            setFilteredTransactions(transactions);
-        } else if (!startingDate) {
-            const filtered = transactions.filter((transaction) => {
-                let jsDate = new Date(transaction.Date);
-                return jsDate <= endingDate;
-            });
-            setFilteredTransactions(filtered);
-        } else if (!endingDate) {
-            const filtered = transactions.filter((transaction) => {
-                let jsDate = new Date(transaction.Date);
-                return jsDate >= startingDate;
-            });
-            setFilteredTransactions(filtered);
-        } else {
-            const filtered = transactions.filter((transaction) => {
-                let jsDate = new Date(transaction.Date);
-                if (jsDate >= startingDate && jsDate <= endingDate)
-                    return true;
-                return false;
-            });
-            setFilteredTransactions(filtered);
-        }
-        const sortedTransactions = filteredTransactions.slice().sort((a, b) => {
-            return new Date(b.date) - new Date(a.date);
-        });
+        const startDate = startingDate ? new Date(startingDate) : null;
+        const endDate = endingDate ? new Date(endingDate) : null;
 
-        setFilteredTransactions(sortedTransactions);
+        let formattedStartingDate = '';
+        let formattedEndingDate = '';
+
+        if (startDate)
+            formattedStartingDate = startDate.toISOString().split("T")[0];
+
+        if (endDate)
+            formattedEndingDate = endDate.toISOString().split("T")[0];
+
+        const fetchTransactions = async () => {
+            try {
+                const url = `https://localhost:7088/api/transaction/transactionsForWallet/${walletId}?`;
+
+                const queryParams = [
+                    startDate ? `startDate=${formattedStartingDate}` : null,
+                    endDate ? `endDate=${formattedEndingDate}` : null
+                ].filter(Boolean).join('&');
+
+                const response = await fetch(`${url}${queryParams}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setTransactions(data);
+            } catch (error) {
+                console.error('Error during fetching transactions:', error);
+        }
+        };
+
+        fetchTransactions();
     };
 
     useEffect(() => {
@@ -56,7 +60,6 @@ const TransactionList = () => {
                 }
                 const data = await response.json();
                 setTransactions(data);
-                setFilteredTransactions(data);
             } catch (error) {
                 console.error('Error during fetching transactions:', error);
             }
@@ -65,33 +68,25 @@ const TransactionList = () => {
         fetchTransactions();
     }, [walletId]);
 
-
-    useEffect(() => {
-        setFilteredTransactions([...filteredTransactions]);
-    }, [filteredTransactions]);
-
   return (
     <div>
           <h2>Transaction list for wallet {walletId}</h2>
           <h3>Filter results:</h3>
-          Starting date:
-          <input
+            Starting date: <input
               type="date"
               name="startingDatePicker"
               value={startingDate || ''}
               onChange={handleStartingDateChange}
-          />
-          <input
+            /> Ending date: <input
               type="date"
               name="endingDatePicker"
               value={endingDate || ''}
               onChange={handleEndingDateChange}
-          />
-          <button onClick={handleFilterClick}>Filter</button>
+            /> <button onClick={handleFilterClick}>Filter</button>
       <ul>
-          {filteredTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
               <li key={transaction.Id}>
-                  Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {transaction.Date}
+                        Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}
           </li>
         ))}
       </ul>
