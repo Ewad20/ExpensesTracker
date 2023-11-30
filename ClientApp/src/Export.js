@@ -11,8 +11,8 @@ function Export(){
     const [clearAll, setClearAll] = useState(false);
     const [alert, setAlert] = useState(null);
     
+    
     useEffect(() => {
-
         //[TODO] dodac przypisanie dla Id uzytkownika jego Id z cookies. Narazie cookies nie ma!
         let tempId = "5af3b420-bba0-4f54-9864-43825d68e49b"
 
@@ -25,7 +25,7 @@ function Export(){
             },
             body: JSON.stringify(tempId),
             });
-    
+
             if (response.ok) {
             const data = await response.json();
             console.log("All wallets were successfuly added.");
@@ -39,8 +39,11 @@ function Export(){
             console.error('Error exporting wallets:', error.message);
         }
         };
-        loadAllUserWallets();
 
+        loadAllUserWallets();
+    }, []);
+    
+    useEffect(() => {
         if (selectedWallets.length === 0) {
             console.log('No wallets selected!');
             setClearAll(false);
