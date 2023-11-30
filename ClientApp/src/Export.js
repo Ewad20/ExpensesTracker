@@ -39,7 +39,6 @@ function Export(){
             console.error('Error exporting wallets:', error.message);
         }
         };
-
         loadAllUserWallets();
     }, []);
     
@@ -133,7 +132,8 @@ function Export(){
                     </tr>
                 </thead>
                 {wallets.map((wallet) => (
-                <tbody key={wallet.Id} className={selectedWallets.includes(wallet.Id) ? 'table-active-custom' : undefined} onClick={() => handleRowClick(wallet.Id)}>
+                <tbody key={wallet.Id} className={selectedWallets.includes(wallet.Id) ? 'table-active-custom' 
+                : undefined} onClick={() => handleRowClick(wallet.Id)}>
                     <tr>
                         <th>{wallet.Id}</th>
                         <td>{wallet.IconId}</td>
@@ -147,7 +147,7 @@ function Export(){
             </table>
             <button className="btn btn-primary" onClick={handleJsonExport}>Export Wallet</button>
             {nothingSelected ? <div className="alert alert-danger" role="alert">
-                No wallet is selected to export!
+                Nie wybrano zadnego portfela do eksporu!
             </div>
             : undefined}
             {alert != null ?
