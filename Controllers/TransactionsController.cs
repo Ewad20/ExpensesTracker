@@ -151,6 +151,7 @@ namespace _2023pz_trrepo.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 return "";
             }
         }
