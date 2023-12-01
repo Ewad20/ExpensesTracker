@@ -1,6 +1,7 @@
 using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace _2023pz_trrepo.Controllers
@@ -31,14 +32,14 @@ namespace _2023pz_trrepo.Controllers
             return true;
         }
 
-        [HttpPost("exportWallet")]
+        [HttpPost("Wallet")]
         public IActionResult ExportWallet(string userName, string filePath)
         {
 
             User user;
             try
             {
-                user = _dbContext.Users.Where(x => x.UserName.Equals(userName)).First();
+                user = _dbContext.Users.Where(x => x.UserName!.Equals(userName)).First();
             }
             catch (Exception e)
             {
@@ -54,6 +55,27 @@ namespace _2023pz_trrepo.Controllers
             {
                 Console.WriteLine(wallet.Name);
             }
+            return Ok();
+        }
+
+        //get list of user wallets
+        [HttpPost("Wallets")]
+        public IActionResult GetUserWallets([FromBody] string userId)
+        {
+            List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId.Equals(userId)).ToList();
+
+            if(userWalletList.Count() == 0){
+                return StatusCode(404, "Nie znaleziono portfeli!");
+            }
+
+            string serializeWallets = JsonSerializer.Serialize(userWalletList);
+            return Ok(serializeWallets);
+        }
+
+        [HttpPost("test")]
+        public IActionResult Test()
+        {
+            Console.WriteLine("ExportController test OK()...");
             return Ok();
         }
     }
