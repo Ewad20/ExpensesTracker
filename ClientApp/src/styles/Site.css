@@ -1,0 +1,21 @@
+﻿.card{
+    background-color: #bebebe;
+    height: 25vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-items: center;
+}
+
+.cards-container{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
+}
+
+.wallet-icon{
+    width: 50px;
+
+}
+

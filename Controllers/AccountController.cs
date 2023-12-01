@@ -80,8 +80,10 @@ namespace _2023pz_trrepo.Controllers
 
 
         [HttpPost("addWallet")]
-        public void AddWallet([FromBody] Wallet wallet)
+        public void AddWallet([FromBody] string walletName)
         {
+            Wallet wallet = Wallet.Create(walletName);
+
             _dbContext.Wallets.Add(wallet);
             _dbContext.SaveChanges();
         }
