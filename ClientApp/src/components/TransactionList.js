@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from 'react';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);

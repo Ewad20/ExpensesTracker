@@ -1,7 +1,7 @@
-﻿import React, { useState } from 'react';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './/styles/Site.css';
+import './../styles/Site.css';
 
 const WalletPage = () => {
     const [walletName, setWalletName] = useState('');

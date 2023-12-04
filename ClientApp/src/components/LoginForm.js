@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginForm = () => {
     const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -12,7 +12,7 @@ const LoginForm = () => {
         e.preventDefault();
 
         const credentials = {
-            login: loginIdentifier, 
+            login: loginIdentifier,
             password: password,
         };
 
