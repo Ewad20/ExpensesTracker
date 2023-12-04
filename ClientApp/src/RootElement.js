@@ -88,7 +88,25 @@ const RootElement = () => {
                         </div>
                     </div>
                 )}
-    
+                {!user && location.pathname === '/' && (
+                    <div className="mt-4">
+                        <LoginForm onLogin={handleLogin} />
+                        <div className="d-flex flex-column align-items-center justify-content-center">
+                            <strong>
+                                <p className="my-text"> If you don't have an account, you can register here:</p>
+                                </strong>
+                            <Link to="/register" className="btn btn-primary">Register</Link>
+                        </div>
+                        <div className="mt-4">
+                            <div className="my-card">
+                                <img className="my-icons" src='https://cdn-icons-png.flaticon.com/128/4256/4256662.png' alt="Icon" />
+                                <p className="my-card-text">
+                                    The Expense Tracker Application is designed to help you effectively manage your finances with ease. Whether you're tracking daily expenses,
+                                    managing multiple wallets, or organizing your financial transactions, this application provides a comprehensive solution for your financial management needs.</p>
+                             </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
