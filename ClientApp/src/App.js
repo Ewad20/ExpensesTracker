@@ -7,6 +7,7 @@ import LoginForm from './LoginForm';
 import WalletPage from './WalletPage';
 import Export from './Export';
 import Import from './Import';
+import FinancialReport from './FinancialReport';
 
 const App = () => {
     return (
@@ -20,6 +21,7 @@ const App = () => {
                     <Route path="/wallet" element={<WalletPage />} />
                     <Route path="/export" element={<Export />} />
                     <Route path="/import" element={<Import />} />
+                    <Route path="/report" element={<FinancialReport />} />
                 </Routes>
             </div>
         </Router>
