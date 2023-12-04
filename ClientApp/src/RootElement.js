@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm'; 
 import './/styles/Site.css';
-import Calendar from './Calendar'; 
-import * as jquery2 from '../lib/jquery/jquery.js'
+import Calendar from './Calendar';
+import $ from 'jquery'
+import Chart from 'chart.js/auto'
 
 const RootElement = () => {
     const location = useLocation();
@@ -11,11 +12,10 @@ const RootElement = () => {
 
     const handleLogin = (userData) => {
         setUser(userData);
-        
-        $("#demo-calendar-basic").zabuto_calendar({
-            classname: 'table table-bordered lightgrey-weekends'
-        });
 
+        //$("#demo-calendar-basic").zabuto_calendar({
+        //    classname: 'table table-bordered lightgrey-weekends'
+        //});
 
         $(document).ready(function () {
             var ctx = document.getElementById("myChart").getContext("2d");
