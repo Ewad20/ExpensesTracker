@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LoginForm = () => {
+const LoginForm = ({ onLogin }) => {
     const [loginIdentifier, setLoginIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -12,7 +12,7 @@ const LoginForm = () => {
         e.preventDefault();
 
         const credentials = {
-            login: loginIdentifier, 
+            login: loginIdentifier,
             password: password,
         };
 
@@ -27,6 +27,7 @@ const LoginForm = () => {
 
             if (response.ok) {
                 console.log('Login successful!');
+                onLogin({ username: loginIdentifier });
                 navigate('/');
             } else {
                 console.error('Login failed');

@@ -1,6 +1,6 @@
-﻿.card{
+﻿.card {
     background-color: #bebebe;
-    height: 25vh;
+    height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,8 +14,47 @@
     grid-gap: 20px;
 }
 
-.wallet-icon{
-    width: 50px;
-
+.icons{
+    width: 70px;
 }
+
+.link {
+    color: black; 
+    text-decoration: none;
+}
+
+.dashboard-card {
+    background-color: #D4D2D5;
+    height: 200px;
+    width: 239px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-items: center;
+    margin-top: 30px;
+    border-radius: 10px;
+}
+.my-card {
+    background-color: #BFAFA6;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-items: center;
+    border-radius: 10px;
+    margin-top: 140px;
+}
+.my-icons {
+    width: 150px;
+    margin-left: 20px;
+}
+.my-card-text {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.my-text {
+    margin-top: 40px;
+}
+
 

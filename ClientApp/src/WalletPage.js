@@ -67,7 +67,7 @@ const WalletPage = () => {
                 {
                     Object.keys(wallets).map((keyname, i) => (
                     <div className="card">
-                        <img className="wallet-icon" src='https://cdn-icons-png.flaticon.com/512/493/493389.png' />
+                        <img className="icons" src='https://cdn-icons-png.flaticon.com/512/493/493389.png' />
                         <p>{wallets[i].name}</p>
                     </div>))
                 }
