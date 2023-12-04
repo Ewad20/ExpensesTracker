@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace _2023pz_trrepo.Model
 {
@@ -10,7 +11,9 @@ namespace _2023pz_trrepo.Model
         public string? Description { get; set; }
         public double Amount { get; set; }
         public DateTime Date {  get; set; }
+        [ForeignKey("WalletId")]
         public long WalletId { get; set; }
+        public Wallet Wallet;
         public long CategoryId { get; set; }
         public abstract string TransactionType();
     }

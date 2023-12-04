@@ -19,7 +19,7 @@ builder.Services.AddAuthentication(options =>
     .AddCookie(options =>
     {
         options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.Zero; 
+        options.ExpireTimeSpan = TimeSpan.Zero;
         options.SlidingExpiration = true;
         options.Cookie.SameSite = SameSiteMode.Strict;
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ETDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders();    
 
 builder.Services.AddAuthorization();
 
