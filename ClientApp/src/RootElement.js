@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm'; 
 import './/styles/Site.css';
-
+import Calendar from './Calendar'; 
+import * as jquery2 from '../lib/jquery/jquery.js'
 
 const RootElement = () => {
     const location = useLocation();
@@ -10,6 +11,37 @@ const RootElement = () => {
 
     const handleLogin = (userData) => {
         setUser(userData);
+        
+        $("#demo-calendar-basic").zabuto_calendar({
+            classname: 'table table-bordered lightgrey-weekends'
+        });
+
+
+        $(document).ready(function () {
+            var ctx = document.getElementById("myChart").getContext("2d");
+            const xValues = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 150];
+            const yValues = [7, 8, 8, 9, 9, 9, 10, 11, 14, 14, 15, 15];
+
+            new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        fill: false,
+                        lineTension: 0,
+                        backgroundColor: "rgba(200,200,200,1.0)",
+                        borderColor: "rgba(0,0,0,0.1)",
+                        data: yValues
+                    }]
+                },
+                options: {
+                    legend: { display: false },
+                    scales: {
+                        yAxes: [{ ticks: { min: 6, max: 16 } }],
+                    }
+                }
+            });
+        });
     };
 
     const handleLogout = () => {
@@ -51,7 +83,7 @@ const RootElement = () => {
             </nav>
             <div className="container mt-4">
                 {user && location.pathname === '/' && (
-                    <div className="mb-3">
+                    <><div className="mb-3">
                         <span class="fs-4"><strong>Welcome, {user.username}!</strong></span>
                         <p className="mt-2"><em>Explore your dashboard and manage your financial activities with ease.</em></p>
                         <div className="d-flex mt-3">
@@ -85,6 +117,35 @@ const RootElement = () => {
                                     <span>My Receipt</span>
                                 </div>
                             </Link>
+                        </div>
+                    </div>
+                        <div className="main-page-dashboard">
+                            <div className="dashboard-card dashboard-card__main-section">
+                                <canvas id="myChart" width="400" height="400"></canvas>
+                            </div>
+                            <div className="dashboard-card dashboard-card__main-section">
+                                <Calendar>
+
+                                </Calendar>
+                            </div>
+                        </div></>
+                )}
+                {!user && location.pathname === '/' && (
+                    <div className="mt-4">
+                        <LoginForm onLogin={handleLogin} />
+                        <div className="d-flex flex-column align-items-center justify-content-center">
+                            <strong>
+                                <p className="my-text"> If you don't have an account, you can register here:</p>
+                            </strong>
+                            <Link to="/register" className="btn btn-primary">Register</Link>
+                        </div>
+                        <div className="mt-4">
+                            <div className="my-card">
+                                <img className="my-icons" src='https://cdn-icons-png.flaticon.com/128/4256/4256662.png' alt="Icon" />
+                                <p className="my-card-text">
+                                    The Expense Tracker Application is designed to help you effectively manage your finances with ease. Whether you're tracking daily expenses,
+                                    managing multiple wallets, or organizing your financial transactions, this application provides a comprehensive solution for your financial management needs.</p>
+                            </div>
                         </div>
                     </div>
                 )}
