@@ -220,6 +220,7 @@ namespace _2023pz_trrepo.Controllers
             try
             {
                 List<AbstractTransaction> transactions = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransactions = new List<AbstractTransaction>();
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     var incomes = _dbContext.Incomes
@@ -284,10 +285,14 @@ namespace _2023pz_trrepo.Controllers
                     transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
-                List<AbstractTransaction> filteredTransactions = transactions
+                if (selectedCategory.HasValue) 
+                {
+                    filteredTransactions = transactions
                     .Where(transaction => transaction.CategoryId == selectedCategory)
                     .ToList();
-
+                }
+                else { filteredTransactions = transactions; }
+                
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
