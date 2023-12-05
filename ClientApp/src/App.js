@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegisterForm from './components/RegisterForm';
-import RootElement from './components/RootElement';
-import TransactionList from './components/TransactionList';
-import LoginForm from './components/LoginForm';
-import WalletPage from './components/WalletPage';
-import Export from './components/Export';
-import Import from './components/Import';
+import RegisterForm from './RegisterForm';
+import RootElement from './RootElement';
+import TransactionList from './TransactionList';
+import LoginForm from './LoginForm';
+import WalletPage from './WalletPage';
+import Export from './Export';
+import Import from './Import';
 
 
 const App = () => {
