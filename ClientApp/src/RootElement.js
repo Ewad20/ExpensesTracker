@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm';
 import './styles/Site.css';
 import $ from 'jquery';
+import Chart1 from './Chart1';
+import Chart2 from './Chart2';
 import Chart from 'chart.js/auto';
 
 const RootElement = () => {
@@ -11,69 +13,12 @@ const RootElement = () => {
 
     const handleLogin = (userData) => {
         setUser(userData);
-
-        $(document).ready(function () {
-            var ctx = document.getElementById("myChart").getContext("2d");
-
-            const xValues = ["Incomes", "Expenses"];
-            const yValues = [4, 8];
-
-            new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: xValues,
-                    datasets: [{
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: ["pink", "lightblue"],
-                        borderColor: "6C698D",
-                        data: yValues
-                    }]
-                },
-                options: {
-                    legend: { display: false },
-                    scales: {
-                        yAxes: [{ ticks: { min: 6, max: 16 } }],
-                    }
-                }
-            });
-        });
     };
-
-    useEffect(() => {
-        if (user) {
-            $(document).ready(function () {
-                var ctx2 = document.getElementById("myChart2").getContext("2d");
-
-                const xValues = ["Food", "Clothes", "Fuel", "Cosmetics"];
-                const yValues = [4, 8, 10, 6];
-
-                new Chart(ctx2, {
-                    type: "bar",
-                    data: {
-                        labels: xValues,
-                        datasets: [{
-                            fill: false,
-                            lineTension: 0,
-                            backgroundColor: ["pink", "lightblue"],
-                            borderColor: "6C698D",
-                           data: yValues,
-                        }],
-                    },
-                    options: {
-                        legend: { display: false },
-                        scales: {
-                            yAxes: [{ ticks: { min: 6, max: 16 } }],
-                        },
-                    },
-                });
-            });
-        }
-    }, [user]);
 
     const handleLogout = () => {
         setUser(null);
     };
+
 
     return (
         <div>
@@ -147,15 +92,8 @@ const RootElement = () => {
                         </div>
                     </div>
                         <div className="main-page-dashboard">
-                            <div className="dashboard-card dashboard-card__main-section chart-container2">
-                                <p style={{ fontWeight: 'bold', fontSize: '18px' }}> Incomes & Expences</p>
-                                <canvas id="myChart" width="200" height="200"></canvas>
-                            </div>
-
-                            <div className="dashboard-card dashboard-card__main-section chart-container">
-                                <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Expense Categories</p>
-                                <canvas id="myChart2" width="200" height="200"></canvas>
-                            </div>
+                            <Chart1 />
+                            <Chart2 />
                         </div></>
                 )}
                 {!user && location.pathname === '/' && (
