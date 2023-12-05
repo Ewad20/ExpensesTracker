@@ -3,8 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const walletId = 2; //Id testowe
 
     const handleStartingDateChange = (event) => {
@@ -14,6 +16,15 @@ const TransactionList = () => {
     const handleEndingDateChange = (event) => {
         setEndingDate(event.target.value);
     };
+
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
+
+    function findCategoryName(categoryId) {
+        const foundCategory = categories.find(category => category.id === categoryId);
+        return foundCategory ? foundCategory.name : 'Unknown';
+    }
 
     const handleFilterClick = () => {
         const startDate = startingDate ? new Date(startingDate) : null;
@@ -34,7 +45,8 @@ const TransactionList = () => {
 
                 const queryParams = [
                     startDate ? `startDate=${formattedStartingDate}` : null,
-                    endDate ? `endDate=${formattedEndingDate}` : null
+                    endDate ? `endDate=${formattedEndingDate}` : null,
+                    selectedCategory ? `selectedCategory=${selectedCategory}` : null
                 ].filter(Boolean).join('&');
 
                 const response = await fetch(`${url}${queryParams}`);
@@ -65,6 +77,20 @@ const TransactionList = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error during fetching transactions:', error);
+            }
+        };
+
+        fetchCategories();
         fetchTransactions();
     }, [walletId]);
 
@@ -82,11 +108,22 @@ const TransactionList = () => {
               name="endingDatePicker"
               value={endingDate || ''}
               onChange={handleEndingDateChange}
-            /> <button onClick={handleFilterClick}>Filter</button>
+          /> Category: <select
+              id="categorySelect"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+          >
+              <option value="">Select a category</option>
+              {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                      {category.name}
+                  </option>
+              ))}
+          </select> <button onClick={handleFilterClick}>Filter</button>
       <ul>
                 {transactions.map((transaction) => (
               <li key={transaction.Id}>
-                        Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}
+                        Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}, Category: {findCategoryName(transaction.categoryId)}
           </li>
         ))}
       </ul>
