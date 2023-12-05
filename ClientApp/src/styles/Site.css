@@ -5,6 +5,11 @@
     justify-content: center;
     align-items: center;
     align-items: center;
+    transition: all 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05)
 }
 
 .cards-container {
@@ -72,12 +77,13 @@
     height: 100%;
     padding: 40px;
 }
+
 .chart-container {
     width: 690px;
     height: 600px;
 }
+
 .chart-container2 {
-    width:  570px;
+    width: 570px;
     height: 600px;
 }
-

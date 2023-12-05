@@ -52,7 +52,6 @@ const TransactionList = () => {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log(data);
             if (data != "")
                 setTransactions(data);
             else
@@ -68,38 +67,45 @@ const TransactionList = () => {
 
     useEffect(() => {
         handleFilterClick();
-    }, [walletId, transactionType]); // Dodanie transactionType do zale�no�ci useEffect dla automatycznego filtrowania
+    }, [walletId, transactionType]);
 
     return (
-        <div>
-            <h2>Transaction list for wallet {walletId}</h2>
+        <div className='container-fluid'>
+            <h2 >Transaction list for wallet {walletId}</h2>
 
-            <div>
-                <button onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
-                <button onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
-                <button onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+            <div className='d-flex justify-content-center'>
+                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
+                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
+                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
             </div>
+            <div className='d-flex flex-column'>
+                <h3>Filter results:</h3>
+                <div className='mx-auto'>
+                    <span className='mx-2'>Starting date:</span><input
+                        type="date"
+                        name="startingDatePicker"
+                        value={startingDate || ''}
+                        onChange={handleStartingDateChange}
+                    />
+                    <span className='mx-2'>Ending date:</span> <input
+                        type="date"
+                        name="endingDatePicker"
+                        value={endingDate || ''}
+                        onChange={handleEndingDateChange}
+                    /> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
+                </div>
 
-            <h3>Filter results:</h3>
-            Starting date: <input
-                type="date"
-                name="startingDatePicker"
-                value={startingDate || ''}
-                onChange={handleStartingDateChange}
-            /> Ending date: <input
-                type="date"
-                name="endingDatePicker"
-                value={endingDate || ''}
-                onChange={handleEndingDateChange}
-            /> <button onClick={handleFilterClick}>Filter</button>
-
-            <ul>
+            </div>
+            <div className='row d-flex justify-content-center'>
                 {transactions.map((transaction, i) => (
-                    <li key={i}>
-                        Transaction ID: {transaction.id}, Title: {transaction.title}, Amount: {transaction.amount}, Date: {transaction.date}
+                    <li key={i} className='mx-5 my-3 card w-25'>
+                        <h2>{transaction.title}</h2>
+                        <h5>{transaction.amount} PLN</h5>
+                        <p>{new Date(transaction.date).toISOString().split('T')[0]}</p>
                     </li>
                 ))}
-            </ul>
+            </div>
+
         </div>
     );
 };

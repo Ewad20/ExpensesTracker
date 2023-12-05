@@ -92,13 +92,14 @@ const WalletPage = () => {
                     </form>
                 </div>
                 {wallets.map((wallet, i) => (
-                    <div key={i} onClick={() => handleWalletClick(wallet.id)} className="card">
+                    <div key={i} onClick={() => handleWalletClick(wallet.id)} className="card ">
                         <img
                             className="icons"
                             src="https://cdn-icons-png.flaticon.com/512/493/493389.png"
                             alt={`icon-${i}`}
                         />
-                        <p>{wallet.name}</p>
+                        <p style={{marginBottom:'0',paddingBottom:'0'}}>{wallet.name}</p>
+                        <p>{wallet.accountBalance} PLN</p>
                     </div>
                 ))}
             </div>

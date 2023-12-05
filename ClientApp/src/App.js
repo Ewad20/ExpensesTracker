@@ -22,8 +22,10 @@ const App = () => {
 
     return (
         <Router>
-            <RootElement user={user} onLogout={handleLogout} />
-            <div>
+            <div className='fixed-top'>
+                <RootElement user={user} onLogout={handleLogout} />
+            </div>
+            <div style={{marginTop:'80px'}}>
                 <Routes>
                     <Route path='/' Component={<App />}/>
                     <Route path="/register" element={<RegisterForm />} />

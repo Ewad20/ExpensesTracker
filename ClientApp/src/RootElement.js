@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm';
 import './styles/Site.css';
+import 'bootstrap/dist/js/bootstrap'
 import $ from 'jquery';
 import Chart from 'chart.js/auto';
 
