@@ -84,3 +84,12 @@ table.lightgrey-weekends tbody {
     height: 100%;
     padding: 40px;
 }
+.chart-container {
+    width: 690px;
+    height: 600px;
+}
+.chart-container2 {
+    width:  570px;
+    height: 600px;
+}
+
