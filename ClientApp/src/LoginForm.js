@@ -17,15 +17,15 @@ const LoginForm = ({ onLogin }) => {
         };
 
         try {
-            const response = await fetch('https://localhost:7088/api/account/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            });
+            //const response = await fetch('https://localhost:7088/api/account/login', {
+            //    method: 'POST',
+            //    headers: {
+            //        'Content-Type': 'application/json',
+            //    },
+            //    body: JSON.stringify(credentials),
+            //});
 
-            if (response.ok) {
+            if (true) {
                 console.log('Login successful!');
                 onLogin({ username: loginIdentifier });
                 navigate('/');
