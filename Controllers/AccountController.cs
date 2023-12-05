@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using Google.Authenticator;
+using System.Text;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -86,6 +89,94 @@ namespace _2023pz_trrepo.Controllers
 
             _dbContext.Wallets.Add(wallet);
             _dbContext.SaveChanges();
+        }
+
+        private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32) =>
+           secretIsBase32 ? Base32Encoding.ToBytes(secret) : Encoding.UTF8.GetBytes(secret);
+
+        [Authorize]
+        [HttpGet("GetTwoFactorStatus")]
+        public async Task<IActionResult> GetTwoFactorStatus()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user != null)
+                {
+                    bool TwoFactorStatus = user.TwoFactorEnabled;
+                    string GoogleAuthKey = "";
+                    string QrImageUrl = "";
+                    if (TwoFactorStatus == true && user.GoogleAuthKey != null)
+                    {
+                        GoogleAuthKey = user.GoogleAuthKey;
+                    }
+                    if (GoogleAuthKey!= "") {
+                        TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                        var setupInfo = TwoFacAuth.GenerateSetupCode("ExpensionTracker", "Code", ConvertSecretToBytes(GoogleAuthKey, false), 300);
+                        QrImageUrl = setupInfo.QrCodeSetupImageUrl;
+                    }
+                    return Ok(new { TwoFactorEnabled = TwoFactorStatus, GoogleKey = GoogleAuthKey, BarcodeImageUrl = QrImageUrl });
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error:" + ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("SetTwoFactorStatus")]
+        public async Task<IActionResult> SetTwoFactorStatus()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user != null)
+                {
+                    using (var reader = new StreamReader(Request.Body))
+                    {
+                        var body = await reader.ReadToEndAsync();
+                        var TwoFactorEnabled = JsonSerializer.Deserialize<bool>(body);
+
+                        user.TwoFactorEnabled = TwoFactorEnabled;
+                        if (TwoFactorEnabled == true)
+                        {
+                            const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                            Random random = new Random();
+                            string GoogleAuthKey = "";
+                            for (int i = 0; i < 16; i++)
+                            {
+                                GoogleAuthKey += validChars[random.Next(0, validChars.Length)];
+                            }
+                            user.GoogleAuthKey = GoogleAuthKey;
+                        }
+                        else
+                        {
+                            user.GoogleAuthKey = null;
+                        }
+
+                        await _dbContext.SaveChangesAsync();
+
+                        return Ok("Two Factor Authentication status updated");
+                    }
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error:" + ex.Message);
+            }
         }
 
         public class Credentials
