@@ -45,14 +45,18 @@ const TransactionList = () => {
                 endDate ? `endDate=${formattedEndingDate}` : null
             ].filter(Boolean).join('&');
 
-            const response = await fetch(`${url}?${queryParams}`,{
-            credentials:"include"
-        });
+            const response = await fetch(`${url}?${queryParams}`, {
+                credentials: "include"
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            setTransactions(data);
+            console.log(data);
+            if (data != "")
+                setTransactions(data);
+            else
+                setTransactions([]);
         } catch (error) {
             console.error('Error during fetching transactions:', error);
         }
@@ -90,9 +94,9 @@ const TransactionList = () => {
             /> <button onClick={handleFilterClick}>Filter</button>
 
             <ul>
-                {transactions.map((transaction) => (
-                    <li key={transaction.Id}>
-                        Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}
+                {transactions.map((transaction, i) => (
+                    <li key={i}>
+                        Transaction ID: {transaction.id}, Title: {transaction.title}, Amount: {transaction.amount}, Date: {transaction.date}
                     </li>
                 ))}
             </ul>

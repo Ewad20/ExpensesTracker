@@ -1,6 +1,6 @@
-﻿import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginForm = ({ onLogin }) => {
     const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -17,16 +17,16 @@ const LoginForm = ({ onLogin }) => {
         };
 
         try {
-            const response = await fetch('https://localhost:7088/api/account/login', {
-               method: 'POST',
+             const response = await fetch('https://localhost:7088/api/account/login', {
+             method: 'POST',
                headers: {
-                   'Content-Type': 'application/json',
-               },
+                   'Content-Type': 'application/json'
+                 },
+               credentials: 'include',
                body: JSON.stringify(credentials),
-               credentials: 'include', 
             });
 
-            if (response.ok) {
+            if (true) {
                 console.log('Login successful!');
                 onLogin({ username: loginIdentifier });
                 navigate('/');

@@ -104,7 +104,7 @@ namespace _2023pz_trrepo.Controllers
 
             var user = await _dbContext.Users
             .Include("Wallets")
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(u => u.Id==userId);
 
             if (user == null)
             {
