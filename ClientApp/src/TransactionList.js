@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [transactionType, setTransactionType] = useState('all'); // 'all', 'income', 'expenditure'
@@ -16,6 +17,33 @@ const TransactionList = () => {
     const handleEndingDateChange = (event) => {
         setEndingDate(event.target.value);
     };
+
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
+
+    function findCategoryName(categoryId) {
+        const foundCategory = categories.find(category => category.id === categoryId);
+        return foundCategory ? foundCategory.name : 'Unknown';
+    }
+
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
+
+    function findCategoryName(categoryId) {
+        const foundCategory = categories.find(category => category.id === categoryId);
+        return foundCategory ? foundCategory.name : 'Unknown';
+    }
+
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
+
+    function findCategoryName(categoryId) {
+        const foundCategory = categories.find(category => category.id === categoryId);
+        return foundCategory ? foundCategory.name : 'Unknown';
+    }
 
     const handleFilterClick = async () => {
         const startDate = startingDate ? new Date(startingDate) : null;
@@ -44,6 +72,11 @@ const TransactionList = () => {
                 startDate ? `startDate=${formattedStartingDate}` : null,
                 endDate ? `endDate=${formattedEndingDate}` : null
             ].filter(Boolean).join('&');
+                const queryParams = [
+                    startDate ? `startDate=${formattedStartingDate}` : null,
+                    endDate ? `endDate=${formattedEndingDate}` : null,
+                    selectedCategory ? `selectedCategory=${selectedCategory}` : null
+                ].filter(Boolean).join('&');
 
             const response = await fetch(`${url}?${queryParams}`, {
                 credentials: "include"
@@ -66,48 +99,71 @@ const TransactionList = () => {
     };
 
     useEffect(() => {
-        handleFilterClick();
-    }, [walletId, transactionType]);
+        const fetchTransactions = async () => {
+            try {
+                const response = await fetch(`https://localhost:7088/api/transaction/transactionsForWallet/${walletId}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setTransactions(data);
+            } catch (error) {
+                console.error('Error during fetching transactions:', error);
+            }
+        };
 
-    return (
-        <div className='container-fluid'>
-            <h2 >Transaction list for wallet {walletId}</h2>
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error during fetching transactions:', error);
+            }
+        };
 
-            <div className='d-flex justify-content-center'>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
-            </div>
-            <div className='d-flex flex-column'>
-                <h3>Filter results:</h3>
-                <div className='mx-auto'>
-                    <span className='mx-2'>Starting date:</span><input
-                        type="date"
-                        name="startingDatePicker"
-                        value={startingDate || ''}
-                        onChange={handleStartingDateChange}
-                    />
-                    <span className='mx-2'>Ending date:</span> <input
-                        type="date"
-                        name="endingDatePicker"
-                        value={endingDate || ''}
-                        onChange={handleEndingDateChange}
-                    /> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
-                </div>
+        fetchCategories();
+        fetchTransactions();
+    }, [walletId]);
 
-            </div>
-            <div className='row d-flex justify-content-center'>
-                {transactions.map((transaction, i) => (
-                    <li key={i} className='mx-5 my-3 card w-25'>
-                        <h2>{transaction.title}</h2>
-                        <h5>{transaction.amount} PLN</h5>
-                        <p>{new Date(transaction.date).toISOString().split('T')[0]}</p>
-                    </li>
-                ))}
-            </div>
-
-        </div>
-    );
+  return (
+    <div>
+          <h2>Transaction list for wallet {walletId}</h2>
+          <h3>Filter results:</h3>
+            Starting date: <input
+              type="date"
+              name="startingDatePicker"
+              value={startingDate || ''}
+              onChange={handleStartingDateChange}
+            /> Ending date: <input
+              type="date"
+              name="endingDatePicker"
+              value={endingDate || ''}
+              onChange={handleEndingDateChange}
+          /> Category: <select
+              id="categorySelect"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+          >
+              <option value="">Select a category</option>
+              {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                      {category.name}
+                  </option>
+              ))}
+          </select> <button onClick={handleFilterClick}>Filter</button>
+      <ul>
+                {transactions.map((transaction) => (
+              <li key={transaction.Id}>
+                        Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}, Category: {findCategoryName(transaction.categoryId)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default TransactionList;
