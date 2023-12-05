@@ -20,9 +20,9 @@ const LoginForm = ({ onLogin }) => {
              const response = await fetch('https://localhost:7088/api/account/login', {
              method: 'POST',
                headers: {
-                   'Content-Type': 'application/json',
-                    credentials:'include'
-               },
+                   'Content-Type': 'application/json'
+                 },
+               credentials: 'include',
                body: JSON.stringify(credentials),
             });
 

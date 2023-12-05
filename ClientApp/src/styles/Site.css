@@ -61,18 +61,6 @@
     margin-top: 40px;
 }
 
-.calendar {
-    width: 47rem;
-}
-
-table.lightgrey-weekends tbody {
-    background-color: #ffffff;
-}
-
-    table.lightgrey-weekends tbody td:nth-child(n+6) {
-        background-color: #737373;
-    }
-
 .main-page-dashboard {
     display: grid;
     grid-template-columns: 1fr 1fr;
