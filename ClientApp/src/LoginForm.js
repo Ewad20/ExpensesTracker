@@ -23,6 +23,7 @@ const LoginForm = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(credentials),
+                credentials: 'include',
             });
 
             if (response.ok) {
