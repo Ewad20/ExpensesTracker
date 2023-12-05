@@ -5,7 +5,8 @@ const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
-    const walletId = 1; //Id testowe
+    const [transactionType, setTransactionType] = useState('all'); // 'all', 'income', 'expenditure'
+    const walletId = 1; // Id testowe
 
     const handleStartingDateChange = (event) => {
         setStartingDate(event.target.value);
@@ -15,7 +16,7 @@ const TransactionList = () => {
         setEndingDate(event.target.value);
     };
 
-    const handleFilterClick = () => {
+    const handleFilterClick = async () => {
         const startDate = startingDate ? new Date(startingDate) : null;
         const endDate = endingDate ? new Date(endingDate) : null;
 
@@ -28,70 +29,72 @@ const TransactionList = () => {
         if (endDate)
             formattedEndingDate = endDate.toISOString().split("T")[0];
 
-        const fetchTransactions = async () => {
-            try {
-                const url = `https://localhost:7088/api/transaction/transactionsForWallet/${walletId}?`;
+        try {
+            let url = `https://localhost:7088/api/transaction/`;
+            if (transactionType === 'income') {
+                url += `incomesForWallet/${walletId}`;
+            } else if (transactionType === 'expenditure') {
+                url += `expendituresForWallet/${walletId}`;
+            } else {
+                url += `transactionsForWallet/${walletId}`;
+            }
 
-                const queryParams = [
-                    startDate ? `startDate=${formattedStartingDate}` : null,
-                    endDate ? `endDate=${formattedEndingDate}` : null
-                ].filter(Boolean).join('&');
+            const queryParams = [
+                startDate ? `startDate=${formattedStartingDate}` : null,
+                endDate ? `endDate=${formattedEndingDate}` : null
+            ].filter(Boolean).join('&');
 
-                const response = await fetch(`${url}${queryParams}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setTransactions(data);
-            } catch (error) {
-                console.error('Error during fetching transactions:', error);
+            const response = await fetch(`${url}?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setTransactions(data);
+        } catch (error) {
+            console.error('Error during fetching transactions:', error);
         }
-        };
+    };
 
-        fetchTransactions();
+    const handleTransactionTypeChange = (type) => {
+        setTransactionType(type);
     };
 
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                const response = await fetch(`https://localhost:7088/api/transaction/transactionsForWallet/${walletId}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setTransactions(data);
-            } catch (error) {
-                console.error('Error during fetching transactions:', error);
-            }
-        };
+        handleFilterClick();
+    }, [walletId, transactionType]); // Dodanie transactionType do zale¿noœci useEffect dla automatycznego filtrowania
 
-        fetchTransactions();
-    }, [walletId]);
+    return (
+        <div>
+            <h2>Transaction list for wallet {walletId}</h2>
 
-  return (
-    <div>
-          <h2>Transaction list for wallet {walletId}</h2>
-          <h3>Filter results:</h3>
+            <div>
+                <button onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
+                <button onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
+                <button onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+            </div>
+
+            <h3>Filter results:</h3>
             Starting date: <input
-              type="date"
-              name="startingDatePicker"
-              value={startingDate || ''}
-              onChange={handleStartingDateChange}
+                type="date"
+                name="startingDatePicker"
+                value={startingDate || ''}
+                onChange={handleStartingDateChange}
             /> Ending date: <input
-              type="date"
-              name="endingDatePicker"
-              value={endingDate || ''}
-              onChange={handleEndingDateChange}
+                type="date"
+                name="endingDatePicker"
+                value={endingDate || ''}
+                onChange={handleEndingDateChange}
             /> <button onClick={handleFilterClick}>Filter</button>
-      <ul>
+
+            <ul>
                 {transactions.map((transaction) => (
-              <li key={transaction.Id}>
+                    <li key={transaction.Id}>
                         Transaction ID: {transaction.Id}, Title: {transaction.Title}, Amount: {transaction.Amount}, Date: {new Date(transaction.Date).toLocaleString()}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
 export default TransactionList;
