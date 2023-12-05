@@ -1,12 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [transactionType, setTransactionType] = useState('all'); // 'all', 'income', 'expenditure'
-    const walletId = 1; // Id testowe
+    const { walletId } = useParams();
 
     const handleStartingDateChange = (event) => {
         setStartingDate(event.target.value);
@@ -44,7 +45,9 @@ const TransactionList = () => {
                 endDate ? `endDate=${formattedEndingDate}` : null
             ].filter(Boolean).join('&');
 
-            const response = await fetch(`${url}?${queryParams}`);
+            const response = await fetch(`${url}?${queryParams}`,{
+            credentials:"include"
+        });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -61,7 +64,7 @@ const TransactionList = () => {
 
     useEffect(() => {
         handleFilterClick();
-    }, [walletId, transactionType]); // Dodanie transactionType do zale¿noœci useEffect dla automatycznego filtrowania
+    }, [walletId, transactionType]); // Dodanie transactionType do zaleï¿½noï¿½ci useEffect dla automatycznego filtrowania
 
     return (
         <div>

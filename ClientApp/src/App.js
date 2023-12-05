@@ -26,7 +26,7 @@ const App = () => {
             <div>
                 <Routes>
                     <Route path="/register" element={<RegisterForm />} />
-                    <Route path="/transaction" element={<TransactionList />} />
+                    <Route path="/transaction/:walletId" element={<TransactionList />} />
                     <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
                     <Route path="/wallet" element={<WalletPage />} />
                     <Route path="/export" element={<Export />} />

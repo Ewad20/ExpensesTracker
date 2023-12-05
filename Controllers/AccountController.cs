@@ -81,8 +81,20 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [Authorize]
+        [HttpGet("getWallets")]
+        public async Task<JsonResult> getWallets(){
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return new JsonResult(Unauthorized("Session ended! Sign in again"));
+            }   
+            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
+            return new JsonResult(wallets);
+        }
+
+        [Authorize]
         [HttpPost("addWallet")]
-        public async Task<IActionResult> AddWallet([FromBody] Wallet wallet)
+        public async Task<IActionResult> AddWallet([FromBody] WalletRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
@@ -98,21 +110,19 @@ namespace _2023pz_trrepo.Controllers
             {
                 return NotFound("Unable to find user with this user id");
             }
+            Wallet wallet = new()
+            {
+                User = user,
+                UserId = userId,
+                Name = request.name,
+                IconId = 1,
+                AccountBalance = 0,
+                Incomes = new List<Income>(),
+                Expenditures = new List<Expenditure>()
+            };
 
-            wallet.Incomes = new List<Income>();
-            wallet.Expenditures = new List<Expenditure>();
             user.Wallets.Add(wallet);
-
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return BadRequest("Unable to resolve");
-            }
-
+            await _dbContext.SaveChangesAsync();
             return Ok("Wallet added succesfully");
         }
 
@@ -147,5 +157,10 @@ namespace _2023pz_trrepo.Controllers
             public string Email { get; set; }
             public string Password { get; set; }
         }
+    }
+
+    public class WalletRequest
+    {
+        public string name { get; set; }
     }
 }
