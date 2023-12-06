@@ -58,7 +58,7 @@ const RootElement = () => {
                             lineTension: 0,
                             backgroundColor: ["pink", "lightblue"],
                             borderColor: "6C698D",
-                           data: yValues,
+                            data: yValues,
                         }],
                     },
                     options: {
@@ -101,6 +101,9 @@ const RootElement = () => {
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/transaction">Transaction</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/account/settings/twoFactorAuthentication">TwoFactor</Link>
                             </li>
                         </ul>
                         {user ? (
@@ -165,7 +168,7 @@ const RootElement = () => {
                         <div className="d-flex flex-column align-items-center justify-content-center">
                             <strong>
                                 <p className="my-text"> If you don't have an account, you can register here:</p>
-                                </strong>
+                            </strong>
                             <Link to="/register" className="btn btn-primary">Register</Link>
                         </div>
                         <div className="mt-4">
@@ -174,7 +177,7 @@ const RootElement = () => {
                                 <p className="my-card-text">
                                     The Expense Tracker Application is designed to help you effectively manage your finances with ease. Whether you're tracking daily expenses,
                                     managing multiple wallets, or organizing your financial transactions, this application provides a comprehensive solution for your financial management needs.</p>
-                             </div>
+                            </div>
                         </div>
                     </div>
                 )}
