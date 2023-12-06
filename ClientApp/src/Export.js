@@ -14,16 +14,17 @@ function Export(){
     
     useEffect(() => {
         //[TODO] dodac przypisanie dla Id uzytkownika jego Id z cookies. Narazie cookies nie ma!
-        let tempId = "5af3b420-bba0-4f54-9864-43825d68e49b"
+        let tempId = "3f4d8c47-66fa-4857-b62b-c6726bed1272"
 
         const loadAllUserWallets = async () => {
         try {
-            const response = await fetch('http://localhost:5169/api/export/Wallets', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(tempId),
+            const response = await fetch('https://localhost:7088/api/export/Wallets', {
+             method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+                 },
+               credentials: 'include',
+               body: JSON.stringify(tempId),
             });
 
             if (response.ok) {

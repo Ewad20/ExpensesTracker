@@ -22,7 +22,7 @@ const RootElement = () => {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
+            <nav className="navbar navbar-expand-sm navbar-dark bg-dark w-100">
                 <div className="container-fluid">
                     <Link className="navbar-brand" to="/">Expenses tracker application</Link>
                     <button className="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId"

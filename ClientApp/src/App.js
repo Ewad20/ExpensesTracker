@@ -7,6 +7,7 @@ import LoginForm from './LoginForm';
 import WalletPage from './WalletPage';
 import Export from './Export';
 import Import from './Import';
+
 import TwoFactorAuthentication from './account/settings/TwoFactorAuthentication';
 
 
@@ -22,13 +23,14 @@ const App = () => {
     };
 
     return (
+
         <Router>
-            <div className='fixed-top'>
+            <div>
                 <RootElement user={user} onLogout={handleLogout} />
             </div>
-            <div style={{marginTop:'80px'}}>
+            <div style={{ marginTop: '80px' }}>
                 <Routes>
-                    <Route path='/' Component={<App />}/>
+                    <Route path='/' Component={<App />} />
                     <Route path="/register" element={<RegisterForm />} />
                     <Route path="/transaction/:walletId" element={<TransactionList />} />
                     <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
@@ -39,6 +41,7 @@ const App = () => {
                 </Routes>
             </div>
         </Router>
+
     );
 };
 
