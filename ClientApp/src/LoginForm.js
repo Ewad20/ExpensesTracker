@@ -26,7 +26,7 @@ const LoginForm = ({ onLogin }) => {
                body: JSON.stringify(credentials),
             });
 
-            if (true) {
+            if (response.ok) {
                 console.log('Login successful!');
                 onLogin({ username: loginIdentifier });
                 navigate('/');
