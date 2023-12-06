@@ -26,19 +26,17 @@ namespace _2023pz_trrepo.Controllers
         {
             try
             {
-                income.Date = DateTime.Now;
-                var wallet = _dbContext.Wallets.FirstOrDefault(w => w.Id == income.WalletId);
+                var wallet = await _dbContext.Wallets
+                .Include("Incomes")
+                .FirstOrDefaultAsync(w => w.Id == income.WalletId);
 
                 if (wallet == null)
                 {
                     return NotFound("Wallet not found");
                 }
-
-                wallet.incomes.Add(income);
+                wallet.Incomes.Add(income);
                 wallet.AccountBalance += income.Amount;
                 _dbContext.SaveChanges();
-
-                return Ok("Income added successfully.");
             }
             catch (Exception ex)
             {
@@ -49,24 +47,19 @@ namespace _2023pz_trrepo.Controllers
         }
 
 
+        [Authorize]
         [HttpPost("addExpenditure")]
         public async Task<IActionResult> AddExpenditure([FromBody] Expenditure expenditure)
         {
             try
             {
-                expenditure.Date = DateTime.Now;
-                var wallet = _dbContext.Wallets.FirstOrDefault(w => w.Id == expenditure.WalletId);
-
+                var wallet = await _dbContext.Wallets
+                .Include("Expenditures")
+                .FirstOrDefaultAsync(w => w.Id == expenditure.WalletId);
                 if (wallet == null)
                 {
                     return NotFound("Wallet not found");
                 }
-
-                wallet.expenditures.Add(expenditure);
-                wallet.AccountBalance -= expenditure.Amount;
-                _dbContext.SaveChanges();
-
-                return Ok("Expenditure added successfully.");
                 if (wallet.AccountBalance <= expenditure.Amount)
                 {
                     return BadRequest("Insuficient funds!");
@@ -215,7 +208,7 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("transactionsForWallet/{walletId}")]
-        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
+        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate)
         {
             try
             {
@@ -270,23 +263,19 @@ namespace _2023pz_trrepo.Controllers
 
                 else
                 {
-                    var incomes = _dbContext.Incomes
-                   .Where(i => i.WalletId == walletId)
-                        .OrderByDescending(i => i.Date)
-                   .ToList();
+                var incomes = _dbContext.Incomes
+               .Where(i => i.WalletId == walletId)
+                    .OrderByDescending(i => i.Date)
+               .ToList();
 
 
-                    var expenditures = _dbContext.Expenditures
-                   .Where(e => e.WalletId == walletId)
-                       .OrderByDescending(e => e.Date)
-                   .ToList();
+                var expenditures = _dbContext.Expenditures
+               .Where(e => e.WalletId == walletId)
+                   .OrderByDescending(e => e.Date)
+               .ToList();
 
                     transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
-
-                List<AbstractTransaction> filteredTransactions = transactions
-                    .Where(transaction => transaction.CategoryId == selectedCategory)
-                    .ToList();
 
                 var options = new JsonSerializerOptions
                 {
@@ -298,7 +287,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(filteredTransactions);
+                return JsonSerializer.Serialize(transactions);
             }
             catch (Exception ex)
             {
@@ -306,70 +295,42 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
-        [HttpGet("monthlySummary/{walletId}/{year}/{month}")]
-        public IActionResult GetMonthlySummary(long walletId, int year, int month)
-        {
-            try
-            {
-                var startDate = new DateTime(year, month, 1);
-                var endDate = startDate.AddMonths(1).AddDays(-1);
+		[HttpGet("monthlySummary/{walletId}/{year}/{month}")]
+		public IActionResult GetMonthlySummary(long walletId, int year, int month)
+		{
+			try
+			{
+				var startDate = new DateTime(year, month, 1);
+				var endDate = startDate.AddMonths(1).AddDays(-1);
 
-                var incomes = _dbContext.Incomes
-                    .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
-                    .ToList();
+				var incomes = _dbContext.Incomes
+					.Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+					.ToList();
 
-                var expenditures = _dbContext.Expenditures
-                    .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
-                    .ToList();
+				var expenditures = _dbContext.Expenditures
+					.Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+					.ToList();
 
-                var totalIncome = incomes.Sum(i => i.Amount);
-                var totalExpenditure = expenditures.Sum(e => e.Amount);
+				var totalIncome = incomes.Sum(i => i.Amount);
+				var totalExpenditure = expenditures.Sum(e => e.Amount);
 
-                var monthlySummary = new
-                {
-                    WalletId = walletId,
-                    Year = year,
-                    Month = month,
-                    TotalIncome = totalIncome,
-                    TotalExpenditure = totalExpenditure,
-                    NetBalance = totalIncome - totalExpenditure
-                };
+				var monthlySummary = new
+				{
+					WalletId = walletId,
+					Year = year,
+					Month = month,
+					TotalIncome = totalIncome,
+					TotalExpenditure = totalExpenditure,
+					NetBalance = totalIncome - totalExpenditure
+				};
 
-                return Ok(monthlySummary);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
+				return Ok(monthlySummary);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"An error occurred: {ex.Message}");
+			}
+		}
 
-        [HttpGet("allCategories")]
-        public string GetAllCategories()
-        {
-            try
-            {
-                List<Category> categories = new List<Category>();
-
-                var cat = _dbContext.Categories
-                .ToList();
-
-                categories = cat;
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-                    WriteIndented = true // Opcjonalne - czy czytelnie sformatować JSON
-                };
-
-                options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-
-                return JsonSerializer.Serialize(categories);
-            }
-            catch (Exception ex)
-            {
-                return "";
-            }
-        }
-    }
+	}
 }
