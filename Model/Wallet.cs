@@ -13,8 +13,6 @@ namespace _2023pz_trrepo.Model
         public long IconId { get; set; }
 
         public double AccountBalance { get; set; }
-
-        [ForeignKey("UserId")]
         public string UserId { get; set; }
         public User User;
         public ICollection<Expenditure> Expenditures { get; set; }

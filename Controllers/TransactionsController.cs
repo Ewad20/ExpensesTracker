@@ -64,6 +64,7 @@ namespace _2023pz_trrepo.Controllers
                 {
                     return BadRequest("Insuficient funds!");
                 }
+                expenditure.Wallet = wallet;
                 wallet.AccountBalance -= expenditure.Amount;
                 wallet.Expenditures.Add(expenditure);
                 _dbContext.SaveChanges();
