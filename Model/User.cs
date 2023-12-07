@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace _2023pz_trrepo.Model
 {
@@ -7,8 +6,10 @@ namespace _2023pz_trrepo.Model
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public ICollection<Wallet> Wallets { get; set; }
+
+        public string? GoogleAuthKey { get; set; }
         public ICollection<Wallet> wallets { get; } = new List<Wallet>();
         
     }
 }
-

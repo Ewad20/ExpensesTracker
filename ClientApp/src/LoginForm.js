@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LoginForm = () => {
+const LoginForm = ({ onLogin }) => {
     const [loginIdentifier, setLoginIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -12,21 +12,23 @@ const LoginForm = () => {
         e.preventDefault();
 
         const credentials = {
-            login: loginIdentifier, 
+            login: loginIdentifier,
             password: password,
         };
 
         try {
-            const response = await fetch('https://localhost:7088/api/account/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
+             const response = await fetch('https://localhost:7088/api/account/login', {
+             method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+                 },
+               credentials: 'include',
+               body: JSON.stringify(credentials),
             });
 
             if (response.ok) {
                 console.log('Login successful!');
+                onLogin({ username: loginIdentifier });
                 navigate('/');
             } else {
                 console.error('Login failed');

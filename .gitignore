@@ -66,6 +66,8 @@ dlldata.c
 *.svclog
 *.scc
 
+/Migrations
+
 # Chutzpah Test files
 _Chutzpah*
 
