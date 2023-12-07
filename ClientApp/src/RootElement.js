@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm';
 import './styles/Site.css';
-import $ from 'jquery';
 import Chart1 from './Chart1';
 import Chart2 from './Chart2';
-import Chart from 'chart.js/auto';
 
 const RootElement = () => {
     const location = useLocation();

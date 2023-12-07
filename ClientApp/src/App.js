@@ -31,7 +31,6 @@ const App = () => {
             </div>
             <div style={{ marginTop: '80px' }}>
                 <Routes>
-                    <Route path='/' Component={<App />} />
                     <Route path="/register" element={<RegisterForm />} />
                     <Route path="/transaction/:walletId" element={<TransactionList />} />
                     <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
