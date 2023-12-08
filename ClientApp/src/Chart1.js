@@ -1,4 +1,4 @@
-﻿// Chart1.js
+// Chart1.js
 import React, { useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
