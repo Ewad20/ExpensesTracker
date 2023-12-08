@@ -61,7 +61,9 @@ const TransactionList = () => {
                 selectedCategory ? `selectedCategory=${selectedCategory}` : null
             ].filter(Boolean).join('&');
 
-            const response = await fetch(`${url}?${queryParams}`);
+            const response = await fetch(`${url}?${queryParams}`, {
+                credentials: 'include',
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -76,7 +78,9 @@ const TransactionList = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`);
+                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`, {
+                    credentials: 'include',
+                });
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -134,8 +138,8 @@ const TransactionList = () => {
             </div>
             <div className='row my-3'>
                 {transactions.map((transaction, i) => (
-                    <div key={i} className='col my-3'>
-                        <div className='card h-100 text-center'>
+                    <div key={i} className='col my-3' style={{minWidth:"30%"}}>
+                        <div className='card h-100 w-100 text-center'>
                             <h2 className='w-75'>{transaction.Title}</h2>
                             <h5>{transaction.Amount} PLN</h5>
                             <p>{new Date(transaction.Date).toISOString().split('T')[0]}</p>

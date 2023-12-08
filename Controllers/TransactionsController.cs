@@ -345,14 +345,55 @@ namespace _2023pz_trrepo.Controllers
 
                 var incomes = _dbContext.Incomes
                     .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                    .Select(i => new
+                    {
+                        Date = i.Date,
+                        Title = i.Title,
+                        Amount = i.Amount,
+                        Category = i.CategoryId,
+                        Type = "income"
+                    })
                     .ToList();
 
                 var expenditures = _dbContext.Expenditures
                     .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                    .Select(e => new
+                    {
+                        Date = e.Date,
+                        Title = e.Title,
+                        Amount = e.Amount,
+                        Category = e.CategoryId,
+                        Type = "expenditure"
+                    })
+                    .ToList();
+
+                var transactions = incomes.Concat(expenditures)
+                    .OrderByDescending(t => t.Date)
                     .ToList();
 
                 var totalIncome = incomes.Sum(i => i.Amount);
                 var totalExpenditure = expenditures.Sum(e => e.Amount);
+
+                var incomeByCategory = incomes.
+                    GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
+                var expenditureByCategory = expenditures.
+                    GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
 
                 var monthlySummary = new
                 {
@@ -361,7 +402,10 @@ namespace _2023pz_trrepo.Controllers
                     Month = month,
                     TotalIncome = totalIncome,
                     TotalExpenditure = totalExpenditure,
-                    NetBalance = totalIncome - totalExpenditure
+                    NetBalance = totalIncome - totalExpenditure,
+                    Transactions = transactions,
+                    IncomeByCategory = incomeByCategory,
+                    ExpenditureByCategory = expenditureByCategory
                 };
 
                 return Ok(monthlySummary);
@@ -371,6 +415,7 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
         [Authorize]
         [HttpGet("allCategories")]
         public string GetAllCategories()
