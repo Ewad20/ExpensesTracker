@@ -5,6 +5,7 @@
   "dependencies": {
     "bootstrap": "^5.2.3",
     "chart.js": "^4.4.1",
+    "clean": "^4.0.2",
     "http-proxy-middleware": "^2.0.6",
     "jquery": "^3.6.4",
     "merge": "^2.1.1",

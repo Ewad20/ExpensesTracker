@@ -1,4 +1,4 @@
-﻿// Chart1.js
+// Chart1.js
 import React, { useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
@@ -30,9 +30,9 @@ const Chart1 = () => {
     }, []);
 
     return (
-        <div className="dashboard-card dashboard-card__main-section chart-container2">
+        <div className="card mx-auto my-5 h-auto background-my w-75">
             <p style={{ fontWeight: 'bold', fontSize: '18px' }}> Incomes & Expenses</p>
-            <canvas id="myChart" width="200" height="200"></canvas>
+            <canvas id="myChart" width="520" height="520"></canvas>
         </div>
     );
 };

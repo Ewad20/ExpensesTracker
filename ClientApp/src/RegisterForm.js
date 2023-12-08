@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
     const [firstName, setFirstName] = useState('');
@@ -8,6 +9,8 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [registerError, setRegisterError] = useState('');
+    const navigate = useNavigate();
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
@@ -31,7 +34,12 @@ const RegisterForm = () => {
         } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
             setPasswordError('Your password has to contain at least one special sign.');
             valid = false;
-        } else {
+        }
+        else if (!/[0-9]/.test(password)) {
+            setPasswordError('Your password has to contain at least one number.');
+            valid = false;
+        }
+        else {
             setPasswordError('');
         }
 
@@ -53,9 +61,12 @@ const RegisterForm = () => {
                 });
 
                 if (response.ok) {
-                    console.log('Registration successful!');
+                    setRegisterError('Registration successful! You will be redirected to the login page in 2 seconds.');
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 2000)
                 } else {
-                    console.error('Registration failed');
+                    setRegisterError('Registration failed');
                 }
             } catch (error) {
                 console.error('Error during registration', error);
@@ -131,6 +142,7 @@ const RegisterForm = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary">Sign Up</button>
+                <p>{registerError}</p>
             </form>
         </div>
     );

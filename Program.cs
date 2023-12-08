@@ -27,7 +27,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ETDbContext>()
-    .AddDefaultTokenProviders();    
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthorization();
 
