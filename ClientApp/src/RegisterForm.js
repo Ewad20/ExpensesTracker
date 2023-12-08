@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
     const [firstName, setFirstName] = useState('');
@@ -8,6 +9,8 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [registerError, setRegisterError] = useState('');
+    const navigate = useNavigate();
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
@@ -53,9 +56,12 @@ const RegisterForm = () => {
                 });
 
                 if (response.ok) {
-                    console.log('Registration successful!');
+                    setRegisterError('Registration successful');
+                    setTimeout(() => {
+                        navigate('/login');
+                    })
                 } else {
-                    console.error('Registration failed');
+                    setRegisterError('Registration failed');
                 }
             } catch (error) {
                 console.error('Error during registration', error);
@@ -132,6 +138,7 @@ const RegisterForm = () => {
 
                 <button type="submit" className="btn btn-primary">Sign Up</button>
             </form>
+            <p>{registerError}</p>
         </div>
     );
 };

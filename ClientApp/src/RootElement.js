@@ -1,5 +1,6 @@
 import React, { useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import 'bootstrap/dist/js/bootstrap.js';
 import LoginForm from './LoginForm';
 import './styles/Site.css';
 import Chart1 from './Chart1';
