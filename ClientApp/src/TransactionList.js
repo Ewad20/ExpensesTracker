@@ -28,8 +28,8 @@ const TransactionList = () => {
     };
 
     function findCategoryName(categoryId) {
-        const foundCategory = categories.find(category => category.id === categoryId);
-        return foundCategory ? foundCategory.name : 'Unknown';
+        const foundCategory = categories.find(category => category.Id === categoryId);
+        return foundCategory ? foundCategory.Name : 'Unknown';
     }
 
     const handleFilterClick = async () => {
@@ -123,10 +123,10 @@ const TransactionList = () => {
                         id="categorySelect"
                         onChange={handleCategoryChange}
                     >
-                        <option value="">Select a category</option>
+                        <option value="">No category</option>
                         {categories.map(category => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
+                            <option key={category.Id} value={category.Id}>
+                                {category.Name}
                             </option>
                         ))}
                     </select> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
@@ -138,7 +138,7 @@ const TransactionList = () => {
                         <h2>{transaction.Title}</h2>
                         <h5>{transaction.Amount} PLN</h5>
                         <p>{new Date(transaction.Date).toISOString().split('T')[0]}</p>
-                        <p>{findCategoryName(transaction.categoryId)}</p>
+                        <p>{findCategoryName(transaction.CategoryId)}</p>
                     </li>
                 ))}
             </div>

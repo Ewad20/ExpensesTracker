@@ -78,11 +78,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("transactionsForWallet/{walletId}")]
-        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
-                List<AbstractTransaction> transactions = new List<AbstractTransaction>();
+                List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     var incomes = _dbContext.Incomes
@@ -96,7 +98,7 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else if (startDate.HasValue && !endDate.HasValue)
@@ -112,7 +114,7 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else if (!startDate.HasValue && endDate.HasValue)
@@ -128,7 +130,7 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else
@@ -144,8 +146,16 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
+
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
 
                 var options = new JsonSerializerOptions
                 {
@@ -157,7 +167,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transactions);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
@@ -167,11 +177,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("incomesForWallet/{walletId}")]
-        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     var incomes = _dbContext.Incomes
@@ -213,6 +225,14 @@ namespace _2023pz_trrepo.Controllers
                     transaction = incomes.Cast<AbstractTransaction>().ToList();
                 }
 
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -223,7 +243,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transaction);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
@@ -233,11 +253,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("expendituresForWallet/{walletId}")]
-        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
 
@@ -282,6 +304,14 @@ namespace _2023pz_trrepo.Controllers
                     transaction = expenditures.Cast<AbstractTransaction>().ToList();
                 }
 
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -292,7 +322,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transaction);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
