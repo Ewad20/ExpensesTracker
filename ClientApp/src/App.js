@@ -9,38 +9,24 @@ import Export from './Export';
 import Import from './Import';
 import FinancialReport from './FinancialReport';
 
+
 import TwoFactorAuthentication from './account/settings/TwoFactorAuthentication';
 
 
 const App = () => {
-    const [user, setUser] = useState(null);
-
-    const handleLogin = (userData) => {
-        setUser(userData);
-    };
-
-    const handleLogout = () => {
-        setUser(null);
-    };
-
     return (
 
         <Router>
-            <div>
-                <RootElement user={user} onLogout={handleLogout} />
-            </div>
-            <div style={{ marginTop: '80px' }}>
-                <Routes>
-                    <Route path="/register" element={<RegisterForm />} />
-                    <Route path="/transaction/:walletId" element={<TransactionList />} />
-                    <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
-                    <Route path="/wallet" element={<WalletPage />} />
-                    <Route path="/export" element={<Export />} />
-                    <Route path="/import" element={<Import />} />
-                    <Route path="/report" element={<FinancialReport />} />
-                    <Route path="/account/settings/twoFactorAuthentication" element={<TwoFactorAuthentication />} />
-                </Routes>
-            </div>
+            <RootElement />
+            <Routes>
+                <Route path="/register" element={<RegisterForm />} />
+                <Route path="/transaction/:walletId" element={<TransactionList />} />
+                <Route path="/wallet" element={<WalletPage />} />
+                <Route path="/export" element={<Export />} />
+                <Route path="/import" element={<Import />} />
+                <Route path="/report" element={<FinancialReport />} />
+                <Route path="/account/settings/twoFactorAuthentication" element={<TwoFactorAuthentication />} />
+            </Routes>
         </Router>
 
     );

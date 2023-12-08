@@ -29,9 +29,9 @@ const Chart2 = () => {
     }, []);
 
     return (
-        <div className="dashboard-card dashboard-card__main-section chart-container">
+        <div className="card mx-auto my-5 h-auto background-my w-75"  >
             <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Expense Categories</p>
-            <canvas id="myChart2" width="200" height="200"></canvas>
+            <canvas id="myChart2" width="520" height="520"></canvas>
         </div>
     );
 };

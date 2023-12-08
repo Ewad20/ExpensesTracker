@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 const TransactionList = () => {
@@ -96,7 +96,7 @@ const TransactionList = () => {
     }, [walletId, transactionType]);
 
     return (
-        <div className='container-fluid'>
+        <div className='container'>
             <h2>Transaction list for wallet {walletId}</h2>
 
             <div className='d-flex justify-content-center'>
@@ -132,14 +132,16 @@ const TransactionList = () => {
                     </select> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
                 </div>
             </div>
-            <div className='row d-flex justify-content-center'>
+            <div className='row my-3'>
                 {transactions.map((transaction, i) => (
-                    <li key={i} className='mx-5 my-3 card w-25'>
-                        <h2>{transaction.Title}</h2>
-                        <h5>{transaction.Amount} PLN</h5>
-                        <p>{new Date(transaction.Date).toISOString().split('T')[0]}</p>
-                        <p>{findCategoryName(transaction.categoryId)}</p>
-                    </li>
+                    <div key={i} className='col my-3'>
+                        <div className='card h-100 text-center'>
+                            <h2 className='w-75'>{transaction.Title}</h2>
+                            <h5>{transaction.Amount} PLN</h5>
+                            <p>{new Date(transaction.Date).toISOString().split('T')[0]}</p>
+                            <p>{findCategoryName(transaction.categoryId)}</p>
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>

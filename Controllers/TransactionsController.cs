@@ -77,6 +77,7 @@ namespace _2023pz_trrepo.Controllers
             return Ok("Expenditure added successfully.");
         }
 
+        [Authorize]
         [HttpGet("transactionsForWallet/{walletId}")]
         public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate)
         {
@@ -166,6 +167,7 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("incomesForWallet/{walletId}")]
         public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate)
         {
@@ -231,7 +233,8 @@ namespace _2023pz_trrepo.Controllers
                 return "";
             }
         }
-
+        
+        [Authorize]
         [HttpGet("expendituresForWallet/{walletId}")]
         public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate)
         {
@@ -301,6 +304,7 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("monthlySummary/{walletId}/{year}/{month}")]
         public IActionResult GetMonthlySummary(long walletId, int year, int month)
         {
@@ -337,7 +341,7 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
+        [Authorize]
         [HttpGet("allCategories")]
         public string GetAllCategories()
         {

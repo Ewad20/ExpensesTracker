@@ -27,6 +27,19 @@ namespace _2023pz_trrepo.Controllers
             _signInManager = signInManager;
         }
 
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try{
+            await _signInManager.SignOutAsync();
+            }
+            catch(Exception exception){
+                return BadRequest("Unable to logout. " + exception.ToString());
+            }
+            return Ok("Sucsessfully logged out!");
+        }
+
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] Credentials cred)
         {
@@ -77,7 +90,7 @@ namespace _2023pz_trrepo.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest("Registration failed." + "\n" + result.ToString());
+                return BadRequest("Registration failed. " + result.ToString());
             }
 
             return Ok("Registartion succeded");

@@ -34,7 +34,12 @@ const RegisterForm = () => {
         } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
             setPasswordError('Your password has to contain at least one special sign.');
             valid = false;
-        } else {
+        }
+        else if (!/[0-9]/.test(password)) {
+            setPasswordError('Your password has to contain at least one number.');
+            valid = false;
+        }
+        else {
             setPasswordError('');
         }
 
@@ -56,10 +61,10 @@ const RegisterForm = () => {
                 });
 
                 if (response.ok) {
-                    setRegisterError('Registration successful');
+                    setRegisterError('Registration successful! You will be redirected to the login page in 2 seconds.');
                     setTimeout(() => {
-                        navigate('/login');
-                    })
+                        navigate('/');
+                    }, 2000)
                 } else {
                     setRegisterError('Registration failed');
                 }
@@ -137,8 +142,8 @@ const RegisterForm = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary">Sign Up</button>
+                <p>{registerError}</p>
             </form>
-            <p>{registerError}</p>
         </div>
     );
 };
