@@ -2,9 +2,6 @@
 {
     public class Expenditure : AbstractTransaction
     {
-		public override string TransactionType()
-        {
-            return "Expenditure";
-        }
+		public override string TransactionType { get => "expenditure"; }
     }
 }

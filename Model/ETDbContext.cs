@@ -16,24 +16,35 @@ namespace _2023pz_trrepo.Model
         {
             modelBuilder.Entity<User>().HasKey(x => x.Id);
             modelBuilder.Entity<User>().Property(x => x.Id).ValueGeneratedOnAdd();
+
             modelBuilder.Entity<Wallet>().HasKey(x => x.Id);
             modelBuilder.Entity<Wallet>()
                 .HasOne(w => w.User)
                 .WithMany(u => u.Wallets)
                 .HasForeignKey(w => w.UserId);
 
-            modelBuilder.Entity<Income>(x=> {
+            modelBuilder.Entity<Category>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Income>(x =>
+            {
                 x.HasKey(i => i.Id);
                 x.HasOne(i => i.Wallet)
                 .WithMany(w => w.Incomes)
                 .HasForeignKey(i => i.WalletId);
+                x.HasOne(i => i.Category)
+               .WithMany()
+               .HasForeignKey(i => i.CategoryId);
             });
 
-            modelBuilder.Entity<Expenditure>(x=> {
-                x.HasKey(i => i.Id);
-                x.HasOne(i => i.Wallet)
+            modelBuilder.Entity<Expenditure>(x =>
+            {
+                x.HasKey(e => e.Id);
+                x.HasOne(e => e.Wallet)
                 .WithMany(w => w.Expenditures)
-                .HasForeignKey(i => i.WalletId);
+                .HasForeignKey(e => e.WalletId);
+                x.HasOne(e => e.Category)
+               .WithMany()
+               .HasForeignKey(e => e.CategoryId);
             });
 
             modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
