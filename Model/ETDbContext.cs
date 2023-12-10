@@ -23,7 +23,10 @@ namespace _2023pz_trrepo.Model
                 .WithMany(u => u.Wallets)
                 .HasForeignKey(w => w.UserId);
 
-            modelBuilder.Entity<Category>().HasKey(x => x.Id);
+            modelBuilder.Entity<Category>(x =>
+            {
+                x.HasKey(c => c.Id);
+            });
 
             modelBuilder.Entity<Income>(x =>
             {
@@ -34,6 +37,7 @@ namespace _2023pz_trrepo.Model
                 x.HasOne(i => i.Category)
                .WithMany()
                .HasForeignKey(i => i.CategoryId);
+                x.Property(x => x.Date).HasColumnType("Date");
             });
 
             modelBuilder.Entity<Expenditure>(x =>
@@ -45,6 +49,7 @@ namespace _2023pz_trrepo.Model
                 x.HasOne(e => e.Category)
                .WithMany()
                .HasForeignKey(e => e.CategoryId);
+                x.Property(x => x.Date).HasColumnType("Date");
             });
 
             modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");

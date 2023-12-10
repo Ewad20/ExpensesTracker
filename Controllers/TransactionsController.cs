@@ -35,6 +35,28 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [Authorize]
+        [HttpPost("addCategoryAuthorized")]
+        public async Task<IActionResult> AddCategoryAuthorized([FromBody] Category category)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.Include("UserCategories").FirstOrDefaultAsync(u => u.Id == userId);
+                if(user == null) {
+                    return NotFound("User not found");
+                }
+                category.UserId = userId;
+                await _dbContext.Categories.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Unable to add category! Error: " + e.Message);
+            }
+            return Ok("Category added successfully!");
+        }
+
+        [Authorize]
         [HttpPost("addIncome")]
         public async Task<IActionResult> AddIncome([FromBody] Income income)
         {
@@ -122,8 +144,9 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("transactionsForWallet/{walletId}")]
-        public string GetTransactionsForWallet(long walletId, DateOnly? startDate, DateOnly? endDate, long? selectedCategory)
+        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
+            
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
@@ -222,7 +245,7 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("incomesForWallet/{walletId}")]
-        public string GetIncomesForWallet(long walletId, DateOnly? startDate, DateOnly? endDate, long? selectedCategory)
+        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
@@ -299,7 +322,7 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("expendituresForWallet/{walletId}")]
-        public string GetExpendituresForWallet(long walletId, DateOnly? startDate, DateOnly? endDate, long? selectedCategory)
+        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
@@ -383,7 +406,7 @@ namespace _2023pz_trrepo.Controllers
         {
             try
             {
-                var startDate = new DateOnly(year, month, 1);
+                var startDate = new DateTime(year, month, 1);
                 var endDate = startDate.AddMonths(1).AddDays(-1);
 
                 var incomes = _dbContext.Incomes
@@ -414,15 +437,21 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
         [Authorize]
         [HttpGet("allCategories")]
         public string GetAllCategories()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+                return "";
             try
             {
                 List<Category> categories = new List<Category>();
 
                 var cat = _dbContext.Categories
+                .Where(x => x.UserId == userId || x.UserId == null)
                 .ToList();
 
                 categories = cat;
