@@ -97,6 +97,10 @@ function Export() {
       const selectedWalletData = wallets.filter((wallet) =>
         selectedWallets.includes(wallet.Id)
       );
+      const selectedWalletDataWithoutId = selectedWalletData.map(
+        ({ Id, ...rest }) => rest
+      );
+
       const jsonBlob = new Blob([JSON.stringify(selectedWalletDataWithoutId)], {
         type: "application/json",
       });
