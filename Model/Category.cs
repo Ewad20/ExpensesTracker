@@ -21,5 +21,7 @@ namespace _2023pz_trrepo.Model
 		[ForeignKey("UserId")]
 		public string? UserId { get; set; }
 		public long IconId { get; set; }
-	}
+        public bool IsDefault { get; set; }
+
+    }
 }

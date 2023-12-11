@@ -42,7 +42,6 @@
 
   <ItemGroup>
     <Folder Include="Model\Converters\" />
-    <Folder Include="Migrations\" />
     <Folder Include="Pages\Account\" />
   </ItemGroup>
 

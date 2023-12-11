@@ -14,9 +14,32 @@ namespace _2023pz_trrepo.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly ETDbContext _dbContext;
+
         public TransactionsController(ETDbContext dbContext)
         {
             _dbContext = dbContext;
+            var Clothes = _dbContext.Categories.FirstOrDefault(c => c.Name == "Clothes");
+            var Food = _dbContext.Categories.FirstOrDefault(c => c.Name == "Food");
+            var Work = _dbContext.Categories.FirstOrDefault(c => c.Name == "Work");
+
+            if (Clothes == null)
+            {
+                Clothes = new Category { Name = "Clothes", Type = CategoryType.Expenditure, IsDefault = true };
+                _dbContext.Categories.Add(Clothes);
+            }
+
+            if (Food == null)
+            {
+                Food = new Category { Name = "Food", Type = CategoryType.Expenditure, IsDefault = true };
+                _dbContext.Categories.Add(Food);
+            }
+
+            if (Work == null)
+            {
+                Work = new Category { Name = "Work", Type = CategoryType.Income, IsDefault = true };
+                _dbContext.Categories.Add(Work);
+            }
+            _dbContext.SaveChanges();
         }
 
         [HttpPost("addCategory")]
@@ -473,5 +496,54 @@ namespace _2023pz_trrepo.Controllers
                 return "";
             }
         }
+
+        [HttpPost("editCategory/{categoryId}")]
+        public async Task<IActionResult> EditCategory(long categoryId, [FromBody] Category updatedCategory)
+        {
+            try
+            {
+                var existingCategory = await _dbContext.Categories.FindAsync(categoryId);
+
+                if (existingCategory == null)
+                {
+                    return NotFound("Category not found");
+                }
+
+                existingCategory.Name = updatedCategory.Name;
+                existingCategory.Type = updatedCategory.Type;
+
+                _dbContext.Categories.Update(existingCategory);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Unable to edit category! Error: " + e.Message);
+            }
+            return Ok("Category edited successfully!");
+        }
+
+        [HttpDelete("deleteCategory/{categoryId}")]
+        public async Task<IActionResult> DeleteCategory(long categoryId)
+        {
+            try
+            {
+                var categoryToDelete = await _dbContext.Categories.FindAsync(categoryId);
+
+                if (categoryToDelete == null)
+                {
+                    return NotFound("Category not found");
+                }
+
+                _dbContext.Categories.Remove(categoryToDelete);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Unable to delete category! Error: " + e.Message);
+            }
+            return Ok("Category deleted successfully!");
+        }
+
     }
 }
+ 
