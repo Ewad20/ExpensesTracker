@@ -32,8 +32,7 @@ const TransactionForm = ({onSubmit, walletId }) => {
         const selectedCategory = categories.find(category => category.Id === parseInt(value));
         setNewTransaction(prevTransaction => ({
             ...prevTransaction,
-            categoryId: selectedCategory ? selectedCategory.Id : '',
-            category: value,
+            categoryId: selectedCategory ? selectedCategory.Id : ''
         }));
     };
     const fetchCategories = async () => {
@@ -57,10 +56,6 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
     const handleTypeSelection = (type) => {
         setTransactionType(type);
-        setNewTransaction(prevTransaction => ({
-            ...prevTransaction,
-            type: type, 
-        }));
         setFormVisible(true);
     };
 
@@ -69,12 +64,12 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
         try {
             let url = '';
-            if (newTransaction.type === 'income') {
+            if (transactionType === 'income') {
                 url = 'https://localhost:7088/api/transaction/addIncome';
             } else {
                 url = 'https://localhost:7088/api/transaction/addExpenditure';
             }
-
+            console.log(newTransaction);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -86,7 +81,6 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
             if (response.ok) {
                 console.log('Transaction added!');
-                await onSubmit(newTransaction);
                 setFormVisible(false); 
             } else {
                 console.error(response);
