@@ -2,6 +2,7 @@ using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace _2023pz_trrepo.Controllers
@@ -60,8 +61,14 @@ namespace _2023pz_trrepo.Controllers
 
         //get list of user wallets
         [HttpPost("Wallets")]
-        public IActionResult GetUserWallets([FromBody] string userId)
+        public IActionResult GetUserWallets()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return StatusCode(401, "Uzytkownik nie jest zalogowany!");
+            }   
+            
             List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId.Equals(userId)).ToList();
 
             if(userWalletList.Count() == 0){
