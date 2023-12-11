@@ -1,8 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import AddIncomeForm from './AddIncomeForm';
-import AddExpenditureForm from './AddExpenditureForm';
+import TransactionForm from './TransactionForm';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
@@ -11,8 +10,7 @@ const TransactionList = () => {
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [showAddIncomeForm, setShowAddIncomeForm] = useState(false);
-    const [showAddExpenditureForm, setShowAddExpenditureForm] = useState(false);
+    const [showForm, setShowForm] = useState(false);
     const { walletId } = useParams();
 
     const handleStartingDateChange = (event) => {
@@ -31,52 +29,33 @@ const TransactionList = () => {
         setTransactionType(type);
     };
 
-    const handleAddIncome = async (newIncomeData) => {
+    const handleAddTransaction = async (newTransactionData) => {
         try {
-            
-            const response = await fetch('https://localhost:7088/api/transaction/addIncome', {
+            let url = '';
+            if (newTransactionData.type === 'income') {
+                url = 'https://localhost:7088/api/transaction/addIncome';
+            } else {
+                url = 'https://localhost:7088/api/transaction/addExpenditure';
+            }
+
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newIncomeData),
+                body: JSON.stringify(newTransactionData),
                 credentials: 'include',
             });
 
-            if (!response.ok) {
-                throw new Error('Error adding income');
+            if (response.ok) {
+                console.log('Transaction added!');
+                handleFilterClick(); // Refresh transaction list after adding a new transaction
+                setShowForm(false); // Hide the form after adding a transaction
+            } else {
+                console.error(response);
             }
-
-            handleFilterClick(); // Odœwie¿ listê transakcji po dodaniu nowego przychodu
-            setShowAddIncomeForm(false); // Schowaj formularz po dodaniu przychodu
         } catch (error) {
-            console.error('Error adding income:', error);
-        }
-    };
-
-    const handleAddExpenditure = async (newExpenditureData) => {
-        try {
-       
-            const response = await fetch('https://localhost:7088/api/transaction/addExpenditure', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newExpenditureData),
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Read the error response from the server
-                console.error('Server error:', errorResponse); // Display detailed server error information
-                throw new Error(errorResponse.message || 'Error adding expenditure');
-            }
-
-            // Refresh the transaction list after adding the expenditure
-            handleFilterClick();
-            setShowAddExpenditureForm(false);
-        } catch (error) {
-            console.error('Error adding expenditure:', error);
+            console.error('Error adding transaction:', error);
         }
     };
 
@@ -127,10 +106,7 @@ const TransactionList = () => {
             console.error('Error during fetching transactions:', error);
         }
     };
-
-    useEffect(() => {
-
-        const fetchCategories = async () => {
+            const fetchCategories = async () => {
             try {
                 const response = await fetch(`https://localhost:7088/api/transaction/allCategories`, {
                     credentials: 'include',
@@ -143,8 +119,9 @@ const TransactionList = () => {
             } catch (error) {
                 console.error('Error during fetching transactions:', error);
             }
-        };
+    };
 
+    useEffect(() => {
         fetchCategories();
         handleFilterClick()
     }, [walletId]);
@@ -164,26 +141,18 @@ const TransactionList = () => {
                     <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
                 </div>
                  <div className='d-flex'>
-                    <button className='btn btn-secondary mx-1' onClick={() => setShowAddIncomeForm(true)}>+Income</button>
-                    <button className='btn btn-secondary mx-1' onClick={() => setShowAddExpenditureForm(true)}>+Expenditure</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => setShowForm(true)}>Add Transaction</button>
+                  
                 </div>
              
             </div>
             <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
-                {showAddIncomeForm && (
-                    <AddIncomeForm
-                        categories={categories} // Przekazanie listy kategorii do formularza
-                        onSubmit={handleAddIncome} // Przekazanie funkcji do obs³ugi dodawania przychodu do formularza
-                        onCancel={() => setShowAddIncomeForm(false)} // Obs³uga anulowania dodawania przychodu
-                    />
-                )}
-            </div>
-                <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
-                {showAddExpenditureForm && (
-                    <AddExpenditureForm
-                        categories={categories} // Przekazanie listy kategorii do formularza
-                        onSubmit={handleAddExpenditure} // Przekazanie funkcji do obs³ugi dodawania przychodu do formularza
-                        onCancel={() => setShowAddExpenditureForm(false)} // Obs³uga anulowania dodawania przychodu
+                {showForm && (
+                    <TransactionForm
+                        categories={categories}
+                        walletId={walletId}
+                        onSubmit={(newTransactionData) => handleAddTransaction(newTransactionData)}
+                        onCancel={() => setShowForm(false)}
                     />
                 )}
             </div>
