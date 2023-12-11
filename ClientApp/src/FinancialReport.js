@@ -37,8 +37,8 @@ function MonthlySummaryComponent() {
 
 
             const [summaryResponse, transactionsResponse] = await Promise.all([
-                fetch(`https://localhost:7088/api/monthlySummary/${selectedWallet}/${selectedYear}/${selectedMonth}`),
-                fetch(`https://localhost:7088/api/transactions/${selectedWallet}/${selectedYear}/${selectedMonth}`)
+                fetch(`api/monthlySummary/${selectedWallet}/${selectedYear}/${selectedMonth}`),
+                fetch(`api/transactions/${selectedWallet}/${selectedYear}/${selectedMonth}`)
             ]);
 
             if (!summaryResponse.ok || !transactionsResponse.ok) {

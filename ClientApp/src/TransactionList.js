@@ -46,7 +46,7 @@ const TransactionList = () => {
             formattedEndingDate = endDate.toISOString().split('T')[0];
 
         try {
-            let url = `https://localhost:7088/api/transaction/`;
+            let url = `api/transaction/`;
             if (transactionType === 'income') {
                 url += `incomesForWallet/${walletId}`;
             } else if (transactionType === 'expenditure') {
@@ -78,7 +78,7 @@ const TransactionList = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`, {
+                const response = await fetch(`api/transaction/allCategories`, {
                     credentials: 'include',
                 });
                 if (!response.ok) {

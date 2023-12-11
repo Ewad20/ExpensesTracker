@@ -14,7 +14,7 @@ const TwoFactorAuthentication = () => {
     // Update TwoFactor status for user on server
     const setTwoFactorStatus = async (status) => {
         try {
-            const response = await fetch('https://localhost:7088/api/account/SetTwoFactorStatus', {
+            const response = await fetch('api/account/SetTwoFactorStatus', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -45,7 +45,7 @@ const TwoFactorAuthentication = () => {
     // get TwoFactor status from sever
     const getTwoFactorStatus = async () => {
         try {
-            const response = await fetch('https://localhost:7088/api/account/GetTwoFactorStatus', {
+            const response = await fetch('api/account/GetTwoFactorStatus', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
