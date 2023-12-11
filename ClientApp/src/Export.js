@@ -97,7 +97,7 @@ function Export() {
       const selectedWalletData = wallets.filter((wallet) =>
         selectedWallets.includes(wallet.Id)
       );
-      const jsonBlob = new Blob([JSON.stringify(selectedWalletData)], {
+      const jsonBlob = new Blob([JSON.stringify(selectedWalletDataWithoutId)], {
         type: "application/json",
       });
       const url = URL.createObjectURL(jsonBlob);
@@ -145,7 +145,7 @@ function Export() {
           </thead>
 
           <tbody>
-            {wallets.map((wallet) => (
+            {wallets.map((wallet, index) => (
               <tr
                 key={wallet.Id}
                 className={
@@ -155,7 +155,7 @@ function Export() {
                 }
                 onClick={() => handleRowClick(wallet.Id)}
               >
-                <th>{wallet.Id}</th>
+                <th>{index + 1}</th>
                 <td>{wallet.IconId}</td>
                 <td>{wallet.Name}</td>
                 <td>{wallet.AccountBalance}</td>
