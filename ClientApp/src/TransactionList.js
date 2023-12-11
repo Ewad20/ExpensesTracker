@@ -1,6 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import AddIncomeForm from './AddIncomeForm';
+import AddExpenditureForm from './AddExpenditureForm';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
@@ -9,6 +11,8 @@ const TransactionList = () => {
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [showAddIncomeForm, setShowAddIncomeForm] = useState(false);
+    const [showAddExpenditureForm, setShowAddExpenditureForm] = useState(false);
     const { walletId } = useParams();
 
     const handleStartingDateChange = (event) => {
@@ -26,6 +30,56 @@ const TransactionList = () => {
     const handleTransactionTypeChange = (type) => {
         setTransactionType(type);
     };
+
+    const handleAddIncome = async (newIncomeData) => {
+        try {
+            
+            const response = await fetch('https://localhost:7088/api/transaction/addIncome', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newIncomeData),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Error adding income');
+            }
+
+            handleFilterClick(); // Odœwie¿ listê transakcji po dodaniu nowego przychodu
+            setShowAddIncomeForm(false); // Schowaj formularz po dodaniu przychodu
+        } catch (error) {
+            console.error('Error adding income:', error);
+        }
+    };
+
+    const handleAddExpenditure = async (newExpenditureData) => {
+        try {
+       
+            const response = await fetch('https://localhost:7088/api/transaction/addExpenditure', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newExpenditureData),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json(); // Read the error response from the server
+                console.error('Server error:', errorResponse); // Display detailed server error information
+                throw new Error(errorResponse.message || 'Error adding expenditure');
+            }
+
+            // Refresh the transaction list after adding the expenditure
+            handleFilterClick();
+            setShowAddExpenditureForm(false);
+        } catch (error) {
+            console.error('Error adding expenditure:', error);
+        }
+    };
+
 
     function findCategoryName(categoryId) {
         const foundCategory = categories.find(category => category.Id === categoryId);
@@ -103,10 +157,35 @@ const TransactionList = () => {
         <div className='container'>
             <h2>Transaction list for wallet {walletId}</h2>
 
-            <div className='d-flex justify-content-center'>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+            <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 30 }}>
+                <div className='d-flex'>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+                </div>
+                 <div className='d-flex'>
+                    <button className='btn btn-secondary mx-1' onClick={() => setShowAddIncomeForm(true)}>+Income</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => setShowAddExpenditureForm(true)}>+Expenditure</button>
+                </div>
+             
+            </div>
+            <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
+                {showAddIncomeForm && (
+                    <AddIncomeForm
+                        categories={categories} // Przekazanie listy kategorii do formularza
+                        onSubmit={handleAddIncome} // Przekazanie funkcji do obs³ugi dodawania przychodu do formularza
+                        onCancel={() => setShowAddIncomeForm(false)} // Obs³uga anulowania dodawania przychodu
+                    />
+                )}
+            </div>
+                <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
+                {showAddExpenditureForm && (
+                    <AddExpenditureForm
+                        categories={categories} // Przekazanie listy kategorii do formularza
+                        onSubmit={handleAddExpenditure} // Przekazanie funkcji do obs³ugi dodawania przychodu do formularza
+                        onCancel={() => setShowAddExpenditureForm(false)} // Obs³uga anulowania dodawania przychodu
+                    />
+                )}
             </div>
             <div className='d-flex flex-column'>
                 <h3>Filter results:</h3>
@@ -149,6 +228,7 @@ const TransactionList = () => {
                     </div>
                 ))}
             </div>
+
         </div>
     );
 };
