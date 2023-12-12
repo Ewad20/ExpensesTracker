@@ -59,6 +59,9 @@ const RootElement = () => {
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/report">Report</Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/categories">Categories</Link>
+                                </li>
                             </ul>) :
                             (
                                 <ul className="navbar-nav me-auto mt-2 mt-lg-0">

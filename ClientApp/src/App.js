@@ -8,6 +8,8 @@ import WalletPage from './WalletPage';
 import Export from './Export';
 import Import from './Import';
 import FinancialReport from './FinancialReport';
+import ManageCategories from './ManageCategories';
+
 
 
 import TwoFactorAuthentication from './account/settings/TwoFactorAuthentication';
@@ -26,6 +28,7 @@ const App = () => {
                 <Route path="/import" element={<Import />} />
                 <Route path="/report" element={<FinancialReport />} />
                 <Route path="/account/settings/twoFactorAuthentication" element={<TwoFactorAuthentication />} />
+                <Route path="/categories" element={<ManageCategories />} />
             </Routes>
         </Router>
 
