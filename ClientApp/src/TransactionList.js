@@ -33,9 +33,9 @@ const TransactionList = () => {
         try {
             let url = '';
             if (newTransactionData.type === 'income') {
-                url = 'https://localhost:7088/api/transaction/addIncome';
+                url = 'api/transaction/addIncome';
             } else {
-                url = 'https://localhost:7088/api/transaction/addExpenditure';
+                url = 'api/transaction/addExpenditure';
             }
 
             const response = await fetch(url, {
@@ -123,7 +123,7 @@ const TransactionList = () => {
 
     useEffect(() => {
         fetchCategories();
-        handleFilterClick()
+        handleFilterClick();
     }, [walletId]);
 
     useEffect(() => {
