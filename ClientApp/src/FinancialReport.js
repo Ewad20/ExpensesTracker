@@ -15,7 +15,7 @@ const MonthlySummary = () => {
 
     const handleGenerateClick = async () => {
         try {
-            const response = await fetch(`https://localhost:7088/api/transaction/monthlySummary/${walletId}/${year}/${month}`, {
+            const response = await fetch(`api/transaction/monthlySummary/${walletId}/${year}/${month}`, {
                 credentials: 'include',
             });
             if (!response.ok) {
