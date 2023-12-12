@@ -63,6 +63,23 @@ namespace _2023pz_trrepo.Controllers
             {
                 return Unauthorized("Invalid credentials.");
             }
+            
+            // Two-Factor Authentication is needed
+            if (user.TwoFactorEnabled && cred.AuthKey == null)
+            {
+                return StatusCode(202, "Two-Factor Authentication");
+            }
+            else if(user.TwoFactorEnabled && cred.AuthKey != null)
+            {
+                // Validate key
+                TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                bool isValid = TwoFacAuth.ValidateTwoFactorPIN(user.GoogleAuthKey, cred.AuthKey, TimeSpan.FromSeconds(15));
+
+                if (!isValid)
+                {
+                    return Unauthorized("Invalid credentials");
+                }
+            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -258,15 +275,16 @@ namespace _2023pz_trrepo.Controllers
 
         public class Credentials
         {
-            public Credentials(string login, string password)
+            public Credentials(string login, string password, string? authKey)
             {
                 Login = login;
                 Password = password;
+                AuthKey = authKey;
             }
 
             public string Login { get; set; }
             public string Password { get; set; }
-
+            public string? AuthKey { get; set; }
         }
 
         public class UserModelForRegistration
