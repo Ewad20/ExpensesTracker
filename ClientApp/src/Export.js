@@ -16,7 +16,7 @@ function Export() {
     const loadAllUserWallets = async () => {
       try {
         const response = await fetch(
-          "https://localhost:7088/api/export/Wallets",
+          "/api/export/Wallets",
           {
             method: "POST",
             headers: {

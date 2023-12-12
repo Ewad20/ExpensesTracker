@@ -13,7 +13,7 @@ function Import() {
     //handle if user isn't logged in
     const isUserLogged = async () => {
       try {
-        const response = await fetch("https://localhost:7088/api/import/user", {
+        const response = await fetch("/api/import/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
