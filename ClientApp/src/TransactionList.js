@@ -106,7 +106,10 @@ const TransactionList = () => {
             console.error('Error during fetching transactions:', error);
         }
     };
-            const fetchCategories = async () => {
+
+    useEffect(() => {
+
+        const fetchCategories = async () => {
             try {
                 const response = await fetch(`api/transaction/allCategories`, {
                     credentials: 'include',
@@ -117,9 +120,9 @@ const TransactionList = () => {
                 const data = await response.json();
                 setCategories(data);
             } catch (error) {
-                console.error('Error during fetching transactions:', error);
+                console.error('Error during fetching categories:', error);
             }
-    };
+        };
 
     useEffect(() => {
         fetchCategories();
