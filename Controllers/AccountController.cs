@@ -8,6 +8,11 @@ using System.Text.Json.Serialization;
 using Google.Authenticator;
 using System.Text;
 using System.Text.Json;
+using Azure.Core;
+using System.Runtime.InteropServices.JavaScript;
+using System.Threading.Tasks.Dataflow;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -57,6 +62,23 @@ namespace _2023pz_trrepo.Controllers
             if (!signInResult.Succeeded)
             {
                 return Unauthorized("Invalid credentials.");
+            }
+            
+            // Two-Factor Authentication is needed
+            if (user.TwoFactorEnabled && cred.AuthKey == null)
+            {
+                return StatusCode(202, "Two-Factor Authentication");
+            }
+            else if(user.TwoFactorEnabled && cred.AuthKey != null)
+            {
+                // Validate key
+                TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                bool isValid = TwoFacAuth.ValidateTwoFactorPIN(user.GoogleAuthKey, cred.AuthKey, TimeSpan.FromSeconds(15));
+
+                if (!isValid)
+                {
+                    return Unauthorized("Invalid credentials");
+                }
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
@@ -156,19 +178,43 @@ namespace _2023pz_trrepo.Controllers
 
                 if (user != null)
                 {
-                    bool TwoFactorStatus = user.TwoFactorEnabled;
+                    return Ok(new { twoFactorEnabled = user.TwoFactorEnabled});
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error:" + ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("GetTwoFactorKey")]
+        public async Task<IActionResult> GetTwoFactorKey()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user != null)
+                {
                     string GoogleAuthKey = "";
                     string QrImageUrl = "";
-                    if (TwoFactorStatus == true && user.GoogleAuthKey != null)
+                    const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    // Generate 10 char secret key
+                    Random random = new Random();
+                    for (int i = 0; i < 10; i++)
                     {
-                        GoogleAuthKey = user.GoogleAuthKey;
+                        GoogleAuthKey += validChars[random.Next(0, validChars.Length)];
                     }
-                    if (GoogleAuthKey!= "") {
-                        TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
-                        var setupInfo = TwoFacAuth.GenerateSetupCode("ExpensionTracker", "Code", ConvertSecretToBytes(GoogleAuthKey, false), 300);
-                        QrImageUrl = setupInfo.QrCodeSetupImageUrl;
-                    }
-                    return Ok(new { TwoFactorEnabled = TwoFactorStatus, GoogleKey = GoogleAuthKey, BarcodeImageUrl = QrImageUrl });
+                    // Generate setupcode
+                    TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                    var setupInfo = TwoFacAuth.GenerateSetupCode("ExpensionTracker", user.UserName, ConvertSecretToBytes(GoogleAuthKey, false), 200);
+                    QrImageUrl = setupInfo.QrCodeSetupImageUrl;
+                    return Ok(new {authKey = GoogleAuthKey, barcodeImageUrl = QrImageUrl });
                 }
                 else
                 {
@@ -182,8 +228,8 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [Authorize]
-        [HttpPost("SetTwoFactorStatus")]
-        public async Task<IActionResult> SetTwoFactorStatus()
+        [HttpPost("enableTwoFactor")]
+        public async Task<IActionResult> enableTwoFactor()
         {
             try
             {
@@ -192,32 +238,29 @@ namespace _2023pz_trrepo.Controllers
 
                 if (user != null)
                 {
-                    using (var reader = new StreamReader(Request.Body))
+                    // Read json data from body
+                    string requestBody;
+                    using (var reader = new System.IO.StreamReader(Request.Body))
                     {
-                        var body = await reader.ReadToEndAsync();
-                        var TwoFactorEnabled = JsonSerializer.Deserialize<bool>(body);
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+                    dynamic data = JObject.Parse(requestBody);
+                    string authKey = data.authKey;
+                    string enteredAuthKey = data.enteredAuthKey;
+                    // Validate key
+                    TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                    bool isValid = TwoFacAuth.ValidateTwoFactorPIN(authKey, enteredAuthKey, TimeSpan.FromSeconds(15));
 
-                        user.TwoFactorEnabled = TwoFactorEnabled;
-                        if (TwoFactorEnabled == true)
-                        {
-                            const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                            Random random = new Random();
-                            string GoogleAuthKey = "";
-                            for (int i = 0; i < 16; i++)
-                            {
-                                GoogleAuthKey += validChars[random.Next(0, validChars.Length)];
-                            }
-                            user.GoogleAuthKey = GoogleAuthKey;
-                        }
-                        else
-                        {
-                            user.GoogleAuthKey = null;
-                        }
-
+                    if (isValid)
+                    {
+                        user.TwoFactorEnabled = true;
+                        user.GoogleAuthKey = authKey;
                         await _dbContext.SaveChangesAsync();
 
-                        return Ok("Two Factor Authentication status updated");
+                        return Ok(true);
                     }
+
+                    return Ok(false);
                 }
                 else
                 {
@@ -232,15 +275,16 @@ namespace _2023pz_trrepo.Controllers
 
         public class Credentials
         {
-            public Credentials(string login, string password)
+            public Credentials(string login, string password, string? authKey)
             {
                 Login = login;
                 Password = password;
+                AuthKey = authKey;
             }
 
             public string Login { get; set; }
             public string Password { get; set; }
-
+            public string? AuthKey { get; set; }
         }
 
         public class UserModelForRegistration
