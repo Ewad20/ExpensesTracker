@@ -67,7 +67,7 @@ const Chart1 = () => {
 
     return (
         <div className="card mx-auto my-5 h-auto background-my w-75">
-            <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Chart 1</p>
+            <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Incomes & Expenses</p>
             <canvas id="myChart1" width="520" height="520"></canvas>
         </div>
     );
