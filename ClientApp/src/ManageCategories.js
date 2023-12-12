@@ -25,7 +25,7 @@ const ManageCategories = () => {
 
     const handleAddCategory = async () => {
         try {
-            const response = await fetch('https://localhost:7088/api/transaction/addCategory', {
+            const response = await fetch('/api/transaction/addCategory', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const ManageCategories = () => {
 
     const handleEditCategory = async () => {
         try {
-            const response = await fetch(`https://localhost:7088/api/transaction/editCategory/${editingCategoryId}`, {
+            const response = await fetch(`/api/transaction/editCategory/${editingCategoryId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const ManageCategories = () => {
 
     const handleDeleteCategory = async (categoryId) => {
         try {
-            const response = await fetch(`https://localhost:7088/api/transaction/deleteCategory/${categoryId}`, {
+            const response = await fetch(`/api/transaction/deleteCategory/${categoryId}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
@@ -98,7 +98,7 @@ const ManageCategories = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('https://localhost:7088/api/transaction/allCategories', {
+            const response = await fetch('api/transaction/allCategories', {
                 credentials: 'include',
             });
 
