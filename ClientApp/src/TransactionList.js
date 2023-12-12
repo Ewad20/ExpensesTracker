@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import TransactionForm from './TransactionForm';
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
@@ -9,6 +10,7 @@ const TransactionList = () => {
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [showForm, setShowForm] = useState(false);
     const { walletId } = useParams();
 
     const handleStartingDateChange = (event) => {
@@ -26,6 +28,37 @@ const TransactionList = () => {
     const handleTransactionTypeChange = (type) => {
         setTransactionType(type);
     };
+
+    const handleAddTransaction = async (newTransactionData) => {
+        try {
+            let url = '';
+            if (newTransactionData.type === 'income') {
+                url = 'https://localhost:7088/api/transaction/addIncome';
+            } else {
+                url = 'https://localhost:7088/api/transaction/addExpenditure';
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newTransactionData),
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                console.log('Transaction added!');
+                handleFilterClick(); // Refresh transaction list after adding a new transaction
+                setShowForm(false); // Hide the form after adding a transaction
+            } else {
+                console.error(response);
+            }
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+        }
+    };
+
 
     function findCategoryName(categoryId) {
         const foundCategory = categories.find(category => category.Id === categoryId);
@@ -73,10 +106,7 @@ const TransactionList = () => {
             console.error('Error during fetching transactions:', error);
         }
     };
-
-    useEffect(() => {
-
-        const fetchCategories = async () => {
+            const fetchCategories = async () => {
             try {
                 const response = await fetch(`api/transaction/allCategories`, {
                     credentials: 'include',
@@ -89,8 +119,9 @@ const TransactionList = () => {
             } catch (error) {
                 console.error('Error during fetching transactions:', error);
             }
-        };
+    };
 
+    useEffect(() => {
         fetchCategories();
         handleFilterClick()
     }, [walletId]);
@@ -103,10 +134,27 @@ const TransactionList = () => {
         <div className='container'>
             <h2>Transaction list for wallet {walletId}</h2>
 
-            <div className='d-flex justify-content-center'>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+            <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 30 }}>
+                <div className='d-flex'>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('all')}>All Transactions</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('income')}>Incomes</button>
+                    <button className='btn btn-secondary mx-1' onClick={() => handleTransactionTypeChange('expenditure')}>Expenditures</button>
+                </div>
+                 <div className='d-flex'>
+                    <button className='btn btn-secondary mx-1' onClick={() => setShowForm(true)}>Add Transaction</button>
+                  
+                </div>
+             
+            </div>
+            <div className='d-flex justify-content-between' style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
+                {showForm && (
+                    <TransactionForm
+                        categories={categories}
+                        walletId={walletId}
+                        onSubmit={(newTransactionData) => handleAddTransaction(newTransactionData)}
+                        onCancel={() => setShowForm(false)}
+                    />
+                )}
             </div>
             <div className='d-flex flex-column'>
                 <h3>Filter results:</h3>
@@ -149,6 +197,7 @@ const TransactionList = () => {
                     </div>
                 ))}
             </div>
+
         </div>
     );
 };
