@@ -15,7 +15,7 @@ const TwoFactorAuthentication = () => {
                 enteredAuthKey: enteredValue
             };
 
-            const response = await fetch('https://localhost:7088/api/account/enableTwoFactor', {
+            const response = await fetch('/api/account/enableTwoFactor', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -91,7 +91,7 @@ const TwoFactorAuthentication = () => {
     // Get two factor status
     const fetchTwoFactorKey = async () => {
         try {
-            const response = await fetch('https://localhost:7088/api/account/GetTwoFactorKey', {
+            const response = await fetch('/api/account/GetTwoFactorKey', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
