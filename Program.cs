@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ETDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("JanConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OlaConnection")));
 builder.Services.AddCors();
 
 builder.Services.AddAuthentication(options =>
