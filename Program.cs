@@ -25,6 +25,7 @@ builder.Services.AddAuthentication(options =>
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
 
+
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ETDbContext>()
     .AddDefaultTokenProviders();
@@ -43,8 +44,9 @@ app.UseRouting();
 app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader()
-    .WithOrigins("https://localhost:44485")
-    .AllowCredentials());
+    .WithOrigins("https://0.0.0.0:44485")
+    .AllowCredentials()
+    );
 
 app.UseAuthorization();
 

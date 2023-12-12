@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,24 +19,74 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpPost("addCategory")]
+        public async Task<IActionResult> AddCategory([FromBody] Category category)
+        {
+            try
+            {
+                await _dbContext.Categories.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Unable to add category! Error: " + e.Message);
+            }
+            return Ok("Category added successfully!");
+        }
+
+        [Authorize]
+        [HttpPost("addCategoryAuthorized")]
+        public async Task<IActionResult> AddCategoryAuthorized([FromBody] Category category)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.Include("UserCategories").FirstOrDefaultAsync(u => u.Id == userId);
+                if(user == null) {
+                    return NotFound("User not found");
+                }
+                category.UserId = userId;
+                await _dbContext.Categories.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, "Unable to add category! Error: " + e.Message);
+            }
+            return Ok("Category added successfully!");
+        }
+
         [Authorize]
         [HttpPost("addIncome")]
         public async Task<IActionResult> AddIncome([FromBody] Income income)
         {
             try
             {
-                var wallet = await _dbContext.Wallets
-                .Include("Incomes")
-                .FirstOrDefaultAsync(w => w.Id == income.WalletId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.Include("Wallets.Incomes").FirstOrDefaultAsync(u => u.Id == userId);
 
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                var wallet = user.Wallets.FirstOrDefault(w => w.Id == income.WalletId);
                 if (wallet == null)
                 {
                     return NotFound("Wallet not found");
                 }
+
+                var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == income.CategoryId);
+                if (category == null || category.Type != CategoryType.Income)
+                {
+                    return BadRequest("You choosed invalid category. Please try again after refreshing the page.");
+                }
+
                 income.Wallet = wallet;
+                income.Category = category;
                 wallet.Incomes.Add(income);
                 wallet.AccountBalance += income.Amount;
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -53,21 +103,36 @@ namespace _2023pz_trrepo.Controllers
         {
             try
             {
-                var wallet = await _dbContext.Wallets
-                .Include("Expenditures")
-                .FirstOrDefaultAsync(w => w.Id == expenditure.WalletId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.Include("Wallets.Expenditures").FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                var wallet = user.Wallets.FirstOrDefault(w => w.Id == expenditure.WalletId);
                 if (wallet == null)
                 {
                     return NotFound("Wallet not found");
                 }
-                if (wallet.AccountBalance <= expenditure.Amount)
+
+                if (wallet.AccountBalance < expenditure.Amount)
                 {
                     return BadRequest("Insuficient funds!");
                 }
+
+                var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == expenditure.CategoryId);
+                if (category == null || category.Type != CategoryType.Expenditure)
+                {
+                    return BadRequest("You chose invalid category. Please try again after refreshing the page.");
+                }
+
                 expenditure.Wallet = wallet;
+                expenditure.Category = category;
                 wallet.AccountBalance -= expenditure.Amount;
                 wallet.Expenditures.Add(expenditure);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -81,6 +146,7 @@ namespace _2023pz_trrepo.Controllers
         [HttpGet("transactionsForWallet/{walletId}")]
         public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
+            
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
@@ -136,16 +202,16 @@ namespace _2023pz_trrepo.Controllers
 
                 else
                 {
-                var incomes = _dbContext.Incomes
-               .Where(i => i.WalletId == walletId)
-                    .OrderByDescending(i => i.Date)
-               .ToList();
+                    var incomes = _dbContext.Incomes
+                   .Where(i => i.WalletId == walletId)
+                        .OrderByDescending(i => i.Date)
+                   .ToList();
 
 
-                var expenditures = _dbContext.Expenditures
-               .Where(e => e.WalletId == walletId)
-                   .OrderByDescending(e => e.Date)
-               .ToList();
+                    var expenditures = _dbContext.Expenditures
+                   .Where(e => e.WalletId == walletId)
+                       .OrderByDescending(e => e.Date)
+                   .ToList();
 
                     transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
@@ -253,7 +319,7 @@ namespace _2023pz_trrepo.Controllers
                 return "";
             }
         }
-        
+
         [Authorize]
         [HttpGet("expendituresForWallet/{walletId}")]
         public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
@@ -371,19 +437,25 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
         [Authorize]
         [HttpGet("allCategories")]
         public string GetAllCategories()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+                return "";
             try
             {
                 List<Category> categories = new List<Category>();
 
                 var cat = _dbContext.Categories
+                .Where(x => x.UserId == userId || x.UserId == null)
                 .ToList();
 
                 categories = cat;
-
+                
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

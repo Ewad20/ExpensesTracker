@@ -15,7 +15,7 @@ const WalletPage = () => {
 
     const fetchWallets = async () => {
         try {
-            const response = await fetch('https://localhost:7088/api/account/getWallets', {
+            const response = await fetch('api/account/getWallets', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const WalletPage = () => {
             const cred = {
                 name: walletName,
             };
-            const response = await fetch('https://localhost:7088/api/account/addWallet', {
+            const response = await fetch('api/account/addWallet', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

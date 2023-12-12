@@ -40,13 +40,13 @@ const TransactionList = () => {
         let formattedEndingDate = '';
 
         if (startDate)
-            formattedStartingDate = startDate.toUTCString();
+            formattedStartingDate = startDate.toISOString().split('T')[0];
 
         if (endDate)
-            formattedEndingDate = endDate.toUTCString();
+            formattedEndingDate = endDate.toISOString().split('T')[0];
 
         try {
-            let url = `https://localhost:7088/api/transaction/`;
+            let url = `api/transaction/`;
             if (transactionType === 'income') {
                 url += `incomesForWallet/${walletId}`;
             } else if (transactionType === 'expenditure') {
@@ -78,7 +78,7 @@ const TransactionList = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch(`https://localhost:7088/api/transaction/allCategories`, {
+                const response = await fetch(`api/transaction/allCategories`, {
                     credentials: 'include',
                 });
                 if (!response.ok) {
@@ -141,6 +141,7 @@ const TransactionList = () => {
                     <div key={i} className='col my-3' style={{minWidth:"30%"}}>
                         <div className='card h-100 w-100 text-center'>
                             <h2 className='w-75'>{transaction.Title}</h2>
+                            <h4 className='w-75'>{transaction.TransactionType}</h4>
                             <h5>{transaction.Amount} PLN</h5>
                             <p>{new Date(transaction.Date).toISOString().split('T')[0]}</p>
                             <p>{findCategoryName(transaction.CategoryId)}</p>

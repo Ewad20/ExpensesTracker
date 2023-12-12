@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:56104",
+      "applicationUrl": "http://0.0.0.0:56104",
       "sslPort": 44303
     }
   },
@@ -11,7 +11,7 @@
     "_2023pz_trrepo": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7088;http://localhost:5169",
+      "applicationUrl": "https://0.0.0.0:7088;http://0.0.0.0:5169",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"

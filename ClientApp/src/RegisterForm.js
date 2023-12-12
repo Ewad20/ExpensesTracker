@@ -52,7 +52,7 @@ const RegisterForm = () => {
         };
         if (valid) {
             try {
-                const response = await fetch('https://localhost:7088/api/account/register', {
+                const response = await fetch('api/account/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
