@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,8 +15,25 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpPost("importWallet")]
-        public IActionResult ExportWallet(string userName, string filePath){
-        
+        public IActionResult ExportWallet()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return StatusCode(401, "Uzytkownik nie jest zalogowany!");
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("user")]
+        public IActionResult IsUserLogged()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return StatusCode(401, "Uzytkownik nie jest zalogowany!");
+            }
             return Ok();
         }
 
