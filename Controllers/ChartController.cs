@@ -54,7 +54,7 @@ namespace _2023pz_trrepo.Controllers
             }
 
 
-            List<Category> expenditureCategories = _dbContext.Categories.Where(x => x.UserId == userId && x.Type == CategoryType.Expenditure).ToList();
+            List<Category> expenditureCategories = _dbContext.Categories.Where(x=>x.Type == CategoryType.Expenditure).ToList();
 
             Dictionary<string, double> categoryExpenses = new Dictionary<string, double>();
             foreach (Category category in expenditureCategories)
