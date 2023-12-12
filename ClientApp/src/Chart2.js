@@ -1,11 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
 const Chart2 = () => {
+
+    const [chart2, setChart2] = useState([]);
+
     useEffect(() => {
+        const fetchChart2 = async () => {
+            try {
+                const response = await fetch('https://localhost:7088/v1/api/chart/getChart2', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const chart2Data = await response.json();
+                    console.log(chart2Data);
+                    setChart2(chart2Data);
+                } else {
+                    console.error(response);
+                    setChart2([]);
+                }
+            } catch (error) {
+                console.error('Error Chart2', error);
+            }
+        };
+
+
         const ctx2 = document.getElementById("myChart2").getContext("2d");
-        const xValues = ["Food", "Clothes", "Fuel", "Cosmetics"];
-        const yValues = [4, 8, 10, 6];
+        const xValues = Object.keys(chart2);
+        fetchChart2();
+        console.log(chart2);
+        const yValues = Object.values(chart2);
 
         new Chart(ctx2, {
             type: "bar",
