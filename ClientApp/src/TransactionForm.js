@@ -37,7 +37,7 @@ const TransactionForm = ({onSubmit, walletId }) => {
     };
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`https://localhost:7088/api/transaction/allCategories`, {
+            const response = await fetch(`api/transaction/allCategories`, {
                 credentials: 'include',
             });
             if (!response.ok) {
@@ -65,9 +65,9 @@ const TransactionForm = ({onSubmit, walletId }) => {
         try {
             let url = '';
             if (transactionType === 'income') {
-                url = 'https://localhost:7088/api/transaction/addIncome';
+                url = 'api/transaction/addIncome';
             } else {
-                url = 'https://localhost:7088/api/transaction/addExpenditure';
+                url = 'api/transaction/addExpenditure';
             }
             console.log(newTransaction);
             const response = await fetch(url, {
