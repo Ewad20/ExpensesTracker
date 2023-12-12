@@ -120,13 +120,12 @@ const TransactionList = () => {
                 const data = await response.json();
                 setCategories(data);
             } catch (error) {
-                console.error('Error during fetching categories:', error);
+                console.error('Error during fetching transactions:', error);
             }
         };
 
-    useEffect(() => {
         fetchCategories();
-        handleFilterClick();
+        handleFilterClick()
     }, [walletId]);
 
     useEffect(() => {
