@@ -7,7 +7,7 @@ const Chart1 = () => {
     useEffect(() => {
         const fetchChart1 = async () => {
             try {
-                const response = await fetch('https://localhost:7088/v1/api/chart/getChart1', {
+                const response = await fetch('api/chart/getChart1', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace _2023pz_trrepo.Controllers
 {
     [ApiController]
-    [Route("/v1/api/chart")]
+    [Route("/api/chart")]
     public class ChartController : Controller
     {
         private readonly ETDbContext _dbContext;
