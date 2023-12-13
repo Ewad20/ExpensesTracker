@@ -78,11 +78,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("transactionsForWallet/{walletId}")]
-        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
-                List<AbstractTransaction> transactions = new List<AbstractTransaction>();
+                List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     var incomes = _dbContext.Incomes
@@ -96,7 +98,7 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else if (startDate.HasValue && !endDate.HasValue)
@@ -112,7 +114,7 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else if (!startDate.HasValue && endDate.HasValue)
@@ -128,24 +130,32 @@ namespace _2023pz_trrepo.Controllers
                    .OrderByDescending(e => e.Date)
                    .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
 
                 else
                 {
-                var incomes = _dbContext.Incomes
-               .Where(i => i.WalletId == walletId)
-                    .OrderByDescending(i => i.Date)
-               .ToList();
+                    var incomes = _dbContext.Incomes
+                   .Where(i => i.WalletId == walletId)
+                        .OrderByDescending(i => i.Date)
+                   .ToList();
 
 
-                var expenditures = _dbContext.Expenditures
-               .Where(e => e.WalletId == walletId)
-                   .OrderByDescending(e => e.Date)
-               .ToList();
+                    var expenditures = _dbContext.Expenditures
+                   .Where(e => e.WalletId == walletId)
+                       .OrderByDescending(e => e.Date)
+                   .ToList();
 
-                    transactions = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
+                    transaction = incomes.Cast<AbstractTransaction>().Concat(expenditures.Cast<AbstractTransaction>()).ToList();
                 }
+
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
 
                 var options = new JsonSerializerOptions
                 {
@@ -157,7 +167,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transactions);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
@@ -167,11 +177,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("incomesForWallet/{walletId}")]
-        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
                     var incomes = _dbContext.Incomes
@@ -213,6 +225,14 @@ namespace _2023pz_trrepo.Controllers
                     transaction = incomes.Cast<AbstractTransaction>().ToList();
                 }
 
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -223,7 +243,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transaction);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
@@ -233,11 +253,13 @@ namespace _2023pz_trrepo.Controllers
         }
 
         [HttpGet("expendituresForWallet/{walletId}")]
-        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate)
+        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
         {
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
+                List<AbstractTransaction> filteredTransaction = new List<AbstractTransaction>();
+
                 if (startDate.HasValue && endDate.HasValue)
                 {
 
@@ -282,6 +304,14 @@ namespace _2023pz_trrepo.Controllers
                     transaction = expenditures.Cast<AbstractTransaction>().ToList();
                 }
 
+                if (selectedCategory.HasValue)
+                {
+                    filteredTransaction = transaction
+                    .Where(transaction => transaction.CategoryId == selectedCategory)
+                    .ToList();
+                }
+                else { filteredTransaction = transaction; }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -292,7 +322,7 @@ namespace _2023pz_trrepo.Controllers
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 options.Converters.Add(new JsonStringDateTimeConverter());
 
-                return JsonSerializer.Serialize(transaction);
+                return JsonSerializer.Serialize(filteredTransaction);
             }
             catch (Exception ex)
             {
@@ -300,7 +330,7 @@ namespace _2023pz_trrepo.Controllers
                 return "";
             }
         }
-
+        [Authorize]
         [HttpGet("monthlySummary/{walletId}/{year}/{month}")]
         public IActionResult GetMonthlySummary(long walletId, int year, int month)
         {
@@ -311,10 +341,28 @@ namespace _2023pz_trrepo.Controllers
 
                 var incomes = _dbContext.Incomes
                     .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                    .Select(i => new
+                    {
+                        Date = i.Date,
+                        Title = i.Title,
+                        Amount = i.Amount,
+                        Type = "income"
+                    })
                     .ToList();
 
                 var expenditures = _dbContext.Expenditures
                     .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                    .Select(e => new
+                    {
+                        Date = e.Date,
+                        Title = e.Title,
+                        Amount = e.Amount,
+                        Type = "expenditure"
+                    })
+                    .ToList();
+
+                var transactions = incomes.Concat(expenditures)
+                    .OrderByDescending(t => t.Date)
                     .ToList();
 
                 var totalIncome = incomes.Sum(i => i.Amount);
@@ -327,7 +375,8 @@ namespace _2023pz_trrepo.Controllers
                     Month = month,
                     TotalIncome = totalIncome,
                     TotalExpenditure = totalExpenditure,
-                    NetBalance = totalIncome - totalExpenditure
+                    NetBalance = totalIncome - totalExpenditure,
+                    Transactions = transactions
                 };
 
                 return Ok(monthlySummary);

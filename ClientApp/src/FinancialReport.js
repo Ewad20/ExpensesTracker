@@ -1,128 +1,92 @@
-﻿import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function MonthlySummaryComponent() {
-    const [summary, setSummary] = useState(null);
-    const [transactions, setTransactions] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState(1);
-    const [selectedYear, setSelectedYear] = useState(2023);
-    const WalletId = 1;
-    const [selectedWallet, setSelectedWallet] = useState(WalletId);
+const MonthlySummary = () => {
+  const [walletId, setWalletId] = useState("");
+  const [year, setYear] = useState("");
+  const [month, setMonth] = useState("");
+  const [summary, setSummary] = useState(null);
+  const [transactions, setTransactions] = useState([]);
 
-    const handleMonthChange = (e) => {
-        setSelectedMonth(e.target.value);
-    };
-
-    const handleYearChange = (e) => {
-        setSelectedYear(e.target.value);
-    };
-
-    /*const handleWalletChange = (e) => {
-        setSelectedWallet(e.target.value);
-    };*/
-
-    const fetchData = async () => {
-        setLoading(true);
-
-        try {
-            /*const walletsResponse = await fetch(`https://localhost:7088/api/wallets`);
-            if (!walletsResponse.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const walletsData = await walletsResponse.json();
-
-            // Ustawienie listy portfeli w opcjach wyboru
-            setWalletOptions(walletsData.map(wallet => ({ id: wallet.id, name: wallet.name })));*/
-
-
-            const [summaryResponse, transactionsResponse] = await Promise.all([
-                fetch(`https://localhost:7088/api/monthlySummary/${selectedWallet}/${selectedYear}/${selectedMonth}`),
-                fetch(`https://localhost:7088/api/transactions/${selectedWallet}/${selectedYear}/${selectedMonth}`)
-            ]);
-
-            if (!summaryResponse.ok || !transactionsResponse.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const summaryData = await summaryResponse.json();
-            const transactionsData = await transactionsResponse.json();
-
-            setSummary(summaryData);
-            setTransactions(transactionsData);
-            setLoading(false);
-        } catch (error) {
-            console.error('There was a problem with the fetch operation:', error);
-            setLoading(false);
-            // Obsługa błędów z pobieraniem danych
+  const handleGenerateClick = async () => {
+    try {
+      const response = await fetch(
+        `https://localhost:7088/api/transaction/monthlySummary/${walletId}/${year}/${month}`,
+        {
+          credentials: "include",
         }
-    };
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setSummary(data);
+      setTransactions(data.transactions);
+    } catch (error) {
+      console.error("Error during fetching summary:", error);
+    }
+  };
 
-    useEffect(() => {
-        fetchData();
-    }, [selectedMonth, selectedYear]);
-
-    return (
+  return (
+    <div className="container">
+      <h1>Monthly Summary</h1>
+      <div>
+        <input
+          type="text"
+          placeholder="Wallet ID"
+          value={walletId}
+          onChange={(e) => setWalletId(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Year"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Month"
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+        />
+        <button onClick={handleGenerateClick}>Generate</button>
+      </div>
+      {summary && (
         <div>
-            <h2>Monthly Summary</h2>
-            <div style={{ marginBottom: '20px' }}>
-                <label htmlFor="month">Month:</label>
-                <select id="month" value={selectedMonth} onChange={handleMonthChange} style={{ marginLeft: '10px', marginRight: '10px' }}>
-                    {Array.from({ length: 12 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                            {new Date(2000, i).toLocaleString('en', { month: 'long' })}
-                        </option>
-                    ))}
-                </select>
-                <label htmlFor="year">Year:</label>
-                <select id="year" value={selectedYear} onChange={handleYearChange} style={{ marginLeft: '10px', marginRight: '10px' }}>
-                    {Array.from({ length: 10 }, (_, i) => (
-                        <option key={i + 1} value={2023 - i}>
-                            {2023 - i}
-                        </option>
-                    ))}
-                </select>
-                <label htmlFor="wallet">Wallet:{WalletId}</label>
-                
-                <button onClick={fetchData} style={{ marginLeft: '10px' }}>Get Summary</button>
-            </div>
-            {!loading && summary && (
-                <div>
-                    <h3>Summary:</h3>
-                    <p>Income: {summary.TotalIncome}</p>
-                    <p>Balance: {summary.NetBalance}</p>
-                    <p>Expenditure: {summary.TotalExpenditure}</p>
-                </div>
-            )}
-            {!loading && transactions.length > 0 && (
-                <div>
-                    <h3>Transactions:</h3>
-                    <ul>
-                        {transactions.map(transaction => (
-                            <li key={transaction.id}>
-                                Transaction ID: {transaction.Id},
-                                Title: {transaction.Title},
-                                Amount: {transaction.Amount},
-                                Date: {new Date(transaction.Date).toLocaleString()}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            {loading && <p>Loading...</p>}
-            {!loading && transactions.length === 0 && (
-                <p>No transactions found for the selected criteria.</p>
-            )}
+          <p>
+            <span style={{ color: "green" }}>
+              Total Income: {summary.totalIncome}
+            </span>
+            ,&nbsp;
+            <span style={{ color: "red" }}>
+              Total Expenditure: {summary.totalExpenditure}
+            </span>
+            ,&nbsp; Net Balance: {summary.netBalance}
+          </p>
         </div>
-    );
-}
+      )}
+      {transactions.length > 0 && (
+        <div>
+          <h3>Transactions:</h3>
+          {transactions.map((transaction, index) => (
+            <div key={index}>
+              <p>
+                {transaction.date} - {transaction.title} - {transaction.amount}{" "}
+                PLN&nbsp;
+                <span
+                  style={{
+                    color: transaction.type === "income" ? "green" : "red",
+                  }}
+                >
+                  ({transaction.type === "income" ? "Income" : "Expenditure"})
+                </span>
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
-export default MonthlySummaryComponent;
-
-
-/*wybór portfela
-<select id="wallet" value={selectedWallet} onChange={handleWalletChange} style={{ marginLeft: '10px', marginRight: '10px' }}>
-    {/*Opcje wyboru portfela }
-</>*/
-
-
+export default MonthlySummary;
