@@ -226,7 +226,6 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Error:" + ex.Message);
             }
         }
-
         [Authorize]
         [HttpPost("enableTwoFactor")]
         public async Task<IActionResult> enableTwoFactor()
@@ -272,7 +271,49 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Error:" + ex.Message);
             }
         }
+        [Authorize]
+        [HttpPost("disableTwoFactor")]
+        public async Task<IActionResult> disableTwoFactor()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
+                if (user != null)
+                {
+                    // Read json data from body
+                    string requestBody;
+                    using (var reader = new System.IO.StreamReader(Request.Body))
+                    {
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+                    dynamic data = JObject.Parse(requestBody);
+                    string enteredAuthKey = data.enteredAuthKey;
+                    // Validate key
+                    TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                    bool isValid = TwoFacAuth.ValidateTwoFactorPIN(user.GoogleAuthKey, enteredAuthKey, TimeSpan.FromSeconds(15));
+
+                    if (isValid)
+                    {
+                        user.TwoFactorEnabled = false;
+                        user.GoogleAuthKey = null;
+                        await _dbContext.SaveChangesAsync();
+                        return Ok(true);
+                    }
+
+                    return Ok(false);
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error:" + ex.Message);
+            }
+        }
         public class Credentials
         {
             public Credentials(string login, string password, string? authKey)

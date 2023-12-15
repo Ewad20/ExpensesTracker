@@ -5,7 +5,6 @@ const TwoFactorAuthentication = () => {
     const [TwoFactorStatus, setTwoFactorStatus] = useState(null);
     const [googleAuthKey, setGoogleAuthKey] = useState('');
 
-    // Update TwoFactor status for user on server
     const activateTwoFactor = async (status) => {
         try {
             const enteredValue = document.getElementById('userAuthKey').value;
@@ -28,9 +27,9 @@ const TwoFactorAuthentication = () => {
                 var displayDiv = document.createElement("div");
                 displayDiv.setAttribute("role", "alert");
 
-                console.log(data);
-
                 if (data) {
+                    setTwoFactorStatus(true);
+                    updateStatusInfo(true);
                     displayDiv.classList.add("alert", "alert-success");
                     displayDiv.textContent = "Activated!";
                 }
@@ -40,11 +39,55 @@ const TwoFactorAuthentication = () => {
                 }
                 var x = document.getElementById('activation-alert');
                 x.innerHTML = "";
-
                 x.appendChild(displayDiv);
             }
             else {
                 throw new Error('Failed to update Two Factor Status');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const disableTwoFactor = async (status) => {
+        try {
+            const enteredValue = document.getElementById('userAuthKey').value;
+
+            const sendData = {
+                enteredAuthKey: enteredValue
+            };
+
+            const response = await fetch('/api/account/disableTwoFactor', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(sendData),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                var displayDiv = document.createElement("div");
+                displayDiv.setAttribute("role", "alert");
+
+                if (data) {
+                    setTwoFactorStatus(false);
+                    updateStatusInfo(false);
+                    displayDiv.classList.add("alert", "alert-success");
+                    displayDiv.textContent = "Disabled!";
+                }
+                else {
+                    displayDiv.classList.add("alert", "alert-danger");
+                    displayDiv.textContent = "Code is expired or wrong!";
+                }
+                var x = document.getElementById('activation-alert');
+                x.innerHTML = "";
+
+                x.appendChild(displayDiv);
+                await fetchTwoFactorKey();
+            }
+            else {
+                throw new Error('Failed to disable 2FA');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -80,7 +123,9 @@ const TwoFactorAuthentication = () => {
                 // Process received data
                 setTwoFactorStatus(data.twoFactorEnabled);
                 updateStatusInfo(data.twoFactorEnabled);
-                setTwoFactorStatus(data.twoFactorEnabled);
+                if (!data.twoFactorEnabled) {
+                    await fetchTwoFactorKey();
+                }
             } else {
                 throw new Error('Failed to fetch data');
             }
@@ -114,7 +159,6 @@ const TwoFactorAuthentication = () => {
     // Effect to fetch data from the API and update isChecked state
     useEffect(() => {
         fetchTwoFactorStatus();
-        fetchTwoFactorKey();
     }, []);
 
     return (
@@ -132,23 +176,39 @@ const TwoFactorAuthentication = () => {
                     </div>
                 </div> 
             </div> <hr></hr>
-            <div className="row mb-2">
-                <div className="col-2">
-                    <img src="" className="img-fluid" alt="QR Code" id="QR_image"></img>
-                    <figcaption className="figure-caption text-center"></figcaption>
+            {!TwoFactorStatus ? (
+                <div className="row mb-2">
+                    <div className="col-2">
+                        <img src="" className="img-fluid" alt="QR Code" id="QR_image"></img>
+                        <figcaption className="figure-caption text-center"></figcaption>
+                    </div>
+                    <div className="col-10 align-items-center">
+                        <h4>How to Enable</h4>
+                        <ol>
+                            <li>Download and install the Google Authenticator app from the app store on your mobile device. This app will generate codes for your 2FA.</li>
+                            <li>Open the Authenticator app and choose the option to add a new account. Use the app to scan the provided QR code or manually enter the secret key provided.</li>
+                            <li>Once the QR code is scanned or the secret key is entered, the app will generate a unique code for your account. Enter this code on the website to confirm setup.</li>
+                        </ol>
+                    </div>
                 </div>
-                <div className="col-10 d-flex align-items-center">
-                    <p>Install Google Authenticator app from store on your mobile device.<br></br>
-                        Using the authenticator app, scan the QR code. Alternatively, you can manually enter the secret key.<br></br>
-                    If authentication is enabled and you activate it again, the previous one will be deactivated</p>
-                </div>
-            </div> <hr></hr>
+            ):(
+                    <div className="row mb-2">
+                        <div>
+                            <p>Your Two-Factor Authentication is currently active.</p>
+                            <p>To disable 2FA, please follow these steps:</p>
+                            <ol>
+                                <li>Open your Google Authenticator app.</li>
+                                <li>Enter the code generated by Google Authenticator below:</li>
+                            </ol>
+                        </div>
+                    </div>
+            ) }
             <div className="row mt-4">
                 <div className="col h4">
                     <input type="number" className="form-control" placeholder="enter the digit code" id="userAuthKey" maxLength="6"></input>
                 </div>
                 <div className="col-8 status-info">
-                    <input className="btn btn-dark" type="button" value="Confirm & Enable" onClick={activateTwoFactor}></input>
+                    <input className="btn btn-dark" type="button" value={!TwoFactorStatus ? ("Enable") : ("Disable")} onClick={!TwoFactorStatus ? (activateTwoFactor) : (disableTwoFactor)}></input>
                 </div>
             </div>
 
