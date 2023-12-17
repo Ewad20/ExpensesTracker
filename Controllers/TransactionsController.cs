@@ -167,7 +167,7 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("transactionsForWallet/{walletId}")]
-        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
+        public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory, double? minValue, double? maxValue)
         {
             
             try
@@ -247,6 +247,20 @@ namespace _2023pz_trrepo.Controllers
                 }
                 else { filteredTransaction = transaction; }
 
+                if (minValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount >= minValue)
+                    .ToList();
+                }
+
+                if (maxValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount <= maxValue)
+                    .ToList();
+                }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -268,7 +282,7 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("incomesForWallet/{walletId}")]
-        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
+        public string GetIncomesForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory, double? minValue, double? maxValue)
         {
             try
             {
@@ -324,6 +338,20 @@ namespace _2023pz_trrepo.Controllers
                 }
                 else { filteredTransaction = transaction; }
 
+                if (minValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount >= minValue)
+                    .ToList();
+                }
+
+                if (maxValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount <= maxValue)
+                    .ToList();
+                }
+
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -345,7 +373,7 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("expendituresForWallet/{walletId}")]
-        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory)
+        public string GetExpendituresForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory, double? minValue, double? maxValue)
         {
             try
             {
@@ -403,6 +431,20 @@ namespace _2023pz_trrepo.Controllers
                     .ToList();
                 }
                 else { filteredTransaction = transaction; }
+
+                if (minValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount >= minValue)
+                    .ToList();
+                }
+
+                if (maxValue.HasValue)
+                {
+                    filteredTransaction = filteredTransaction
+                    .Where(transaction => transaction.Amount <= maxValue)
+                    .ToList();
+                }
 
                 var options = new JsonSerializerOptions
                 {

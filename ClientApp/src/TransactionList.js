@@ -10,6 +10,8 @@ const TransactionList = () => {
     const [startingDate, setStartingDate] = useState(null);
     const [endingDate, setEndingDate] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [minValue, setMinValue] = useState(null);
+    const [maxValue, setMaxValue] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const { walletId } = useParams();
 
@@ -27,6 +29,14 @@ const TransactionList = () => {
 
     const handleTransactionTypeChange = (type) => {
         setTransactionType(type);
+    };
+
+    const handleMinValueChange = (event) => {
+        setMinValue(event.target.value);
+    };
+
+    const handleMaxValueChange = (event) => {
+        setMaxValue(event.target.value);
     };
 
     const handleAddTransaction = async (newTransactionData) => {
@@ -91,7 +101,9 @@ const TransactionList = () => {
             const queryParams = [
                 startDate ? `startDate=${formattedStartingDate}` : null,
                 endDate ? `endDate=${formattedEndingDate}` : null,
-                selectedCategory ? `selectedCategory=${selectedCategory}` : null
+                selectedCategory ? `selectedCategory=${selectedCategory}` : null,
+                minValue ? `minValue=${minValue}` : null,
+                maxValue ? `maxValue=${maxValue}` : null
             ].filter(Boolean).join('&');
 
             const response = await fetch(`${url}?${queryParams}`, {
@@ -177,13 +189,24 @@ const TransactionList = () => {
                         id="categorySelect"
                         onChange={handleCategoryChange}
                     >
-                        <option value="">No category</option>
-                        {categories.map(category => (
-                            <option key={category.Id} value={category.Id}>
-                                {category.Name}
-                            </option>
-                        ))}
-                    </select> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
+                    <option value="">No category</option>
+                    {categories.map(category => (
+                        <option key={category.Id} value={category.Id}>
+                            {category.Name}
+                        </option>
+                    ))}
+                    </select> <span className='mx-2'>Min value:</span> <input
+                        type="number"
+                        name="minValuePicker"
+                        step="any"
+                        onChange={handleMinValueChange}
+                    />
+                    <span className='mx-2'>Max value:</span> <input
+                        type="number"
+                        name="maxValuePicker"
+                        step="any"
+                        onChange={handleMaxValueChange}
+                    /> <button className='btn btn-secondary mx-1' onClick={handleFilterClick}>Filter</button>
                 </div>
             </div>
             <div className='row my-3'>
