@@ -1,7 +1,9 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const TransactionForm = ({onSubmit, walletId }) => {
+const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
+    const navigate = useNavigate();
+
     const [newTransaction, setNewTransaction] = useState({
         title: '',
         description: '',
@@ -13,8 +15,9 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
     const [formError, setFormError] = useState('');
     const [formVisible, setFormVisible] = useState(false);
-    const [categories, setCategories] = useState([]);
     const [transactionType, setTransactionType] = useState('');
+    const [confirmationVisible, setConfirmationVisible] = useState(false);
+    const [categories, setCategories] = useState([]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -35,6 +38,7 @@ const TransactionForm = ({onSubmit, walletId }) => {
             categoryId: selectedCategory ? selectedCategory.Id : ''
         }));
     };
+
     const fetchCategories = async () => {
         try {
             const response = await fetch(`api/transaction/allCategories`, {
@@ -69,7 +73,7 @@ const TransactionForm = ({onSubmit, walletId }) => {
             } else {
                 url = 'api/transaction/addExpenditure';
             }
-            console.log(newTransaction);
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -81,7 +85,13 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
             if (response.ok) {
                 console.log('Transaction added!');
-                setFormVisible(false); 
+                setFormVisible(false);
+                setConfirmationVisible(true);
+
+                setTimeout(() => {
+                    setConfirmationVisible(false);
+                    navigate(`/wallet`);
+                }, 1500);
             } else {
                 console.error(response);
                 setFormError('Invalid form data');
@@ -94,31 +104,78 @@ const TransactionForm = ({onSubmit, walletId }) => {
 
     return (
         <div>
-            <div>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTypeSelection('income')}>Income</button>
-                <button className='btn btn-secondary mx-1' onClick={() => handleTypeSelection('expenditure')}>Expenditure</button>
+            <div className="mb-3">
+                <button className="btn btn-secondary mx-1" onClick={() => handleTypeSelection('income')}>
+                    Income
+                </button>
+                <button className="btn btn-secondary mx-1" onClick={() => handleTypeSelection('expenditure')}>
+                    Expenditure
+                </button>
             </div>
             {formVisible && (
-                <div>
-                    <h3>Add New Transaction</h3>
-                    <form onSubmit={handleSubmit}>
-                      
-                        <input type="text" name="title" value={newTransaction.title} onChange={handleInputChange} placeholder="Title" required />
-                        <input type="text" name="description" value={newTransaction.description} onChange={handleInputChange} placeholder="Description" />
-                        <input type="number" name="amount" value={newTransaction.amount} onChange={handleInputChange} placeholder="Amount" required />
-                        <input type="date" name="date" value={newTransaction.date} onChange={handleInputChange} placeholder="Date" required />
-                        <select name="category" value={newTransaction.categoryId} onChange={handleCategoryChange}>
+                <div className="card w-50 h-auto m-auto mb-5 p-3 pt-3">
+                    <form onSubmit={handleSubmit} className="row w-100 g-3">
+                        <h5>Add New Transaction</h5>
+
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="title"
+                            value={newTransaction.title}
+                            onChange={handleInputChange}
+                            placeholder="Enter title"
+                            required
+                        />
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="description"
+                            value={newTransaction.description}
+                            onChange={handleInputChange}
+                            placeholder="Enter description"
+                        />
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="amount"
+                            value={newTransaction.amount}
+                            onChange={handleInputChange}
+                            placeholder="Enter amount"
+                            required
+                        />
+                        <input
+                            type="date"
+                            className="form-control"
+                            name="date"
+                            value={newTransaction.date}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <select
+                            className="form-select"
+                            name="category"
+                            value={newTransaction.categoryId}
+                            onChange={handleCategoryChange}
+                            required
+                        >
                             <option value="">Select category</option>
-                            {categories.map(category => (
+                            {categories.map((category) => (
                                 <option key={category.Id} value={category.Id}>
                                     {category.Name}
                                 </option>
                             ))}
                         </select>
 
-                        {formError && <div className="error">{formError}</div>}
-                        <button type="submit">Add</button>
+                        {formError && <div className="col-md-12 error">{formError}</div>}
+                        <button type="submit" className="btn btn-primary col-12">
+                            Add
+                        </button>
                     </form>
+                </div>
+            )}
+            {confirmationVisible && (
+                <div className="alert alert-success" role="alert">
+                    Transaction added successfully!
                 </div>
             )}
         </div>
