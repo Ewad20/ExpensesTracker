@@ -188,9 +188,8 @@ const TransactionList = () => {
                     Transaction added successfully!
                 </div>
             )}
-
+            <h3>Filter results:</h3>
             <div className='d-flex flex-column my-3 align-items-center'>
-                <h3>Filter results:</h3>
                 <div className='d-flex align-items-center my-2'>
                     <div className='d-flex flex-column mx-2 align-items-start'>
                         <label className='mb-1'>Starting date:</label>
@@ -227,18 +226,26 @@ const TransactionList = () => {
                             ))}
                         </select>
                     </div>
-                    <span className='mx-2'>Min value:</span> <input
-                        type="number"
-                        name="minValuePicker"
-                        step="any"
-                        onChange={handleMinValueChange}
-                    />
-                    <span className='mx-2'>Max value:</span> <input
-                        type="number"
-                        name="maxValuePicker"
-                        step="any"
-                        onChange={handleMaxValueChange}
-                    />
+                    <div className='d-flex flex-column mx-2 align-items-start'>
+                        <label className='mb-1'>Min value:</label>
+                        <input
+                            type="number"
+                            name="minValuePicker"
+                            step="any"
+                            onChange={handleMinValueChange}
+                            className='form-control'
+                        />
+                    </div>
+                    <div className='d-flex flex-column mx-2 align-items-start'>
+                        <label className='mb-1'>Max value:</label>
+                        <input
+                            type="number"
+                            name="maxValuePicker"
+                            step="any"
+                            onChange={handleMaxValueChange}
+                            className='form-control'
+                        />
+                    </div>
                     <button className='btn btn-secondary mx-2 align-self-end' onClick={handleFilterClick}>Filter</button>
                 </div>
             </div>
@@ -256,13 +263,8 @@ const TransactionList = () => {
                     </div>
                 ))}
             </div>
-        </div> 
-);
+        </div>
+    );
 };
 
 export default TransactionList;
-
-        
-
-
-
