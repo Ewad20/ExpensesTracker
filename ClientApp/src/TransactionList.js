@@ -227,7 +227,7 @@ const TransactionList = () => {
                             ))}
                         </select>
                     </div>
-                    </select> <span className='mx-2'>Min value:</span> <input
+                    <span className='mx-2'>Min value:</span> <input
                         type="number"
                         name="minValuePicker"
                         step="any"
