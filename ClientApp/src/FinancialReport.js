@@ -55,9 +55,17 @@ const MonthlySummary = () => {
 
     const handleGenerateClick = async () => {
         try {
-            const response = await fetch(`api/transaction/monthlySummary/${walletId}/${year}/${month}`, {
+            let apiEndpoint = '';
+            if (month === 'All') {
+                apiEndpoint = `api/transaction/yearlySummary/${walletId}/${year}`;
+            } else {
+                apiEndpoint = `api/transaction/monthlySummary/${walletId}/${year}/${month}`;
+            }
+
+            const response = await fetch(apiEndpoint, {
                 credentials: 'include',
             });
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -137,6 +145,7 @@ const MonthlySummary = () => {
             value={month}
             onChange={(e) => setMonth(e.target.value)}
         >
+            <option value="All">All</option>
             {months.map((month, index) => (
                 <option key={index} value={index + 1}>
                     {month}
