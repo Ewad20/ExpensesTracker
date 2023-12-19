@@ -65,6 +65,9 @@ const MonthlySummary = () => {
             setSummary(data);
             setTransactions(data.transactions);
             setDataGenerated(true);
+            const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
+            const walletName = selectedWallet ? selectedWallet.name : '';
+            setWalletName(walletName);
         } catch (error) {
             console.error('Error during fetching summary:', error);
         }
@@ -82,12 +85,14 @@ const MonthlySummary = () => {
 
             // Pobierz zawartoœæ pliku PDF z odpowiedzi
             const blob = await response.blob();
+            const wallet = wallets.find((wallet) => wallet.id === walletId);
+            const walletName = wallet ? wallet.name.replace(/ /g, '_') : 'wallet';
 
             // Utwórz link do pobrania pliku i rozpocznij pobieranie
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'monthly_report.pdf');
+            link.setAttribute('download', `monthly_report_${walletName}_${month}_${year}.pdf`);
             document.body.appendChild(link);
             link.click();
 

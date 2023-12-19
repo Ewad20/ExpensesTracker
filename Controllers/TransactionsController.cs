@@ -522,6 +522,7 @@ namespace _2023pz_trrepo.Controllers
             {
                 var startDate = new DateTime(year, month, 1);
                 var endDate = startDate.AddMonths(1).AddDays(-1);
+                
 
                 var incomes = _dbContext.Incomes
                     .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
@@ -575,6 +576,10 @@ namespace _2023pz_trrepo.Controllers
                         TotalAmount = group.Sum(i => i.Amount)
                     })
                     .ToList();
+                var walletName = _dbContext.Wallets
+                    .Where(w => w.Id == walletId)
+                    .Select(w => w.Name)
+                    .FirstOrDefault();
 
                 // Tworzenie nowego dokumentu PDF
                 Document document = new Document();
@@ -583,26 +588,43 @@ namespace _2023pz_trrepo.Controllers
                 document.Open();
 
                 // Dodawanie zawartości do dokumentu PDF
-                iTextSharp.text.Paragraph title = new iTextSharp.text.Paragraph($"Monthly Report for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)} {year}");
+                iTextSharp.text.Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
+                iTextSharp.text.Paragraph title = new iTextSharp.text.Paragraph($"Monthly Report for {CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(month)} {year}", titleFont);
+                title.Alignment = iTextSharp.text.Element.ALIGN_CENTER;
+                title.SpacingAfter = 18f;
                 document.Add(title);
 
                 // Dodawanie informacji o raporcie
-                iTextSharp.text.Paragraph summaryInfo = new iTextSharp.text.Paragraph($"Wallet ID: {walletId}, Total Income: {totalIncome}, Total Expenditure: {totalExpenditure}, Net Balance: {totalIncome - totalExpenditure}");
-                document.Add(summaryInfo);
+                BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
+                iTextSharp.text.Font normalFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.NORMAL);
+                iTextSharp.text.Font headerFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD);
 
+                iTextSharp.text.Paragraph walletInfo = new iTextSharp.text.Paragraph($"Wallet Name: {walletName}", normalFont);
+                iTextSharp.text.Paragraph incomeInfo = new iTextSharp.text.Paragraph($"Total Income: {totalIncome} PLN", normalFont);
+                iTextSharp.text.Paragraph expenditureInfo = new iTextSharp.text.Paragraph($"Total Expenditure: {totalExpenditure} PLN", normalFont);
+                iTextSharp.text.Paragraph balanceInfo = new iTextSharp.text.Paragraph($"Net Balance: {totalIncome - totalExpenditure} PLN", normalFont);
+
+                document.Add(walletInfo);
+                document.Add(incomeInfo);
+                document.Add(expenditureInfo);
+                document.Add(balanceInfo);
+
+                document.Add(new iTextSharp.text.Paragraph("\n"));
                 // Dodawanie transakcji
                 PdfPTable table = new PdfPTable(4); // 4 kolumny dla daty, tytułu, opisu i kwoty
-                table.AddCell("Date");
-                table.AddCell("Title");
-                table.AddCell("Description");
-                table.AddCell("Amount");
+
+                table.AddCell(new PdfPCell(new Phrase("Date", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Title", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Description", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Amount", headerFont)));
 
                 foreach (var transaction in transactions)
                 {
-                    table.AddCell(transaction.Date.ToShortDateString());
-                    table.AddCell(transaction.Title);
-                    table.AddCell(transaction.Description);
-                    table.AddCell(transaction.Amount.ToString());
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Date.ToShortDateString(), normalFont)));
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Title, normalFont)));
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Description, normalFont)));
+                    string formattedAmount = $"{transaction.Amount} PLN";
+                    table.AddCell(new PdfPCell(new Phrase(formattedAmount, normalFont)));
                 }
 
                 document.Add(table);
@@ -615,7 +637,9 @@ namespace _2023pz_trrepo.Controllers
                 byte[] fileContents = memoryStream.ToArray();
 
                 // Zwróć plik PDF jako odpowiedź HTTP
-                return File(fileContents, "application/pdf", "monthly_report.pdf");
+                string fileName = $"{walletName}_monthly_report_{month}_{year}.pdf";
+
+                return File(fileContents, "application/pdf", fileName);
             }
             catch (Exception ex)
             {
