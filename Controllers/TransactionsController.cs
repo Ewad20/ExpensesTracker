@@ -1,10 +1,17 @@
 ﻿using _2023pz_trrepo.Model;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
+using System.Globalization;
+using System.Linq;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -480,6 +487,7 @@ namespace _2023pz_trrepo.Controllers
                     {
                         Date = i.Date,
                         Title = i.Title,
+                        Description = i.Description,
                         Amount = i.Amount,
                         Category = i.CategoryId,
                         Type = "income"
@@ -492,6 +500,7 @@ namespace _2023pz_trrepo.Controllers
                     {
                         Date = e.Date,
                         Title = e.Title,
+                        Description = e.Description,
                         Amount = e.Amount,
                         Category = e.CategoryId,
                         Type = "expenditure"
@@ -546,6 +555,140 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [Authorize]
+        [HttpGet("generateMonthlyReportPDF/{walletId}/{year}/{month}")]
+        public IActionResult GenerateMonthlyReportPDF(long walletId, int year, int month)
+        {
+            try
+            {
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+                
+
+                var incomes = _dbContext.Incomes
+                    .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                    .Select(i => new
+                    {
+                        Date = i.Date,
+                        Title = i.Title,
+                        Description = i.Description,
+                        Amount = i.Amount,
+                        Category = i.CategoryId,
+                        Type = "income"
+                    })
+                    .ToList();
+
+                var expenditures = _dbContext.Expenditures
+                    .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                    .Select(e => new
+                    {
+                        Date = e.Date,
+                        Title = e.Title,
+                        Description = e.Description,
+                        Amount = e.Amount,
+                        Category = e.CategoryId,
+                        Type = "expenditure"
+                    })
+                    .ToList();
+
+                var transactions = incomes.Concat(expenditures)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
+                var totalIncome = incomes.Sum(i => i.Amount);
+                var totalExpenditure = expenditures.Sum(e => e.Amount);
+
+                var incomeByCategory = incomes
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
+                var expenditureByCategory = expenditures
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+                var walletName = _dbContext.Wallets
+                    .Where(w => w.Id == walletId)
+                    .Select(w => w.Name)
+                    .FirstOrDefault();
+
+                // Tworzenie nowego dokumentu PDF
+                Document document = new Document();
+                MemoryStream memoryStream = new MemoryStream();
+                iTextSharp.text.pdf.PdfWriter writer = iTextSharp.text.pdf.PdfWriter.GetInstance(document, memoryStream);
+                document.Open();
+
+                // Dodawanie zawartości do dokumentu PDF
+                iTextSharp.text.Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
+                iTextSharp.text.Paragraph title = new iTextSharp.text.Paragraph($"Monthly Report for {CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(month)} {year}", titleFont);
+                title.Alignment = iTextSharp.text.Element.ALIGN_CENTER;
+                title.SpacingAfter = 18f;
+                document.Add(title);
+
+                // Dodawanie informacji o raporcie
+                BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
+                iTextSharp.text.Font normalFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.NORMAL);
+                iTextSharp.text.Font headerFont = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD);
+
+                iTextSharp.text.Paragraph walletInfo = new iTextSharp.text.Paragraph($"Wallet Name: {walletName}", normalFont);
+                iTextSharp.text.Paragraph incomeInfo = new iTextSharp.text.Paragraph($"Total Income: {totalIncome} PLN", normalFont);
+                iTextSharp.text.Paragraph expenditureInfo = new iTextSharp.text.Paragraph($"Total Expenditure: {totalExpenditure} PLN", normalFont);
+                iTextSharp.text.Paragraph balanceInfo = new iTextSharp.text.Paragraph($"Net Balance: {totalIncome - totalExpenditure} PLN", normalFont);
+
+                document.Add(walletInfo);
+                document.Add(incomeInfo);
+                document.Add(expenditureInfo);
+                document.Add(balanceInfo);
+
+                document.Add(new iTextSharp.text.Paragraph("\n"));
+                // Dodawanie transakcji
+                PdfPTable table = new PdfPTable(4); // 4 kolumny dla daty, tytułu, opisu i kwoty
+
+                table.AddCell(new PdfPCell(new Phrase("Date", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Title", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Description", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Amount", headerFont)));
+
+                foreach (var transaction in transactions)
+                {
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Date.ToShortDateString(), normalFont)));
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Title, normalFont)));
+                    table.AddCell(new PdfPCell(new Phrase(transaction.Description, normalFont)));
+                    string formattedAmount = $"{transaction.Amount} PLN";
+                    table.AddCell(new PdfPCell(new Phrase(formattedAmount, normalFont)));
+                }
+
+                document.Add(table);
+
+                // Zakończenie edycji dokumentu
+                document.Close();
+                writer.Close();
+
+                // Pobierz zawartość pliku z pamięci podręcznej
+                byte[] fileContents = memoryStream.ToArray();
+
+                // Zwróć plik PDF jako odpowiedź HTTP
+                string fileName = $"{walletName}_monthly_report_{month}_{year}.pdf";
+
+                return File(fileContents, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
 
         [Authorize]
         [HttpGet("allCategories")]
