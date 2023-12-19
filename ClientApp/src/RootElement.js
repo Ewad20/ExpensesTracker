@@ -70,7 +70,14 @@ const RootElement = () => {
                                     </li>
                                 </ul>)}
                         {user ? (
-                            <button className="btn btn-outline-light" onClick={() => handleLogout()}>Logout</button>
+                            <>
+                                <ul className="navbar-nav navbar-nav__profile-button">
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/profile">Profile</Link>
+                                    </li>
+                                </ul>
+                                <button className="btn btn-outline-light" onClick={() => handleLogout()}>Logout</button>
+                            </>
                         ) : null}
                     </div>
                 </div>
