@@ -1,10 +1,17 @@
 ﻿using _2023pz_trrepo.Model;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
+using System.Globalization;
+using System.Linq;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -506,6 +513,116 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [Authorize]
+        [HttpGet("generateMonthlyReportPDF/{walletId}/{year}/{month}")]
+        public IActionResult GenerateMonthlyReportPDF(long walletId, int year, int month)
+        {
+            try
+            {
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                var incomes = _dbContext.Incomes
+                    .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                    .Select(i => new
+                    {
+                        Date = i.Date,
+                        Title = i.Title,
+                        Description = i.Description,
+                        Amount = i.Amount,
+                        Category = i.CategoryId,
+                        Type = "income"
+                    })
+                    .ToList();
+
+                var expenditures = _dbContext.Expenditures
+                    .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                    .Select(e => new
+                    {
+                        Date = e.Date,
+                        Title = e.Title,
+                        Description = e.Description,
+                        Amount = e.Amount,
+                        Category = e.CategoryId,
+                        Type = "expenditure"
+                    })
+                    .ToList();
+
+                var transactions = incomes.Concat(expenditures)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
+                var totalIncome = incomes.Sum(i => i.Amount);
+                var totalExpenditure = expenditures.Sum(e => e.Amount);
+
+                var incomeByCategory = incomes
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
+                var expenditureByCategory = expenditures
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
+                // Tworzenie nowego dokumentu PDF
+                Document document = new Document();
+                MemoryStream memoryStream = new MemoryStream();
+                iTextSharp.text.pdf.PdfWriter writer = iTextSharp.text.pdf.PdfWriter.GetInstance(document, memoryStream);
+                document.Open();
+
+                // Dodawanie zawartości do dokumentu PDF
+                iTextSharp.text.Paragraph title = new iTextSharp.text.Paragraph($"Monthly Report for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)} {year}");
+                document.Add(title);
+
+                // Dodawanie informacji o raporcie
+                iTextSharp.text.Paragraph summaryInfo = new iTextSharp.text.Paragraph($"Wallet ID: {walletId}, Total Income: {totalIncome}, Total Expenditure: {totalExpenditure}, Net Balance: {totalIncome - totalExpenditure}");
+                document.Add(summaryInfo);
+
+                // Dodawanie transakcji
+                PdfPTable table = new PdfPTable(4); // 4 kolumny dla daty, tytułu, opisu i kwoty
+                table.AddCell("Date");
+                table.AddCell("Title");
+                table.AddCell("Description");
+                table.AddCell("Amount");
+
+                foreach (var transaction in transactions)
+                {
+                    table.AddCell(transaction.Date.ToShortDateString());
+                    table.AddCell(transaction.Title);
+                    table.AddCell(transaction.Description);
+                    table.AddCell(transaction.Amount.ToString());
+                }
+
+                document.Add(table);
+
+                // Zakończenie edycji dokumentu
+                document.Close();
+                writer.Close();
+
+                // Pobierz zawartość pliku z pamięci podręcznej
+                byte[] fileContents = memoryStream.ToArray();
+
+                // Zwróć plik PDF jako odpowiedź HTTP
+                return File(fileContents, "application/pdf", "monthly_report.pdf");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
 
         [Authorize]
         [HttpGet("allCategories")]

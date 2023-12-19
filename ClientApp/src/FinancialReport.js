@@ -70,6 +70,35 @@ const MonthlySummary = () => {
         }
     };
 
+    const handleGenerateReportClick = async () => {
+        try {
+            const response = await fetch(`api/transaction/generateMonthlyReportPDF/${walletId}/${year}/${month}`, {
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Pobierz zawartoœæ pliku PDF z odpowiedzi
+            const blob = await response.blob();
+
+            // Utwórz link do pobrania pliku i rozpocznij pobieranie
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'monthly_report.pdf');
+            document.body.appendChild(link);
+            link.click();
+
+            // Zwolnij zasoby
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error during fetching PDF:', error);
+        }
+    };
+
     
 
     return (
@@ -88,29 +117,32 @@ const MonthlySummary = () => {
                     ))}
                 </select>
                 <select
-                    className="form-select"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                >
-                    {years.map((yearOption) => (
-                        <option key={yearOption} value={yearOption}>
-                            {yearOption}
-                        </option>
-                    ))}
-                </select>
-                <select
-                    className="form-select"
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value)}
-                >
-                    {months.map((month, index) => (
-                        <option key={index} value={index + 1}>
-                            {month}
-                        </option>
-                    ))}
-                </select>
-                <button className="btn btn-primary" onClick={handleGenerateClick}>
-                    Generate
+            className="form-select"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+        >
+            {years.map((yearOption) => (
+                <option key={yearOption} value={yearOption}>
+                    {yearOption}
+                </option>
+            ))}
+        </select>
+        <select
+            className="form-select"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+        >
+            {months.map((month, index) => (
+                <option key={index} value={index + 1}>
+                    {month}
+                </option>
+            ))}
+        </select>
+        <button className="btn btn-primary" onClick={handleGenerateClick}>
+            Generate
+                </button>
+                <button className="btn btn-primary" onClick={handleGenerateReportClick}>
+                    Generate Monthly Report (PDF)
                 </button>
             </div>
             {summary && (
