@@ -438,6 +438,7 @@ namespace _2023pz_trrepo.Controllers
                     {
                         Date = i.Date,
                         Title = i.Title,
+                        Description = i.Description,
                         Amount = i.Amount,
                         Category = i.CategoryId,
                         Type = "income"
@@ -450,6 +451,7 @@ namespace _2023pz_trrepo.Controllers
                     {
                         Date = e.Date,
                         Title = e.Title,
+                        Description = e.Description,
                         Amount = e.Amount,
                         Category = e.CategoryId,
                         Type = "expenditure"

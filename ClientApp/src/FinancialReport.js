@@ -4,13 +4,53 @@ import ChartReport from './ChartReport';
 
 
 const MonthlySummary = () => {
+    const [wallets, setWallets] = useState([]);
     const [walletId, setWalletId] = useState('');
-    const [year, setYear] = useState('');
-    const [month, setMonth] = useState('');
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() zwraca miesi¹ce od 0 do 11, wiêc dodajemy 1
+    const [month, setMonth] = useState(currentMonth.toString());
+    const currentYear = currentDate.getFullYear();
+    const [year, setYear] = useState(currentYear.toString());
     const [summary, setSummary] = useState(null);
     const [transactions, setTransactions] = useState([]);
     const [dataGenerated, setDataGenerated] = useState(false);
+    const [months] = useState([
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ]);
+    const years = [];
+    const startYear = 2018; // zaczynamy od roku 2020
+    for (let year = currentYear; startYear <= year; year--) {
+        years.push(year.toString());
+    }
 
+    const fetchWallets = async () => {
+        try {
+            const response = await fetch('api/account/getWallets', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const walletData = await response.json();
+                setWallets(walletData);
+                // Ustaw domyœlny portfel na pierwszy na liœcie (jeœli istnieje)
+                if (walletData.length > 0) {
+                    setWalletId(walletData[0].id);
+                }
+            } else {
+                console.error(response);
+            }
+        } catch (error) {
+            console.error('Error fetching wallets:', error);
+        }
+    };
+    useEffect(() => {
+        fetchWallets();
+    }, []);
 
 
     const handleGenerateClick = async () => {
@@ -30,14 +70,48 @@ const MonthlySummary = () => {
         }
     };
 
+    
+
     return (
         <div className='container'>
             <h1>Monthly Summary</h1>
-            <div style={{ marginBottom: '20px' }}>
-                <input type="text" placeholder="Wallet ID" value={walletId} onChange={(e) => setWalletId(e.target.value)} />
-                <input type="text" placeholder="Year" value={year} onChange={(e) => setYear(e.target.value)} />
-                <input type="text" placeholder="Month" value={month} onChange={(e) => setMonth(e.target.value)} />
-                <button onClick={handleGenerateClick}>Generate</button>
+            <div className="input-group mb-3">
+                <select
+                    className="form-select"
+                    value={walletId}
+                    onChange={(e) => setWalletId(e.target.value)}
+                >
+                    {wallets.map((wallet) => (
+                        <option key={wallet.id} value={wallet.id}>
+                            {wallet.name}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    className="form-select"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                >
+                    {years.map((yearOption) => (
+                        <option key={yearOption} value={yearOption}>
+                            {yearOption}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    className="form-select"
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                >
+                    {months.map((month, index) => (
+                        <option key={index} value={index + 1}>
+                            {month}
+                        </option>
+                    ))}
+                </select>
+                <button className="btn btn-primary" onClick={handleGenerateClick}>
+                    Generate
+                </button>
             </div>
             {summary && (
                 <div style={{ width: '100%', fontSize: '18px' }}>
@@ -85,7 +159,7 @@ const MonthlySummary = () => {
                     {transactions.map((transaction, index) => (
                         <div key={index}>
                             <p>
-                                {new Date(transaction.date).toLocaleDateString('pl-PL', { year: 'numeric', month: '2-digit', day: '2-digit' })} - {transaction.title} - {transaction.amount} PLN &nbsp;
+                                {new Date(transaction.date).toLocaleDateString('pl-PL', { year: 'numeric', month: '2-digit', day: '2-digit' })} - {transaction.title} - {transaction.description} - {transaction.amount} PLN &nbsp;
                                 <span style={{ color: transaction.type === 'income' ? 'green' : 'red' }}>
                                     ({transaction.type === 'income' ? 'Income' : 'Expenditure'})
                                 </span>
