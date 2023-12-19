@@ -52,7 +52,7 @@ const ProfilePage = () => {
                         </tr>
                         <tr>
                             <label>Username:</label> {userData.user.userName}
-    `                   </tr>
+                        </tr>
                         <tr>
                             <label>Email:</label> {userData.user.email}
                         </tr>
