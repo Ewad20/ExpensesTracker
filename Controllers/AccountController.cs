@@ -121,7 +121,13 @@ namespace _2023pz_trrepo.Controllers
             {
                 return new JsonResult(Unauthorized("Session ended! Sign in again"));
             }   
-            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
+            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).Include("Incomes").Include("Expenditures").ToListAsync();
+            foreach (Wallet wallet in wallets){
+                var income = wallet.Incomes.Sum(i => i.Amount);
+                var expenditure = wallet.Expenditures.Sum(i => i.Amount);
+                wallet.AccountBalance = income - expenditure;
+            }
+            _dbContext.SaveChanges();
             return new JsonResult(wallets);
         }
 

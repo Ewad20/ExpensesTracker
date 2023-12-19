@@ -25,28 +25,6 @@ namespace _2023pz_trrepo.Controllers
         public TransactionsController(ETDbContext dbContext)
         {
             _dbContext = dbContext;
-            var Clothes = _dbContext.Categories.FirstOrDefault(c => c.Name == "Clothes");
-            var Food = _dbContext.Categories.FirstOrDefault(c => c.Name == "Food");
-            var Work = _dbContext.Categories.FirstOrDefault(c => c.Name == "Work");
-
-            if (Clothes == null)
-            {
-                Clothes = new Category { Name = "Clothes", Type = CategoryType.Expenditure, IsDefault = true };
-                _dbContext.Categories.Add(Clothes);
-            }
-
-            if (Food == null)
-            {
-                Food = new Category { Name = "Food", Type = CategoryType.Expenditure, IsDefault = true };
-                _dbContext.Categories.Add(Food);
-            }
-
-            if (Work == null)
-            {
-                Work = new Category { Name = "Work", Type = CategoryType.Income, IsDefault = true };
-                _dbContext.Categories.Add(Work);
-            }
-            _dbContext.SaveChanges();
         }
 
         [HttpPost("addCategory")]
@@ -63,7 +41,64 @@ namespace _2023pz_trrepo.Controllers
             }
             return Ok("Category added successfully!");
         }
-
+        [Authorize]
+        [HttpPost("updateIncome")]
+        public async Task<IActionResult> updateIncome([FromBody] Income transaction)
+        {
+            try
+            {
+                var inc = await _dbContext.Incomes.FirstOrDefaultAsync(t => t.Id == transaction.Id);
+                if (inc != null)
+                {
+                    inc.Title = transaction.Title;
+                    inc.CategoryId = transaction.CategoryId;
+                    inc.Amount = transaction.Amount;
+                    inc.Date = transaction.Date.ToLocalTime();
+                    inc.Description = transaction.Description;
+                    _dbContext.Incomes.Update(inc);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return StatusCode(500, "Unable to update transaction! Error: " + e.Message);
+            }
+        }
+        [Authorize]
+        [HttpPost("updateExpenditure")]
+        public async Task<IActionResult> upadateExpenditure([FromBody] Expenditure transaction)
+        {
+            try
+            {
+                var exp = await _dbContext.Expenditures.FirstOrDefaultAsync(t => t.Id == transaction.Id);
+                if (exp != null)
+                {
+                    exp.Title = transaction.Title;
+                    exp.CategoryId = transaction.CategoryId;
+                    exp.Amount = transaction.Amount;
+                    exp.Date = transaction.Date.ToLocalTime();
+                    exp.Description = transaction.Description;
+                    _dbContext.Expenditures.Update(exp);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return StatusCode(500, "Unable to update transaction! Error: " + e.Message);
+            }
+        }
         [Authorize]
         [HttpPost("addCategoryAuthorized")]
         public async Task<IActionResult> AddCategoryAuthorized([FromBody] Category category)
@@ -72,7 +107,8 @@ namespace _2023pz_trrepo.Controllers
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var user = await _dbContext.Users.Include("UserCategories").FirstOrDefaultAsync(u => u.Id == userId);
-                if(user == null) {
+                if (user == null)
+                {
                     return NotFound("User not found");
                 }
                 category.UserId = userId;
@@ -176,7 +212,7 @@ namespace _2023pz_trrepo.Controllers
         [HttpGet("transactionsForWallet/{walletId}")]
         public string GetTransactionsForWallet(long walletId, DateTime? startDate, DateTime? endDate, long? selectedCategory, double? minValue, double? maxValue)
         {
-            
+
             try
             {
                 List<AbstractTransaction> transaction = new List<AbstractTransaction>();
@@ -692,31 +728,37 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("allCategories")]
-        public string GetAllCategories()
+        public async Task<string> GetAllCategories()
         {
+            var Clothes = _dbContext.Categories.FirstOrDefault(c => c.Name == "Clothes");
+            var Food = _dbContext.Categories.FirstOrDefault(c => c.Name == "Food");
+            var Work = _dbContext.Categories.FirstOrDefault(c => c.Name == "Work");
+
+            if (Clothes == null)
+            {
+                Clothes = new Category { Name = "Clothes", Type = CategoryType.Expenditure, IsDefault = true };
+                _dbContext.Categories.Add(Clothes);
+            }
+
+            if (Food == null)
+            {
+                Food = new Category { Name = "Food", Type = CategoryType.Expenditure, IsDefault = true };
+                _dbContext.Categories.Add(Food);
+            }
+
+            if (Work == null)
+            {
+                Work = new Category { Name = "Work", Type = CategoryType.Income, IsDefault = true };
+                _dbContext.Categories.Add(Work);
+            }
+            await _dbContext.SaveChangesAsync();
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
                 return "";
             try
             {
-                List<Category> categories = new List<Category>();
-
-                var cat = _dbContext.Categories
-                .Where(x => x.UserId == userId || x.UserId == null)
-                .ToList();
-
-                categories = cat;
-                
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-                    WriteIndented = true // Opcjonalne - czy czytelnie sformatować JSON
-                };
-
-                options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-
+                List<Category> categories = _dbContext.Categories.Where(c => c.UserId == user.Id || c.UserId == null).ToList();
                 return JsonSerializer.Serialize(categories);
             }
             catch (Exception ex)
@@ -751,6 +793,32 @@ namespace _2023pz_trrepo.Controllers
             return Ok("Category edited successfully!");
         }
 
+        [HttpDelete("deleteTransaction/{transactionId}")]
+        public async Task<IActionResult> DeleteTransaction(long transactionId)
+        {
+            try
+            {
+                var income = await _dbContext.Incomes.FirstOrDefaultAsync(transaction => transaction.Id == transactionId);
+                if (income != null)
+                {
+                    _dbContext.Incomes.Remove(income);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                var expenditure = await _dbContext.Expenditures.FirstOrDefaultAsync(transaction => transaction.Id == transactionId);
+                if (expenditure != null)
+                {
+                    _dbContext.Expenditures.Remove(expenditure);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Unable to delete transaction! Error: " + ex.Message);
+            }
+        }
         [HttpDelete("deleteCategory/{categoryId}")]
         public async Task<IActionResult> DeleteCategory(long categoryId)
         {
@@ -775,4 +843,3 @@ namespace _2023pz_trrepo.Controllers
 
     }
 }
- 
