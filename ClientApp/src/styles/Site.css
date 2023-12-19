@@ -93,3 +93,19 @@
     width: 570px;
     height: 600px;
 }
+
+.navbar-nav__profile-button {
+    margin-right:20px;
+}
+
+/*Profile*/
+.profile__component {
+    display: grid;
+    grid-template-columns: 15ch 15ch;
+    grid-gap: 15px;
+    padding: 30px;
+    border-radius: 5px;
+    background-color: #D4D2D5;
+
+    & > table,tbody,tr { display: contents;}
+}

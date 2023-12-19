@@ -10,7 +10,7 @@ import Import from './Import';
 import FinancialReport from './FinancialReport';
 import ManageCategories from './ManageCategories';
 import TwoFactorAuthentication from './account/settings/TwoFactorAuthentication';
-
+import ProfilePage from './UserProfile/ProfilePage'
 
 const App = () => {
     return (
@@ -26,6 +26,7 @@ const App = () => {
                 <Route path="/report" element={<FinancialReport />} />
                 <Route path="/account/settings/twoFactorAuthentication" element={<TwoFactorAuthentication />} />
                 <Route path="/categories" element={<ManageCategories />} />
+                <Route path="/profile" element={<ProfilePage />}></Route>
             </Routes>
         </Router>
 

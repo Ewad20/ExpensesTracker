@@ -4,15 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 using Google.Authenticator;
 using System.Text;
-using System.Text.Json;
-using Azure.Core;
-using System.Runtime.InteropServices.JavaScript;
-using System.Threading.Tasks.Dataflow;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -270,6 +265,24 @@ namespace _2023pz_trrepo.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, "Error:" + ex.Message);
+            }
+        }
+
+        [HttpGet("GetProfilePageData")]
+        [Authorize]
+        public async Task<IActionResult> GetProfilePageData()
+        {
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentNullException(nameof(userId));
+                User user = await _userManager.FindByIdAsync(userId) ?? throw new Exception($"User {userId} not found in DB");
+                IEnumerable<UserLoginInfo> logins = await _userManager.GetLoginsAsync(user);
+
+                return new OkObjectResult(new { user, logins});
+            }
+            catch(Exception ex) 
+            {
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
