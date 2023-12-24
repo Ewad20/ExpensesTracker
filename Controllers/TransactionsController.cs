@@ -12,6 +12,7 @@ using iTextSharp.text.pdf;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using OfficeOpenXml;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -802,6 +803,108 @@ namespace _2023pz_trrepo.Controllers
                 string fileName = $"{walletName}_monthly_report_{month}_{year}.pdf";
 
                 return File(fileContents, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [Authorize]
+        [HttpGet("generateMonthlyReportExcel/{walletId}/{year}/{month}")]
+        public IActionResult GenerateMonthlyReportExcel(long walletId, int year, int month)
+        {
+            try
+            {
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                var incomes = _dbContext.Incomes
+                    .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                    .Select(i => new
+                    {
+                        Date = i.Date,
+                        Title = i.Title,
+                        Description = i.Description,
+                        Amount = i.Amount,
+                        Category = i.CategoryId,
+                        Type = "income"
+                    })
+                    .ToList();
+
+                var expenditures = _dbContext.Expenditures
+                    .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                    .Select(e => new
+                    {
+                        Date = e.Date,
+                        Title = e.Title,
+                        Description = e.Description,
+                        Amount = e.Amount,
+                        Category = e.CategoryId,
+                        Type = "expenditure"
+                    })
+                    .ToList();
+
+                var transactions = incomes.Concat(expenditures)
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
+                var totalIncome = incomes.Sum(i => i.Amount);
+                var totalExpenditure = expenditures.Sum(e => e.Amount);
+
+                var incomeByCategory = incomes
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+
+                var expenditureByCategory = expenditures
+                    .GroupBy(i => i.Category)
+                    .Select(group => new
+                    {
+                        Category = group.Key,
+                        CategoryName = _dbContext.Categories.FirstOrDefault(c => c.Id == group.Key)?.Name,
+                        TotalAmount = group.Sum(i => i.Amount)
+                    })
+                    .ToList();
+                var walletName = _dbContext.Wallets
+                    .Where(w => w.Id == walletId)
+                    .Select(w => w.Name)
+                    .FirstOrDefault();
+
+                // Tworzenie nowego arkusza
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Ustawienie kontekstu licencji
+                ExcelPackage excelPackage = new ExcelPackage();
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("Monthly Report");
+
+                // Ustawienie nagłówków kolumn
+                worksheet.Cells[1, 1].Value = "Date";
+                worksheet.Cells[1, 2].Value = "Title";
+                worksheet.Cells[1, 3].Value = "Description";
+                worksheet.Cells[1, 4].Value = "Amount";
+
+                // Wypełnienie danymi
+                int row = 2;
+                foreach (var transaction in transactions)
+                {
+                    worksheet.Cells[row, 1].Value = transaction.Date.ToShortDateString();
+                    worksheet.Cells[row, 2].Value = transaction.Title;
+                    worksheet.Cells[row, 3].Value = transaction.Description;
+                    worksheet.Cells[row, 4].Value = transaction.Amount;
+                    row++;
+                }
+
+                // Zapisanie pliku
+                byte[] fileContents;
+                string fileName = $"{walletName}_monthly_report_{month}_{year}.xlsx";
+                fileContents = excelPackage.GetAsByteArray();
+
+                // Zwrócenie pliku Excel jako odpowiedź HTTP
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {

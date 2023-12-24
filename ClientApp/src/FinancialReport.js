@@ -6,6 +6,7 @@ import ChartReport from './ChartReport';
 const MonthlySummary = () => {
     const [wallets, setWallets] = useState([]);
     const [walletId, setWalletId] = useState('');
+    const [walletName, setWalletName] = useState('');
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1; // getMonth() zwraca miesi¹ce od 0 do 11, wiêc dodajemy 1
     const [month, setMonth] = useState(currentMonth.toString());
@@ -96,11 +97,13 @@ const MonthlySummary = () => {
             const wallet = wallets.find((wallet) => wallet.id === walletId);
             const walletName = wallet ? wallet.name.replace(/ /g, '_') : 'wallet';
 
+            const fileName = `monthly_report_${walletName}_${month}_${year}.pdf`;
+
             // Utwórz link do pobrania pliku i rozpocznij pobieranie
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `monthly_report_${walletName}_${month}_${year}.pdf`);
+            link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
 
@@ -109,6 +112,39 @@ const MonthlySummary = () => {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Error during fetching PDF:', error);
+        }
+    };
+
+    const handleGenerateExcelClick = async () => {
+        try {
+            const response = await fetch(`api/transaction/generateMonthlyReportExcel/${walletId}/${year}/${month}`, {
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Pobierz zawartoœæ pliku Excel z odpowiedzi
+            const blob = await response.blob();
+            const wallet = wallets.find((wallet) => wallet.id === walletId);
+            const walletName = wallet ? wallet.name.replace(/ /g, '_') : 'wallet';
+
+            const fileName = `monthly_report_${walletName}_${month}_${year}.xlsx`;
+
+            // Utwórz link do pobrania pliku i rozpocznij pobieranie
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+
+            // Zwolnij zasoby
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error during fetching Excel:', error);
         }
     };
 
@@ -157,6 +193,9 @@ const MonthlySummary = () => {
                 </button>
                 <button className="btn btn-primary" onClick={handleGenerateReportClick}>
                     Generate Monthly Report (PDF)
+                </button>
+                <button className="btn btn-primary" onClick={handleGenerateExcelClick}>
+                    Generate Monthly Report (Excel)
                 </button>
             </div>
             {summary && (
