@@ -152,12 +152,14 @@ const MonthlySummary = () => {
 
     return (
         <div className='container'>
-            <h1>Monthly Summary</h1>
-            <div className="input-group mb-3">
+            <h1 style={{ color: '#AA968A', borderBottom: '2px solid #AA968A', paddingBottom: '10px' }}>Monthly Summary</h1>
+
+            <div className="select-container" style={{ border: `1px solid #AA968A`, borderRadius: '5px', padding: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
                 <select
                     className="form-select"
                     value={walletId}
                     onChange={(e) => setWalletId(e.target.value)}
+                    style={{ marginRight: '10px' }}
                 >
                     {wallets.map((wallet) => (
                         <option key={wallet.id} value={wallet.id}>
@@ -166,96 +168,119 @@ const MonthlySummary = () => {
                     ))}
                 </select>
                 <select
-            className="form-select"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-        >
-            {years.map((yearOption) => (
-                <option key={yearOption} value={yearOption}>
-                    {yearOption}
-                </option>
-            ))}
-        </select>
-        <select
-            className="form-select"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-        >
-            <option value="All">All</option>
-            {months.map((month, index) => (
-                <option key={index} value={index + 1}>
-                    {month}
-                </option>
-            ))}
-        </select>
-        <button className="btn btn-primary" onClick={handleGenerateClick}>
-            Generate
-                </button>
-                <button className="btn btn-primary" onClick={handleGenerateReportClick}>
-                    Generate Monthly Report (PDF)
-                </button>
-                <button className="btn btn-primary" onClick={handleGenerateExcelClick}>
-                    Generate Monthly Report (Excel)
-                </button>
-            </div>
-            {summary && (
-                <div style={{ width: '100%', fontSize: '18px' }}>
-                    <p>
-                        <span style={{ color: 'green', fontWeight: 'bold' }}>Total Income: {summary.totalIncome}</span>&nbsp;
-                        <span style={{ fontWeight: 'bold' }}>Net Balance: {summary.netBalance}</span>&nbsp;
-                        <span style={{ color: 'red', fontWeight: 'bold' }}>Total Expenditure: {summary.totalExpenditure}</span>&nbsp;
-                    </p>
-                </div>
-
-            )}
-            {dataGenerated && summary && (
-                <ChartReport summary={summary} />
-            )}
-            <div style={{ display: 'flex' }}>
-                {summary && summary.incomeByCategory && summary.incomeByCategory.length > 0 && (
-                    <div style={{ flex: 1 }}>
-                        <h3>Income by Category:</h3>
-                        {summary.incomeByCategory.map((category, index) => (
-                            <div key={index}>
-                                <p>
-                                    <strong>{category.categoryName}</strong> - {category.totalAmount} PLN
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {summary && summary.expenditureByCategory && summary.expenditureByCategory.length > 0 && (
-                    <div style={{ flex: 1 }}>
-                        <h3>Expenditure by Category:</h3>
-                        {summary.expenditureByCategory.map((category, index) => (
-                            <div key={index}>
-                                <p>
-                                    <strong>{category.categoryName}</strong> - {category.totalAmount} PLN
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-            {transactions.length > 0 && (
-                <div>
-                    <h3>Transactions:</h3>
-                    {transactions.map((transaction, index) => (
-                        <div key={index}>
-                            <p>
-                                {new Date(transaction.date).toLocaleDateString('pl-PL', { year: 'numeric', month: '2-digit', day: '2-digit' })} - {transaction.title} - {transaction.description} - {transaction.amount} PLN &nbsp;
-                                <span style={{ color: transaction.type === 'income' ? 'green' : 'red' }}>
-                                    ({transaction.type === 'income' ? 'Income' : 'Expenditure'})
-                                </span>
-                            </p>
-                        </div>
+                    className="form-select"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    style={{ marginRight: '10px' }}
+                >
+                    {years.map((yearOption) => (
+                        <option key={yearOption} value={yearOption}>
+                            {yearOption}
+                        </option>
                     ))}
+                </select>
+                <select
+                    className="form-select"
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                >
+                    <option value="All">All</option>
+                    {months.map((month, index) => (
+                        <option key={index} value={index + 1}>
+                            {month}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="button-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                {month === 'All' ? (
+                    <button className="btn btn-primary" style={{ backgroundColor: '#6C698D' }} onClick={handleGenerateClick}>
+                        Generate
+                    </button>
+                ) : (
+                    <>
+                        <button className="btn btn-primary" style={{ backgroundColor: '#6C698D', marginRight: '10px' }} onClick={handleGenerateClick}>
+                            Generate
+                        </button>
+                        <button className="btn btn-primary" style={{ backgroundColor: '#BFAFA6', marginRight: '10px' }} onClick={handleGenerateReportClick}>
+                            Generate Monthly Report (PDF)
+                        </button>
+                        <button className="btn btn-primary" style={{ backgroundColor: '#D4D2D5' }} onClick={handleGenerateExcelClick}>
+                            Generate Monthly Report (Excel)
+                        </button>
+                    </>
+                )}
+            </div>
+                
+            {summary && dataGenerated &&(
+                <div style={{ border: `1px solid #AA968A`, borderRadius: '5px', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                        <div style={{ flex: 1 }}>
+                            <h3>Total Income: <span style={{ color: 'lightgreen' }}>{summary.totalIncome}</span></h3>
+                            <h3>Total Expenditure: <span style={{ color: 'lightcoral' }}>{summary.totalExpenditure}</span></h3>
+                        </div>
+                        <div style={{ flex: 1, textAlign: 'right' }}>
+                            <h3>Net Balance: {summary.netBalance}</h3>
+                        </div>
+                    </div>
+                    <ChartReport summary={summary} />
                 </div>
             )}
 
+            {summary && ((summary.incomeByCategory && summary.incomeByCategory.length > 0) || (summary.expenditureByCategory && summary.expenditureByCategory.length > 0)) && (
+                <div style={{ border: `1px solid #6C698D`, borderRadius: '5px', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', marginBottom: '20px' }}>
+                        {summary.incomeByCategory && summary.incomeByCategory.length > 0 && (
+                            <div style={{ flex: 1, marginRight: '10px' }}>
+                                <div style={{ border: `1px solid #AA968A`, borderRadius: '5px', padding: '10px', marginBottom: '20px' }}>
+                                    <h3>Income by Category:</h3>
+                                    {summary.incomeByCategory.map((category, index) => (
+                                        <div key={index}>
+                                            <p>
+                                                <strong>{category.categoryName}</strong> - {category.totalAmount} PLN
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
+                        {summary.expenditureByCategory && summary.expenditureByCategory.length > 0 && (
+                            <div style={{ flex: 1, marginLeft: '10px' }}>
+                                <div style={{ border: `1px solid #AA968A`, borderRadius: '5px', padding: '10px', marginBottom: '20px' }}>
+                                    <h3>Expenditure by Category:</h3>
+                                    {summary.expenditureByCategory.map((category, index) => (
+                                        <div key={index}>
+                                            <p>
+                                                <strong>{category.categoryName}</strong> - {category.totalAmount} PLN
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
+            <div style={{ border: `1px solid #6C698D`, borderRadius: '5px', padding: '20px', display: transactions.length > 0 ? 'block' : 'none' }}>
+                    {transactions.length > 0 && (
+                        <div>
+                            <h3>Transactions:</h3>
+                            {transactions.map((transaction, index) => (
+                                <div key={index}>
+                                    <p>
+                                        {new Date(transaction.date).toLocaleDateString('pl-PL', { year: 'numeric', month: '2-digit', day: '2-digit' })} - {transaction.title} - {transaction.description} - {transaction.amount} PLN &nbsp;
+                                        <span style={{ color: transaction.type === 'income' ? 'green' : 'red' }}>
+                                            ({transaction.type === 'income' ? 'Income' : 'Expenditure'})
+                                        </span>
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+            </div>
 
         </div>
     );
