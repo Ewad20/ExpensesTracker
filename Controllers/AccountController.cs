@@ -221,7 +221,6 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Error:" + ex.Message);
             }
         }
-
         [Authorize]
         [HttpPost("enableTwoFactor")]
         public async Task<IActionResult> enableTwoFactor()
@@ -267,25 +266,49 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Error:" + ex.Message);
             }
         }
-
-        [HttpGet("GetProfilePageData")]
         [Authorize]
-        public async Task<IActionResult> GetProfilePageData()
+        [HttpPost("disableTwoFactor")]
+        public async Task<IActionResult> disableTwoFactor()
         {
             try
             {
-                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentNullException(nameof(userId));
-                User user = await _userManager.FindByIdAsync(userId) ?? throw new Exception($"User {userId} not found in DB");
-                IEnumerable<UserLoginInfo> logins = await _userManager.GetLoginsAsync(user);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-                return new OkObjectResult(new { user, logins});
+                if (user != null)
+                {
+                    // Read json data from body
+                    string requestBody;
+                    using (var reader = new System.IO.StreamReader(Request.Body))
+                    {
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+                    dynamic data = JObject.Parse(requestBody);
+                    string enteredAuthKey = data.enteredAuthKey;
+                    // Validate key
+                    TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                    bool isValid = TwoFacAuth.ValidateTwoFactorPIN(user.GoogleAuthKey, enteredAuthKey, TimeSpan.FromSeconds(15));
+
+                    if (isValid)
+                    {
+                        user.TwoFactorEnabled = false;
+                        user.GoogleAuthKey = null;
+                        await _dbContext.SaveChangesAsync();
+                        return Ok(true);
+                    }
+
+                    return Ok(false);
+                }
+                else
+                {
+                    return NotFound("User not found");
+                }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return StatusCode(500, "Error:" + ex.Message);
             }
         }
-
         public class Credentials
         {
             public Credentials(string login, string password, string? authKey)

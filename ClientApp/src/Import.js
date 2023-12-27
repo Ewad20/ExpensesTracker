@@ -5,9 +5,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 function Import() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [wallets, setWallets] = useState(null);
-  const [selectedWallets, setSelectedWallets] = useState([]);
+  const [selectedWalletsID, setselectedWalletsID] = useState([]);
   const [clearAll, setClearAll] = useState(false);
-  const [alert, setAlert] = useState(null);
+  const [alertDanger, setAlertDanger] = useState(null);
+  const [alertSuccess, setAlertSuccess] = useState(null);
 
   useEffect(() => {
     //handle if user isn't logged in
@@ -23,7 +24,7 @@ function Import() {
         });
 
         if (response.status === 401) {
-          setAlert("Uzytkownik nie jest zalogowany!");
+          setAlertDanger("Uzytkownik nie jest zalogowany!");
           console.error(
             "Uzytkownik nie jest zalogowany!",
             response.status,
@@ -31,7 +32,8 @@ function Import() {
           );
 
           if (response.ok) {
-            setAlert(null);
+            setAlertDanger(null);
+            setAlertSuccess(null);
           }
         }
       } catch (error) {
@@ -43,7 +45,8 @@ function Import() {
 
   const handleFile = (event) => {
     const file = event.target.files[0];
-
+    setAlertSuccess(null);
+    setAlertDanger(null);
     if (file) {
       const reader = new FileReader();
 
@@ -84,48 +87,82 @@ function Import() {
   }
 
   const handleRowClick = (id) => {
-    setSelectedWallets((prevSelectedWallets) => {
-      if (prevSelectedWallets.includes(id)) {
-        return prevSelectedWallets.filter((selectedId) => selectedId !== id);
+    setselectedWalletsID((prevselectedWalletsID) => {
+      if (prevselectedWalletsID.includes(id)) {
+        return prevselectedWalletsID.filter((selectedId) => selectedId !== id);
       } else {
-        return [...prevSelectedWallets, id];
+        return [...prevselectedWalletsID, id];
       }
     });
 
-    console.log(selectedWallets);
+    console.log(selectedWalletsID);
   };
 
   const handleSelectAll = () => {
-    if (selectedWallets.length > 0) {
-      setSelectedWallets([]);
+    if (selectedWalletsID.length > 0) {
+      setselectedWalletsID([]);
       setClearAll(false);
     } else {
       const allWalletIds = wallets.map((wallet) => wallet.Id);
-      setSelectedWallets(allWalletIds);
+      setselectedWalletsID(allWalletIds);
       setClearAll(true);
     }
   };
 
   useEffect(() => {
-    if (selectedWallets.length === 0 && clearAll) {
+    if (selectedWalletsID.length === 0 && clearAll) {
       console.log("No wallets selected!");
       setClearAll(false);
-    } else if (selectedWallets.length > 0 && !clearAll) {
-      console.log("Wallets selected:", selectedWallets);
+    } else if (selectedWalletsID.length > 0 && !clearAll) {
+      console.log("Wallets selected:", selectedWalletsID);
       setClearAll(true);
     }
-  }, [selectedWallets, clearAll]);
+  }, [selectedWalletsID, clearAll]);
 
   function handleImport() {
-    if (selectedWallets.length === 0) {
-      setAlert("No wallets selected to import! Select some!");
+    if (selectedWalletsID.length === 0) {
+      setAlertDanger("No wallets selected to import! Select some!");
       console.log("No wallets selected!");
-    } else {
-      setAlert(null);
-      console.log("Save selected wallets to new account!");
-      //call a backend to save new wallets to the database
+      return;
     }
+
+    setAlertDanger(null);
+    console.log("Save selected wallets to new account!");
+    //call a backend to save new wallets to the database
+    sendselectedWalletsID();
   }
+
+  const sendselectedWalletsID = async () => {
+    //selectedWallets
+
+    const selectedWalletToImport = wallets.filter((wallet) =>
+      selectedWalletsID.includes(wallet.Id)
+    );
+
+    console.log(selectedWalletToImport);
+    try {
+      const response = await fetch("/api/import/importWallets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(selectedWalletToImport),
+      });
+
+      if (response.ok) {
+        const responseData = await response.text()
+        setAlertSuccess(responseData);
+      }
+
+      if(response === 401){
+        setAlertDanger('Uzytkownik nie jest zalogowany!');
+        setAlertSuccess(null);
+      }
+    } catch (error) {
+      console.error("Error importing wallets:", error.message);
+    }
+  };
 
   return (
     <>
@@ -169,7 +206,7 @@ function Import() {
                   <tr
                     key={index}
                     className={
-                      selectedWallets.includes(wallet.Id)
+                      selectedWalletsID.includes(wallet.Id)
                         ? "table-primary"
                         : undefined
                     }
@@ -190,9 +227,14 @@ function Import() {
             </button>
           </>
         )}
-        {alert != null ? (
+        {alertDanger != null ? (
           <div className="alert alert-danger" role="alert">
-            {alert}
+            {alertDanger}
+          </div>
+        ) : undefined}
+        {alertSuccess != null ? (
+          <div className="alert alert-success" role="alert">
+            {alertSuccess}
           </div>
         ) : undefined}
       </div>
