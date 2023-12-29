@@ -31,10 +31,12 @@ namespace _2023pz_trrepo.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            try{
-            await _signInManager.SignOutAsync();
+            try
+            {
+                await _signInManager.SignOutAsync();
             }
-            catch(Exception exception){
+            catch (Exception exception)
+            {
                 return BadRequest("Unable to logout. " + exception.ToString());
             }
             return Ok("Sucsessfully logged out!");
@@ -58,13 +60,13 @@ namespace _2023pz_trrepo.Controllers
             {
                 return Unauthorized("Invalid credentials.");
             }
-            
+
             // Two-Factor Authentication is needed
             if (user.TwoFactorEnabled && cred.AuthKey == null)
             {
                 return StatusCode(202, "Two-Factor Authentication");
             }
-            else if(user.TwoFactorEnabled && cred.AuthKey != null)
+            else if (user.TwoFactorEnabled && cred.AuthKey != null)
             {
                 // Validate key
                 TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
@@ -115,19 +117,14 @@ namespace _2023pz_trrepo.Controllers
 
         [Authorize]
         [HttpGet("getWallets")]
-        public async Task<JsonResult> getWallets(){
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        public async Task<JsonResult> getWallets()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return new JsonResult(Unauthorized("Session ended! Sign in again"));
-            }   
-            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).Include("Incomes").Include("Expenditures").ToListAsync();
-            foreach (Wallet wallet in wallets){
-                var income = wallet.Incomes.Sum(i => i.Amount);
-                var expenditure = wallet.Expenditures.Sum(i => i.Amount);
-                wallet.AccountBalance = income - expenditure;
             }
-            _dbContext.SaveChanges();
+            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
             return new JsonResult(wallets);
         }
 
@@ -143,7 +140,7 @@ namespace _2023pz_trrepo.Controllers
 
             var user = await _dbContext.Users
             .Include("Wallets")
-            .FirstOrDefaultAsync(u => u.Id==userId);
+            .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
             {
@@ -179,7 +176,7 @@ namespace _2023pz_trrepo.Controllers
 
                 if (user != null)
                 {
-                    return Ok(new { twoFactorEnabled = user.TwoFactorEnabled});
+                    return Ok(new { twoFactorEnabled = user.TwoFactorEnabled });
                 }
                 else
                 {
@@ -215,7 +212,7 @@ namespace _2023pz_trrepo.Controllers
                     TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
                     var setupInfo = TwoFacAuth.GenerateSetupCode("ExpensionTracker", user.UserName, ConvertSecretToBytes(GoogleAuthKey, false), 200);
                     QrImageUrl = setupInfo.QrCodeSetupImageUrl;
-                    return Ok(new {authKey = GoogleAuthKey, barcodeImageUrl = QrImageUrl });
+                    return Ok(new { authKey = GoogleAuthKey, barcodeImageUrl = QrImageUrl });
                 }
                 else
                 {
@@ -315,6 +312,7 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Error:" + ex.Message);
             }
         }
+
         [HttpGet("GetProfilePageData")]
         [Authorize]
         public async Task<IActionResult> GetProfilePageData()
@@ -325,12 +323,63 @@ namespace _2023pz_trrepo.Controllers
                 User user = await _userManager.FindByIdAsync(userId) ?? throw new Exception($"User {userId} not found in DB");
                 IEnumerable<UserLoginInfo> logins = await _userManager.GetLoginsAsync(user);
 
-                return new OkObjectResult(new { user, logins});
+                return new OkObjectResult(new { user, logins });
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        [HttpPost("UpdateProfilePageData")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfilePageData([FromBody] UserUpdateModel updatedUserData)
+        {
+            try
+            {
+                if (updatedUserData == null)
+                {
+                    return BadRequest("Invalid data");
+                }
+
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentNullException(nameof(userId));
+                User user = await _userManager.FindByIdAsync(userId) ?? throw new Exception($"User {userId} not found in DB");
+
+                user.FirstName = updatedUserData.FirstName;
+                user.LastName = updatedUserData.LastName;
+                user.UserName = updatedUserData.UserName;
+                user.Email = updatedUserData.Email;
+
+                IdentityResult result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return new OkObjectResult(new { user });
+                }
+                else
+                {
+                    return BadRequest("Failed to update user data");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public class UserUpdateModel
+        {
+            public UserUpdateModel(string firstName, string lastName, string username, string email, string password)
+            {
+                FirstName = firstName;
+                LastName = lastName;
+                UserName = username;
+                Email = email;
+            }
+            public string UserId { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string UserName { get; set; }
+            public string Email { get; set; }
         }
 
         public class Credentials
