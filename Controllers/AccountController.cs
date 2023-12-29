@@ -328,6 +328,57 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [HttpPost("UpdateProfilePageData")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfilePageData([FromBody] UserUpdateModel updatedUserData)
+        {
+            try
+            {
+                if (updatedUserData == null)
+                {
+                    return BadRequest("Invalid data");
+                }
+
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentNullException(nameof(userId));
+                User user = await _userManager.FindByIdAsync(userId) ?? throw new Exception($"User {userId} not found in DB");
+
+                user.FirstName = updatedUserData.FirstName;
+                user.LastName = updatedUserData.LastName;
+                user.UserName = updatedUserData.UserName;
+                user.Email = updatedUserData.Email;
+
+                IdentityResult result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return new OkObjectResult(new { user });
+                }
+                else
+                {
+                    return BadRequest("Failed to update user data");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        public class UserUpdateModel
+        {
+            public UserUpdateModel(string firstName, string lastName, string username, string email, string password)
+            {
+                FirstName = firstName;
+                LastName = lastName;
+                UserName = username;
+                Email = email;
+            }
+            public string UserId { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string UserName { get; set; }
+            public string Email { get; set; }
+        }
+
         public class Credentials
         {
             public Credentials(string login, string password, string? authKey)
