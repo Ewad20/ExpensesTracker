@@ -8,6 +8,7 @@ using Google.Authenticator;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -372,10 +373,25 @@ namespace _2023pz_trrepo.Controllers
                 UserName = username;
                 Email = email;
             }
+
+            public UserUpdateModel()
+            {
+                
+            }
+
+            [JsonProperty("userId")]
             public string UserId { get; set; }
+
+            [JsonProperty("firstName")]
             public string FirstName { get; set; }
+
+            [JsonProperty("lastName")]
             public string LastName { get; set; }
+
+            [JsonProperty("userName")]
             public string UserName { get; set; }
+
+            [JsonProperty("email")]
             public string Email { get; set; }
         }
 
