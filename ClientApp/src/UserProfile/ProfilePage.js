@@ -50,14 +50,17 @@ const ProfilePage = () => {
             setIsEditing(false);
             setValidationErrors({});
 
-            const response = await fetch('api/account/SaveProfileData', {
+            const response = await fetch('api/account/UpdateProfilePageData', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId: userData.user.id, 
-                    updatedUserData: userData.user,
+                    userId: userData.user.id,
+                    firstName: userData.user.firstName,
+                    lastName: userData.user.lastName,
+                    userName: userData.user.userName,
+                    email: userData.user.email
                 }),
             });
 
