@@ -1016,6 +1016,7 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Unable to delete transaction! Error: " + ex.Message);
             }
         }
+
         [HttpDelete("deleteCategory/{categoryId}")]
         public async Task<IActionResult> DeleteCategory(long categoryId)
         {
@@ -1036,6 +1037,28 @@ namespace _2023pz_trrepo.Controllers
                 return StatusCode(500, "Unable to delete category! Error: " + e.Message);
             }
             return Ok("Category deleted successfully!");
+        }
+
+        [HttpGet("checkTransactions/{categoryId}")]
+        public async Task<IActionResult> CheckTransactions(long categoryId)
+        {
+            try
+            {
+                var categoryExists = await _dbContext.Categories.AnyAsync(c => c.Id == categoryId);
+
+                if (!categoryExists)
+                {
+                    return NotFound("Category not found");
+                }
+
+                var hasTransactions = await _dbContext.Expenditures.AnyAsync(e => e.CategoryId == categoryId);
+
+                return Ok(new { HasTransactions = hasTransactions });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error checking transactions: {ex.Message}");
+            }
         }
 
     }

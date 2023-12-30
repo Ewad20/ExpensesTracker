@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 const ManageCategories = () => {
     const [categories, setCategories] = useState([]);
+    const [information, setInformation] = useState('');
     const [newCategory, setNewCategory] = useState({
         name: '',
         type: 'Expenditure',
@@ -24,62 +25,107 @@ const ManageCategories = () => {
     };
 
     const handleAddCategory = async () => {
-        try {
-            const response = await fetch('/api/transaction/addCategory', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newCategory),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add category');
-            }
-
-            fetchCategories();
-            setNewCategory({ name: '', type: 'Expenditure' });
-        } catch (error) {
-            console.error('Error during adding category:', error);
+        if (newCategory.name === '') {
+            setInformation('You have to name your category!');
         }
+        else {
+            const foundCategory = categories.find(
+                (category) => category.Name === newCategory.name
+            );
+
+            if (foundCategory === null || foundCategory === undefined) {
+                try {
+                    const response = await fetch('/api/transaction/addCategory', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(newCategory),
+                    });
+
+                    if (!response.ok) {
+                        setInformation('Error during adding category.');
+                        throw new Error('Failed to add category');
+                    }
+
+                    setInformation('Category added successfully.');
+                } catch (error) {
+                    console.error('Error during adding category:', error);
+                    setInformation('Error during adding category.');
+                }
+            }
+            else {
+                setInformation('Category with that name already exists!');
+            }
+        }
+        fetchCategories();
+        setNewCategory({ name: '', type: 'Expenditure' });
     };
 
     const handleEditCategory = async () => {
-        try {
-            const response = await fetch(`/api/transaction/editCategory/${editingCategoryId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(editingCategory),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to edit category');
-            }
-
-            fetchCategories();
-            setEditingCategoryId(null);
-            setEditingCategory({ name: '', type: 'Expenditure' });
-        } catch (error) {
-            console.error('Error during editing category:', error);
+        if (editingCategory.name === '') {
+            setInformation('You have to name your category!');
         }
+        else {
+            const foundCategory = categories.find(
+                (category) => category.Name === editingCategory.name && category.Id !== editingCategoryId
+            );
+
+            if (foundCategory === null || foundCategory === undefined) {
+                try {
+                    const response = await fetch(`/api/transaction/editCategory/${editingCategoryId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(editingCategory),
+                    });
+
+                    if (!response.ok) {
+                        setInformation('Error during saving changes.');
+                        throw new Error('Failed to edit category');
+                    }
+
+                    setInformation('Changes saved.');
+                } catch (error) {
+                    console.error('Error during editing category:', error);
+                    setInformation('Error during saving changes.');
+                }
+            }
+            else {
+                setInformation('Category with that name already exists!');
+            }
+        }
+        fetchCategories();
+        setEditingCategoryId(null);
+        setEditingCategory({ name: '', type: 'Expenditure' });
     };
 
     const handleDeleteCategory = async (categoryId) => {
-        try {
-            const response = await fetch(`/api/transaction/deleteCategory/${categoryId}`, {
-                method: 'DELETE',
-                credentials: 'include',
-            });
 
-            if (!response.ok) {
-                throw new Error('Failed to delete category');
+        const hasTransactions = await checkTransactionsForCategory(categoryId);
+
+        if (hasTransactions) {
+            setInformation('There are transactions associated with this category. Cannot delete.');
+        }
+        else {
+            try {
+                const response = await fetch(`/api/transaction/deleteCategory/${categoryId}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    setInformation('Failed to delete category.');
+                    throw new Error('Failed to delete category');
+                }
+
+                setInformation('Category deleted.');
+                fetchCategories();
+            } catch (error) {
+                console.error('Error during deleting category:', error);
+                setInformation('Failed to delete category.');
             }
-
-            fetchCategories();
-        } catch (error) {
-            console.error('Error during deleting category:', error);
         }
     };
 
@@ -94,6 +140,25 @@ const ManageCategories = () => {
     const handleCancelEditingCategory = () => {
         setEditingCategoryId(null);
         setEditingCategory({ name: '', type: 'Expenditure' });
+    };
+
+    const checkTransactionsForCategory = async (categoryId) => {
+        try {
+            const response = await fetch(`/api/transaction/checkTransactions/${categoryId}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to check transactions');
+            }
+
+            const data = await response.json();
+            return data.hasTransactions;
+        } catch (error) {
+            console.error('Error checking transactions:', error);
+            return false;
+        }
     };
 
     const fetchCategories = async () => {
@@ -149,6 +214,7 @@ const ManageCategories = () => {
                     </label>
                 </div>
                 <button onClick={handleAddCategory} className="btn btn-primary">Add Category</button>
+                {information && <div className="error">{information}</div>}
             </div>
             <div>
                 <h3>Existing Categories:</h3>
