@@ -7,6 +7,7 @@ const ProfilePage = () => {
             lastName: '',
             userName: '',
             email: '',
+            password: '********',
             twoFactorEnabled: false,
         },
         logins: [],
@@ -25,6 +26,7 @@ const ProfilePage = () => {
             }
 
             const data = await response.json();
+            data.user.password = "********";
             setUserData(data);
         } catch (error) {
             console.error('Error during fetching user data:', error);
@@ -60,7 +62,8 @@ const ProfilePage = () => {
                     firstName: userData.user.firstName,
                     lastName: userData.user.lastName,
                     userName: userData.user.userName,
-                    email: userData.user.email
+                    email: userData.user.email,
+                    password: userData.user.password
                 }),
             });
 
@@ -106,12 +109,32 @@ const ProfilePage = () => {
             errors.email = 'Invalid email format';
         }
 
+        if (!userData.user.password.trim()) {
+            errors.password = 'Password is required';
+        } else if (!isValidPassword(userData.user.password)) {
+            errors.password = 'Invalid password format';
+        }         
+
         return errors;
     };
 
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    };
+
+    const isValidPassword = (password) => {
+        if (password.length < 8) {
+            return false;
+        } else if (!/[A-Z]/.test(password)) {
+            return false;
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            return false;
+        }
+        else if (!/[0-9]/.test(password)) {
+            return false;
+        }
+        return true;
     };
 
     return (
@@ -197,6 +220,26 @@ const ProfilePage = () => {
                                     </>
                                 ) : (
                                     userData.user.email
+                                )}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Password:</label>
+                            </td>
+                            <td>
+                                {isEditing ? (
+                                    <>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={userData.user.password}
+                                            onChange={handleInputChange}
+                                        />
+                                        <div className="error">{validationErrors.password}</div>
+                                    </>
+                                ) : (
+                                    userData.user.password
                                 )}
                             </td>
                         </tr>
