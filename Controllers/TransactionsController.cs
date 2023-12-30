@@ -797,6 +797,15 @@ namespace _2023pz_trrepo.Controllers
                     table.AddCell(new PdfPCell(new Phrase(transaction.Title, normalFont)));
                     table.AddCell(new PdfPCell(new Phrase(transaction.Description, normalFont)));
                     string formattedAmount = $"{transaction.Amount} PLN";
+                    if (transaction.Type == "income")
+                    {
+                        formattedAmount = $"+{formattedAmount}";
+                    }
+                    else if (transaction.Type == "expenditure")
+                    {
+                        formattedAmount = $"-{formattedAmount}";
+                    }
+
                     table.AddCell(new PdfPCell(new Phrase(formattedAmount, normalFont)));
                 }
 
@@ -904,7 +913,9 @@ namespace _2023pz_trrepo.Controllers
                     worksheet.Cells[row, 1].Value = transaction.Date.ToShortDateString();
                     worksheet.Cells[row, 2].Value = transaction.Title;
                     worksheet.Cells[row, 3].Value = transaction.Description;
-                    worksheet.Cells[row, 4].Value = transaction.Amount;
+                    var amount = transaction.Type == "expenditure" ? -transaction.Amount : transaction.Amount;
+                    worksheet.Cells[row, 4].Value = amount;
+
                     row++;
                 }
 
