@@ -41,13 +41,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseRouting();
 
-app.UseCors(x => x
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .WithOrigins("https://0.0.0.0:44485")
-    .AllowCredentials()
-    );
+app.UseCors(options =>
+    options.WithOrigins("https://localhost:44485")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

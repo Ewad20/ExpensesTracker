@@ -9,6 +9,11 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
+using System;
+using System.Collections.Generic;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -79,9 +84,47 @@ namespace _2023pz_trrepo.Controllers
                 }
             }
 
+
+            // Generowanie tokena JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = GenerateRandomKey();
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                   
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return Ok("Login successful.");
+            // Zwróæ token JWT w odpowiedzi
+            return Ok(new { Token = tokenString });
+        }
+
+        private string GenerateRandomKey()
+        {
+            const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder stringBuilder = new StringBuilder();
+            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+            {
+                byte[] uintBuffer = new byte[sizeof(uint)];
+
+                for (int i = 0; i < 64; i++) // Generowanie klucza o d³ugoœci 64 znaków
+                {
+                    rng.GetBytes(uintBuffer);
+                    uint num = BitConverter.ToUInt32(uintBuffer, 0);
+                    stringBuilder.Append(validChars[(int)(num % (uint)validChars.Length)]);
+                }
+            }
+
+            return stringBuilder.ToString();
         }
 
         [HttpPost("register")]

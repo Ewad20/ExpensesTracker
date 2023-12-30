@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/js/bootstrap.js';
 import LoginForm from './LoginForm';
@@ -10,12 +10,43 @@ const RootElement = () => {
     const location = useLocation();
     const [user, setUser] = useState(null);
 
-    const handleLogin = (userData) => {
-        setUser(userData);
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // Ustaw stan zalogowanego u¿ytkownika, jeœli token jest dostêpny
+            setUser({ token });
+        }
+    }, []);
+
+    const handleLogin = async (token) => {
+        const response = await fetch('https://localhost:7088/api/account/getProfilePageData', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            credentials: 'include',
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            
+            setUser({
+                token,
+                username: userData.user.userName, 
+            });
+        }
+        // Zachowaj token w pamiêci lokalnej po pomyœlnym zalogowaniu
+        localStorage.setItem('token', token);
     };
 
+
     const handleLogout = async () => {
-        const response = await fetch('api/account/logout', {
+
+        // Usuñ token z pamiêci lokalnej po wylogowaniu
+        localStorage.removeItem('token');
+
+        const response = await fetch('https://localhost:7088/api/account/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -25,6 +56,7 @@ const RootElement = () => {
         if (!response.ok) {
             console.info(response.message);
         }
+
         setUser(null);
     };
 
