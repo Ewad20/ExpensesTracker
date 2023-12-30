@@ -68,7 +68,7 @@ const ManageCategories = () => {
         }
         else {
             const foundCategory = categories.find(
-                (category) => category.Name === newCategory.name
+                (category) => category.Name === editingCategory.name && category.Id !== editingCategoryId
             );
 
             if (foundCategory === null || foundCategory === undefined) {
