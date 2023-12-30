@@ -30,17 +30,27 @@ namespace _2023pz_trrepo.Controllers
         [HttpPost("addCategory")]
         public async Task<IActionResult> AddCategory([FromBody] Category category)
         {
-            try
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
-                await _dbContext.Categories.AddAsync(category);
-                await _dbContext.SaveChangesAsync();
+                return Unauthorized("Session ended! Sign in again");
             }
-            catch (Exception e)
+            else
             {
-                return StatusCode(500, "Unable to add category! Error: " + e.Message);
+                category.UserId = userId;
+                try
+                {
+                    await _dbContext.Categories.AddAsync(category);
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(500, "Unable to add category! Error: " + e.Message);
+                }
+                return Ok("Category added successfully!");
             }
-            return Ok("Category added successfully!");
         }
+
         [Authorize]
         [HttpPost("updateIncome")]
         public async Task<IActionResult> updateIncome([FromBody] Income transaction)
