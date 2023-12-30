@@ -76,7 +76,7 @@ const MonthlySummary = () => {
             setDataGenerated(true);
             const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
             const walletName = selectedWallet ? selectedWallet.name : '';
-            setWalletName(walletName);
+            //setWalletName(walletName);
         } catch (error) {
             console.error('Error during fetching summary:', error);
         }

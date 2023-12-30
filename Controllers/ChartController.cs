@@ -47,20 +47,18 @@ namespace _2023pz_trrepo.Controllers
         [HttpGet("getChart2")]
         public async Task<IActionResult> GetChart2()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return new UnauthorizedObjectResult("");
-            }
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+                return null;
 
-
-            List<Category> expenditureCategories = _dbContext.Categories.Where(x=>x.Type == CategoryType.Expenditure).ToList();
+            List<Category> expenditureCategories = _dbContext.Categories.Where(x => (x.Type == CategoryType.Expenditure) && (x.UserId == user.Id || x.UserId == null)).ToList();
 
             Dictionary<string, double> categoryExpenses = new Dictionary<string, double>();
             foreach (Category category in expenditureCategories)
             {
                 double totalExpense = _dbContext.Expenditures
-                    .Where(e => e.CategoryId == category.Id)
+                    .Where(e => e.CategoryId == category.Id && e.Wallet.UserId == userId)
                     .Sum(e => e.Amount);
 
                 categoryExpenses.Add(category.Name, totalExpense);
