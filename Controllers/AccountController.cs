@@ -350,6 +350,9 @@ namespace _2023pz_trrepo.Controllers
 
                 IdentityResult result = await _userManager.UpdateAsync(user);
 
+                await _userManager.RemovePasswordAsync(user);
+                await _userManager.AddPasswordAsync(user, updatedUserData.Password);
+
                 if (result.Succeeded)
                 {
                     return new OkObjectResult(new { user });
@@ -393,6 +396,8 @@ namespace _2023pz_trrepo.Controllers
 
             [JsonProperty("email")]
             public string Email { get; set; }
+            [JsonProperty("password")]
+            public string Password { get; set; }
         }
 
         public class Credentials
