@@ -8,30 +8,39 @@ function Export() {
   const [nothingSelected, setNothingSelected] = useState(null);
   const [clearAll, setClearAll] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [numberOfIncomesArr, setNumberOfIncomesArr] = useState([]);
+  const [numberOfExpendituresArr, setNumberOfExpendituresArr] = useState([]);
 
   useEffect(() => {
-    //[TODO] dodac przypisanie dla Id uzytkownika jego Id z cookies. Narazie cookies nie ma!
-    //let tempId = "3f4d8c47-66fa-4857-b62b-c6726bed1272"
-
     const loadAllUserWallets = async () => {
       try {
-        const response = await fetch(
-          "/api/export/Wallets",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            //body: JSON.stringify(tempId),
-          }
-        );
+        const response = await fetch("/api/export/Wallets", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          //body: JSON.stringify(tempId),
+        });
 
         if (response.ok) {
           const data = await response.json();
           console.log("All wallets were successfuly added.");
           setAlert(null);
           setWallets(data);
+
+          const numberOfIncomesArr = [];
+          const numberOfExpendituresArr = [];
+          for (const wallet of data) {
+            const numberOfIncomes = await getNumberOfIncomes(wallet.Id);
+            const numberOfExpenditures = await getNumberOfExpenditures(
+              wallet.Id
+            );
+            numberOfIncomesArr.push(numberOfIncomes);
+            numberOfExpendituresArr.push(numberOfExpenditures);
+          }
+          setNumberOfIncomesArr(numberOfIncomesArr);
+          setNumberOfExpendituresArr(numberOfExpendituresArr);
         } else if (response.status === 401) {
           setAlert("Uzytkownik nie jest zalogowany!");
           console.error(
@@ -122,6 +131,64 @@ function Export() {
     }
   };
 
+  async function getNumberOfIncomes(walletId) {
+    let numberOfIncomesInWallet = 0;
+    try {
+      const response = await fetch("/api/export/numberOfIncomesInWallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(walletId),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        numberOfIncomesInWallet = parseInt(data);
+        console.log("Number of incomes in wallet " + walletId + " is: " + numberOfIncomesInWallet);
+      } else {
+        console.error("Server responded with an error:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error exporting wallets:", error.message);
+    }
+
+    return numberOfIncomesInWallet;
+  }
+
+  async function getNumberOfExpenditures(walletId) {
+    let numberOfExpendituresInWallet = 0;
+    try {
+      const response = await fetch("/api/export/numberOfExpendituresInWallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(walletId),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        numberOfExpendituresInWallet = parseInt(data);
+        console.log("Number of Expenditures in wallet " + walletId + " is: " + numberOfExpendituresInWallet);
+  
+      } else {
+        console.error("Server responded with an error:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error exporting wallets:", error.message);
+    }
+
+    return numberOfExpendituresInWallet;
+  }
+
+  function seeMore(walletId) {
+    var newPageUrl = "https://0.0.0.0:44485/transaction/" + walletId;
+    window.open(newPageUrl, "_blank");
+  }
+
   return (
     <>
       <div className="container">
@@ -145,6 +212,7 @@ function Export() {
               <th scope="col">AccountBalance</th>
               <th scope="col">Incomes</th>
               <th scope="col">Expenditures</th>
+              <th scope="col">Link</th>
             </tr>
           </thead>
 
@@ -163,8 +231,17 @@ function Export() {
                 <td>{wallet.IconId}</td>
                 <td>{wallet.Name}</td>
                 <td>{wallet.AccountBalance}</td>
-                <td>{wallet.Incomes}</td>
-                <td>{wallet.Expenditures}</td>
+                <td>{numberOfIncomesArr[index]}</td>
+                <td>{numberOfExpendituresArr[index]}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => seeMore(wallet.Id)}
+                  >
+                    See more
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

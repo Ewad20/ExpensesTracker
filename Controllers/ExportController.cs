@@ -17,24 +17,8 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
-        //TODO restun file to front end, now saves to server 
-        private Boolean saveJsonFile(string filePath, object outcome){
-            string serializedOutcome = JsonSerializer.Serialize(outcome);
-
-            using (StreamWriter writer = new StreamWriter(filePath))
-            {
-                try{
-                    writer.WriteLine(outcome);
-                }catch(Exception e){
-                    Console.WriteLine("Nie duało się zapisać JSON'a" + e.StackTrace);
-                    return false;
-                }
-            }
-            return true;
-        }
-
         [HttpPost("Wallet")]
-        public IActionResult ExportWallet(string userName, string filePath)
+        public IActionResult ExportWallet(string userName)
         {
 
             User user;
@@ -77,6 +61,28 @@ namespace _2023pz_trrepo.Controllers
 
             string serializeWallets = JsonSerializer.Serialize(userWalletList);
             return Ok(serializeWallets);
+        }
+
+        [HttpPost("numberOfIncomesInWallet")]
+        public IActionResult numberOfIncomesInWallet([FromBody] int walletId)
+        {
+            List<Income> walletIncomes = _dbContext.Incomes.Where(x => x.WalletId == walletId).ToList();
+            int numberOfIncomes = walletIncomes.Count;
+            
+            Console.WriteLine("Number of incomes for wallet id " + walletId + " is: " + numberOfIncomes);
+            string serializedNumberOfIncomes = JsonSerializer.Serialize(numberOfIncomes);
+            return Ok(serializedNumberOfIncomes);
+        }
+
+        [HttpPost("numberOfExpendituresInWallet")]
+        public IActionResult numberOfExpendituresInWallet([FromBody] int walletId)
+        {
+            List<Expenditure> walletExpenditures = _dbContext.Expenditures.Where(x => x.WalletId == walletId).ToList();
+            int numberOfExpenditures = walletExpenditures.Count;
+            
+            Console.WriteLine("Number of expenditures for wallet id " + walletId + " is: " + numberOfExpenditures);
+            string serializedNumberOfExpenditures = JsonSerializer.Serialize(numberOfExpenditures);
+            return Ok(serializedNumberOfExpenditures);
         }
 
         [HttpPost("test")]
