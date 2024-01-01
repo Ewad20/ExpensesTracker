@@ -61,7 +61,6 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     const handleTypeSelection = (type) => {
         setTransactionType(type);
         setFormVisible(true);
-        // Filter categories based on the selected type
         const filteredCategories = categories.filter(category => {
             return type === 'income' ? category.Type === 'Income' : category.Type === 'Expenditure';
         });
