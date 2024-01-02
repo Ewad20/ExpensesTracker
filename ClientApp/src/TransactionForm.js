@@ -88,14 +88,12 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
             });
 
             if (response.ok) {
-                console.log('Transaction added!');
                 setFormVisible(false);
                 setConfirmationVisible(true);
-
                 setTimeout(() => {
                     setConfirmationVisible(false);
-                    navigate(`/wallet`);
                 }, 1500);
+                document.getElementById('FilterButton').click();
             } else {
                 console.error(response);
                 setFormError('Invalid form data');

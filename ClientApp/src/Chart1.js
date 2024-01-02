@@ -17,7 +17,7 @@ const Chart1 = () => {
 
                 if (response.ok) {
                     const chart1Data = await response.json();
-                    console.log(chart1Data);
+                    
                     setChart1(chart1Data);
                 } else {
                     console.error(response);
@@ -37,8 +37,6 @@ const Chart1 = () => {
             const labels = ["Incomes", "Expenditures"];
             const data = chart1;
 
-            console.log("Labels:", labels);
-            console.log("Data:", data);
 
             const myChart1 = new Chart(ctx1, {
                 type: "pie",
@@ -61,7 +59,6 @@ const Chart1 = () => {
                 },
             });
 
-            console.log("myChart1:", myChart1);
         }
     }, [chart1]);
 

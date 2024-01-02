@@ -56,8 +56,6 @@ const WalletPage = () => {
                 body: JSON.stringify(cred),
             });
             if (response.ok) {
-                console.log('Wallet added!');
-                navigate('/');
                 fetchWallets(); // Fetch updated wallets after adding a new wallet
             } else {
                 console.error(response);

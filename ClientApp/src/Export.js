@@ -146,7 +146,12 @@ function Export() {
       if (response.ok) {
         const data = await response.json();
         numberOfIncomesInWallet = parseInt(data);
-        console.log("Number of incomes in wallet " + walletId + " is: " + numberOfIncomesInWallet);
+        console.log(
+          "Number of incomes in wallet " +
+            walletId +
+            " is: " +
+            numberOfIncomesInWallet
+        );
       } else {
         console.error("Server responded with an error:", response.statusText);
       }
@@ -172,8 +177,12 @@ function Export() {
       if (response.ok) {
         const data = await response.json();
         numberOfExpendituresInWallet = parseInt(data);
-        console.log("Number of Expenditures in wallet " + walletId + " is: " + numberOfExpendituresInWallet);
-  
+        console.log(
+          "Number of Expenditures in wallet " +
+            walletId +
+            " is: " +
+            numberOfExpendituresInWallet
+        );
       } else {
         console.error("Server responded with an error:", response.statusText);
       }
@@ -203,49 +212,49 @@ function Export() {
             Select all
           </button>
         )}
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Icon</th>
-              <th scope="col">Name</th>
-              <th scope="col">AccountBalance</th>
-              <th scope="col">Incomes</th>
-              <th scope="col">Expenditures</th>
-              <th scope="col">Link</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {wallets.map((wallet, index) => (
-              <tr
-                key={wallet.Id}
-                className={
-                  selectedWallets.includes(wallet.Id)
-                    ? "table-primary"
-                    : undefined
-                }
-                onClick={() => handleRowClick(wallet.Id)}
-              >
-                <th>{index + 1}</th>
-                <td>{wallet.IconId}</td>
-                <td>{wallet.Name}</td>
-                <td>{wallet.AccountBalance}</td>
-                <td>{numberOfIncomesArr[index]}</td>
-                <td>{numberOfExpendituresArr[index]}</td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => seeMore(wallet.Id)}
-                  >
-                    See more
-                  </button>
-                </td>
+        <div className="table-responsive">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">AccountBalance</th>
+                <th scope="col">Incomes</th>
+                <th scope="col">Expenditures</th>
+                <th scope="col">Link</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {wallets.map((wallet, index) => (
+                <tr
+                  key={wallet.Id}
+                  className={
+                    selectedWallets.includes(wallet.Id)
+                      ? "table-primary"
+                      : undefined
+                  }
+                  onClick={() => handleRowClick(wallet.Id)}
+                >
+                  <th>{index + 1}</th>
+                  <td>{wallet.Name}</td>
+                  <td>{wallet.AccountBalance}</td>
+                  <td>{numberOfIncomesArr[index]}</td>
+                  <td>{numberOfExpendituresArr[index]}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => seeMore(wallet.Id)}
+                    >
+                      See more
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <button className="btn btn-primary" onClick={handleJsonExport}>
           Export Wallet
         </button>

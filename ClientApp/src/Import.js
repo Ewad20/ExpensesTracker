@@ -151,12 +151,12 @@ function Import() {
       });
 
       if (response.ok) {
-        const responseData = await response.text()
+        const responseData = await response.text();
         setAlertSuccess(responseData);
       }
 
-      if(response === 401){
-        setAlertDanger('Uzytkownik nie jest zalogowany!');
+      if (response === 401) {
+        setAlertDanger("Uzytkownik nie jest zalogowany!");
         setAlertSuccess(null);
       }
     } catch (error) {
@@ -190,38 +190,40 @@ function Import() {
               </button>
             )}
 
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Icon</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">AccountBalance</th>
-                  <th scope="col">Incomes</th>
-                  <th scope="col">Expenditures</th>
-                </tr>
-              </thead>
-              <tbody>
-                {wallets.map((wallet, index) => (
-                  <tr
-                    key={index}
-                    className={
-                      selectedWalletsID.includes(wallet.Id)
-                        ? "table-primary"
-                        : undefined
-                    }
-                    onClick={() => handleRowClick(wallet.Id)}
-                  >
-                    <th>{index + 1}</th>
-                    <td>{wallet.IconId}</td>
-                    <td>{wallet.Name}</td>
-                    <td>{wallet.AccountBalance}</td>
-                    <td>{wallet.Incomes}</td>
-                    <td>{wallet.Expenditures}</td>
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Icon</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">AccountBalance</th>
+                    <th scope="col">Incomes</th>
+                    <th scope="col">Expenditures</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {wallets.map((wallet, index) => (
+                    <tr
+                      key={index}
+                      className={
+                        selectedWalletsID.includes(wallet.Id)
+                          ? "table-primary"
+                          : undefined
+                      }
+                      onClick={() => handleRowClick(wallet.Id)}
+                    >
+                      <th>{index + 1}</th>
+                      <td>{wallet.IconId}</td>
+                      <td>{wallet.Name}</td>
+                      <td>{wallet.AccountBalance}</td>
+                      <td>{wallet.Incomes}</td>
+                      <td>{wallet.Expenditures}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <button className="btn btn-primary" onClick={handleImport}>
               Import Selected Wallets
             </button>

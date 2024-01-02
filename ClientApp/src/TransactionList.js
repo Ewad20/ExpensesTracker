@@ -91,7 +91,6 @@ const TransactionList = () => {
       });
 
       if (response.ok) {
-        console.log("Transaction added!");
         handleFilterClick();
         setAddedTransaction(newTransactionData);
         setShowForm(false);
@@ -121,9 +120,7 @@ const TransactionList = () => {
       categoryId: transaction.CategoryId,
       type: transaction.TransactionType,
     };
-    console.log(newTransactionData.date);
     let response;
-    console.log(JSON.stringify(newTransactionData));
     switch (newTransactionData.type) {
       case "income":
         response = await fetch("/api/transaction/updateIncome", {
@@ -205,7 +202,6 @@ const TransactionList = () => {
 
       const data = await response.json();
       setTransactions(data);
-      console.log(data);
     } catch (error) {
       console.error("Error during fetching transactions:", error);
     }
@@ -224,7 +220,6 @@ const TransactionList = () => {
 
         const data = await response.json();
         setCategories(data);
-        console.log(data);
       } catch (error) {
         console.error("Error during fetching transactions:", error);
       }
@@ -251,46 +246,43 @@ const TransactionList = () => {
       <h2>Transaction list for wallet {walletId}</h2>
 
       <div
-        className="d-flex justify-content-between"
-        style={{ width: "100%", marginTop: 10, marginBottom: 30 }}
+        className="row"
       >
-        <div className="d-flex">
           <button
-            className="btn btn-secondary mx-1"
+            className="btn btn-secondary h-25 w-25 mx-1 col my-1"
             onClick={() => handleTransactionTypeChange("all")}
           >
             All Transactions
           </button>
           <button
-            className="btn btn-secondary mx-1"
+            className="btn btn-secondary h-25 w-25 mx-1 col my-1"
             onClick={() => handleTransactionTypeChange("income")}
           >
             Incomes
           </button>
           <button
-            className="btn btn-secondary mx-1"
+            className="btn btn-secondary h-25 w-25 mx-1 col my-1"
             onClick={() => handleTransactionTypeChange("expenditure")}
           >
             Expenditures
           </button>
-        </div>
-        <div className="d-flex">
+        
           <button
-            className="btn btn-secondary mx-1"
+            className="btn btn-secondary h-25 w-25 mx-1 col my-1"
             onClick={() => setShowForm(!showForm)}
           >
             {showForm ? "Cancel" : "Add Transaction"}
           </button>
-        </div>
+        
       </div>
 
       {showForm && (
         <TransactionForm
           categories={categories}
           walletId={walletId}
-          onSubmit={(newTransactionData) =>
-            handleAddTransaction(newTransactionData)
-          }
+          onSubmit={(newTransactionData) => {
+            handleAddTransaction(newTransactionData);
+          }}
           onCancel={() => setShowForm(false)}
         />
       )}
@@ -301,8 +293,8 @@ const TransactionList = () => {
         </div>
       )}
       <h3>Filter results:</h3>
-      <div className="d-flex flex-column my-3 align-items-center">
-        <div className="d-flex align-items-center my-2">
+      <div className="row my-3">
+        <div className="col my-2">
           <div className="d-flex flex-column mx-2 align-items-start">
             <label className="mb-1">Starting date:</label>
             <input
@@ -359,8 +351,9 @@ const TransactionList = () => {
             />
           </div>
           <button
-            className="btn btn-secondary mx-2 align-self-end"
+            className="btn btn-secondary mx-2 my-2 align-self-end"
             onClick={handleFilterClick}
+            id="FilterButton"
           >
             Filter
           </button>
