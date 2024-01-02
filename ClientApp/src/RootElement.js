@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/js/bootstrap.js';
 import LoginForm from './LoginForm';
 import './styles/Site.css';
@@ -7,13 +7,14 @@ import Chart1 from './Chart1';
 import Chart2 from './Chart2';
 
 const RootElement = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            // Ustaw stan zalogowanego u¿ytkownika, jeœli token jest dostêpny
+            // Ustaw stan zalogowanego uï¿½ytkownika, jeï¿½li token jest dostï¿½pny
             setUser({ token });
         }
     }, []);
@@ -36,14 +37,14 @@ const RootElement = () => {
                 username: userData.user.userName, 
             });
         }
-        // Zachowaj token w pamiêci lokalnej po pomyœlnym zalogowaniu
+        // Zachowaj token w pamiï¿½ci lokalnej po pomyï¿½lnym zalogowaniu
         localStorage.setItem('token', token);
     };
 
 
     const handleLogout = async () => {
-
-        // Usuñ token z pamiêci lokalnej po wylogowaniu
+        
+        // Usuï¿½ token z pamiï¿½ci lokalnej po wylogowaniu
         localStorage.removeItem('token');
 
         const response = await fetch('https://localhost:7088/api/account/logout', {
@@ -58,6 +59,7 @@ const RootElement = () => {
         }
 
         setUser(null);
+        navigate("/");
     };
 
 
