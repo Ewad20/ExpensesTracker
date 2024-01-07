@@ -5,33 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ETDbContext>(options =>
-
-options.UseSqlServer(builder.Configuration.GetConnectionString("EwaConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
+});
 builder.Services.AddCors();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-    .AddCookie(options =>
-    {
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.Zero;
-        options.SlidingExpiration = true;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    });
-
-
+.AddCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.Zero;
+    options.SlidingExpiration = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ETDbContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<EmailSender>();
+
 
 var app = builder.Build();
 
