@@ -32,11 +32,22 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
 
     const handleCategoryChange = (e) => {
         const { value } = e.target;
-        const selectedCategory = categories.find(category => category.Id === parseInt(value));
         setNewTransaction(prevTransaction => ({
             ...prevTransaction,
-            categoryId: selectedCategory ? selectedCategory.Id : ''
+            categoryId: value
         }));
+    };
+
+    const resetForm = () => {
+        setNewTransaction({
+            title: '',
+            description: '',
+            date: new Date().toISOString().split('T')[0],
+            amount: '',
+            walletId: walletId,
+            categoryId: ''
+        });
+        setFormError('');
     };
 
     const fetchCategories = async () => {
@@ -54,17 +65,10 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         }
     };
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
     const handleTypeSelection = (type) => {
         setTransactionType(type);
         setFormVisible(true);
-        const filteredCategories = categories.filter(category => {
-            return type === 'income' ? category.Type === 'Income' : category.Type === 'Expenditure';
-        });
-        setCategories(filteredCategories);
+        fetchCategories(); 
     };
 
     const handleSubmit = async (e) => {
@@ -88,6 +92,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
             });
 
             if (response.ok) {
+                resetForm();
                 setFormVisible(false);
                 setConfirmationVisible(true);
                 setTimeout(() => {
@@ -162,9 +167,13 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                         >
                             <option value="">Select category</option>
                             {categories.map((category) => (
-                                <option key={category.Id} value={category.Id}>
-                                    {category.Name}
-                                </option>
+                                (transactionType === 'income' && category.Type === 'Income') ||
+                                    (transactionType === 'expenditure' && category.Type === 'Expenditure')
+                                    ? (
+                                        <option key={category.Id} value={category.Id}>
+                                            {category.Name}
+                                        </option>
+                                    ) : null
                             ))}
                         </select>
 
