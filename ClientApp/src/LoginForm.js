@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginForm = ({ onLogin }) => {
@@ -85,10 +85,12 @@ const LoginForm = ({ onLogin }) => {
 
                         {loginError && <div className="col-md-12 alert alert-danger">{loginError}</div>}
 
+                        {loginError && <Link to="/passwordRecovery" className="text-decoration-none mt-0 text-danger">Forgot password ?</Link>}
+
                     <div className="col-12">
                         <button type="submit" className="btn btn-primary">Login</button>
                     </div>
-                </form>
+                    </form>
             </div>
         :
                 <div className="">

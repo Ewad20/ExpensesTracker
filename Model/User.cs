@@ -8,6 +8,7 @@ namespace _2023pz_trrepo.Model
         public string? LastName { get; set; }
         public ICollection<Wallet> Wallets { get; set; }
         public string? GoogleAuthKey { get; set; }
+        public string? ResetPasswordCode { get; set; }
         public ICollection<Category>? UserCategories { get; set; }
     }
 }

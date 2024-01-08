@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace _2023pz_trrepo.Controllers
 {
@@ -24,13 +25,15 @@ namespace _2023pz_trrepo.Controllers
         private readonly ETDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly EmailSender _emailSender;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ETDbContext dbContext)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ETDbContext dbContext, EmailSender emailSender)
 
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
 
         [Authorize]
@@ -83,7 +86,6 @@ namespace _2023pz_trrepo.Controllers
                     return Unauthorized("Invalid credentials");
                 }
             }
-
 
             // Generowanie tokena JWT
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -157,6 +159,69 @@ namespace _2023pz_trrepo.Controllers
             }
 
             return Ok("Registartion succeded");
+        }
+
+        [HttpPost("changePassword")]
+        public async Task<ActionResult> changePassword([FromBody] PasswordChange data)
+        {
+            // Checking if user exist
+            var existingUser = await _userManager.FindByNameAsync(data.username);
+            if (existingUser == null)
+            {
+                return BadRequest("Unsuccessful");
+            }
+            // Change password throw e-mail
+            if (data.email == true)
+            {
+                if(existingUser.ResetPasswordCode != data.code)
+                {
+                    return BadRequest("Unsuccessful");
+                }
+            }
+            // Change password throw 2fa
+            else if (data.fa == true && existingUser.TwoFactorEnabled)
+            {
+                TwoFactorAuthenticator TwoFacAuth = new TwoFactorAuthenticator();
+                bool isValid = TwoFacAuth.ValidateTwoFactorPIN(existingUser.GoogleAuthKey, data.code, TimeSpan.FromSeconds(15));
+
+                if (!isValid)
+                {
+                    return BadRequest("Unsuccessful");
+                }
+            }
+            // Request body is incorrect
+            else return BadRequest("Unsuccessful");
+
+            // Setting new password for user
+            var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
+            var result = await _userManager.ResetPasswordAsync(existingUser, token, data.newPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok("Password have been changed");
+            }
+            else
+            {
+                return BadRequest("Unsuccessful");
+            }
+        }
+
+        [HttpPost("passwordChangeEmail")]
+        public async Task<ActionResult> passwordChangeEmail([FromBody] string username)
+        {
+            var existingUser = await _userManager.FindByNameAsync(username);
+            if (existingUser != null)
+            {
+                Random random = new Random();
+                byte[] bytes = new byte[6];
+                random.NextBytes(bytes);
+                string code = Convert.ToBase64String(bytes).Substring(0, 8);
+                _emailSender.SendEmail(existingUser.Email, code);
+                existingUser.ResetPasswordCode = code;
+                await _dbContext.SaveChangesAsync();
+                return Ok("Sent");
+            }
+            return BadRequest("Unsuccessful");
         }
 
         [Authorize]
