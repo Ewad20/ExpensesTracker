@@ -13,6 +13,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using OfficeOpenXml;
+using PdfSharp.Charting;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -1072,5 +1073,21 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("walletName/{walletId}")]
+        public async Task<string> GetWalletName(long walletId)
+        {
+            try
+            {
+                var wallet = await _dbContext.Wallets.FindAsync(walletId);
+
+                return JsonSerializer.Serialize(wallet.Name);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return "";
+            }
+        }
     }
 }

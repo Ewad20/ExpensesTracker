@@ -14,6 +14,7 @@ const TransactionList = () => {
   const [showForm, setShowForm] = useState(false);
   const [addedTransaction, setAddedTransaction] = useState(null);
   const [transaction, setTransaction] = useState(null);
+  const [walletName, setWalletName] = useState(null);
   const { walletId } = useParams();
 
   const handleInputChange = (e) => {
@@ -225,7 +226,26 @@ const TransactionList = () => {
       }
     };
 
+    const fetchName = async () => {
+      try {
+          const response = await fetch(`api/transaction/walletName/${walletId}`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setWalletName(data);
+      } catch (error) {
+        console.error("Error during fetching transactions:", error);
+      }
+    };
+
+
     fetchCategories();
+    fetchName();
     handleFilterClick();
   }, [walletId]);
 
@@ -243,7 +263,7 @@ const TransactionList = () => {
 
   return (
     <div className="container">
-      <h2>Transaction list for wallet {walletId}</h2>
+      <h2>Transaction list for {walletName}</h2>
 
       <div
         className="row"
