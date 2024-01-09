@@ -13,9 +13,14 @@ const RootElement = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('user');
+
         if (token) {
-            // Ustaw stan zalogowanego u�ytkownika, je�li token jest dost�pny
             setUser({ token });
+        }
+
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
         }
     }, []);
 
@@ -31,13 +36,19 @@ const RootElement = () => {
 
         if (response.ok) {
             const userData = await response.json();
-            
-            setUser({
+
+            const loggedInUser = {
                 token,
-                username: userData.user.userName, 
-            });
+                username: userData.user.userName,
+            };
+
+            setUser(loggedInUser);
+
+            // Zapisz dane użytkownika w pamięci lokalnej
+            localStorage.setItem('user', JSON.stringify(loggedInUser));
         }
-        // Zachowaj token w pami�ci lokalnej po pomy�lnym zalogowaniu
+
+        // Zachowaj token w pamięci lokalnej po pomyślnym zalogowaniu
         localStorage.setItem('token', token);
     };
 
@@ -45,6 +56,7 @@ const RootElement = () => {
     const handleLogout = async () => {
         
         // Usu� token z pami�ci lokalnej po wylogowaniu
+        localStorage.removeItem('user');
         localStorage.removeItem('token');
 
         const response = await fetch('https://localhost:7088/api/account/logout', {
