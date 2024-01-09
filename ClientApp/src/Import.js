@@ -81,6 +81,8 @@ function Import() {
         UserId: walletData.UserId,
         Expenditures: walletData.Expenditures,
         Incomes: walletData.Incomes,
+        IncomesCount: walletData.Incomes.length, // Use length to count elements
+        ExpendituresCount: walletData.Expenditures.length, // Use length to count elements
       };
     });
     setWallets(walletsArray);
@@ -217,8 +219,8 @@ function Import() {
                       <td>{wallet.IconId}</td>
                       <td>{wallet.Name}</td>
                       <td>{wallet.AccountBalance}</td>
-                      <td>{wallet.Incomes}</td>
-                      <td>{wallet.Expenditures}</td>
+                      <td>{wallet.IncomesCount}</td>
+                      <td>{wallet.ExpendituresCount}</td>
                     </tr>
                   ))}
                 </tbody>
