@@ -81,8 +81,8 @@ function Import() {
         UserId: walletData.UserId,
         Expenditures: walletData.Expenditures,
         Incomes: walletData.Incomes,
-        IncomesCount: walletData.Incomes.length, // Use length to count elements
-        ExpendituresCount: walletData.Expenditures.length, // Use length to count elements
+        IncomesCount: walletData.Incomes.length,
+        ExpendituresCount: walletData.Expenditures.length,
       };
     });
     setWallets(walletsArray);

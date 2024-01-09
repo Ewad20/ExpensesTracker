@@ -39,9 +39,39 @@ namespace _2023pz_trrepo.Controllers
                         Name = wallet.Name,
                         IconId = wallet.IconId,
                         AccountBalance = (double)wallet.AccountBalance,
-                        Incomes = wallet.Incomes,
-                        Expenditures = wallet.Expenditures
+                        Incomes = new List<Income>(),
+                        Expenditures = new List<Expenditure>(),
                     };
+
+                    foreach (var income in wallet.Incomes)
+                    {
+                        Income newIncome = new()
+                        {
+                            Title = income.Title,
+                            Description = income.Description,
+                            Amount = income.Amount,
+                            Date = income.Date,
+                            WalletId = newWallet.Id,
+                            CategoryId = income.CategoryId,
+                        };
+
+                        newWallet.Incomes.Add(newIncome);
+                    }
+
+                    foreach (var expenditure in wallet.Expenditures)
+                    {
+                        Expenditure newExpenditure = new Expenditure()
+                        {
+                            Title = expenditure.Title,
+                            Description = expenditure.Description,
+                            Amount = expenditure.Amount,
+                            Date = expenditure.Date,
+                            WalletId = newWallet.Id,
+                            CategoryId = expenditure.CategoryId,
+                        };
+
+                        newWallet.Expenditures.Add(newExpenditure);
+                    }
 
                     user.Wallets.Add(newWallet);
                 }
@@ -110,5 +140,7 @@ namespace _2023pz_trrepo.Controllers
         public string? UserId { get; set; }
         public List<Expenditure>? Expenditures { get; set; }
         public List<Income>? Incomes { get; set; }
+        public int IncomesCount { get; set; }
+        public int ExpendituresCount { get; set; }
     }
 }
