@@ -13,6 +13,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using OfficeOpenXml;
+using PdfSharp.Charting;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -61,6 +62,11 @@ namespace _2023pz_trrepo.Controllers
                 var inc = await _dbContext.Incomes.FirstOrDefaultAsync(t => t.Id == transaction.Id);
                 if (inc != null)
                 {
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == inc.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance += transaction.Amount;
+                    balance -= inc.Amount;
+                    wallet.AccountBalance = balance;
                     inc.Title = transaction.Title;
                     inc.CategoryId = transaction.CategoryId;
                     inc.Amount = transaction.Amount;
@@ -90,6 +96,11 @@ namespace _2023pz_trrepo.Controllers
                 var exp = await _dbContext.Expenditures.FirstOrDefaultAsync(t => t.Id == transaction.Id);
                 if (exp != null)
                 {
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == exp.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance -= transaction.Amount;
+                    balance += exp.Amount;
+                    wallet.AccountBalance = balance;
                     exp.Title = transaction.Title;
                     exp.CategoryId = transaction.CategoryId;
                     exp.Amount = transaction.Amount;
@@ -1010,6 +1021,10 @@ namespace _2023pz_trrepo.Controllers
                 if (income != null)
                 {
                     _dbContext.Incomes.Remove(income);
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == income.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance -= income.Amount;
+                    wallet.AccountBalance = balance;
                     await _dbContext.SaveChangesAsync();
                     return Ok();
                 }
@@ -1017,6 +1032,10 @@ namespace _2023pz_trrepo.Controllers
                 if (expenditure != null)
                 {
                     _dbContext.Expenditures.Remove(expenditure);
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == expenditure.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance += expenditure.Amount;
+                    wallet.AccountBalance = balance;
                     await _dbContext.SaveChangesAsync();
                     return Ok();
                 }
@@ -1072,5 +1091,21 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("walletName/{walletId}")]
+        public async Task<string> GetWalletName(long walletId)
+        {
+            try
+            {
+                var wallet = await _dbContext.Wallets.FindAsync(walletId);
+
+                return JsonSerializer.Serialize(wallet.Name);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return "";
+            }
+        }
     }
 }

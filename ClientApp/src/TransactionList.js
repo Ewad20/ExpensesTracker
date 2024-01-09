@@ -3,18 +3,19 @@ import { useParams } from "react-router-dom";
 import TransactionForm from "./TransactionForm";
 
 const TransactionList = () => {
-    const [transactions, setTransactions] = useState([]);
-    const [transactionType, setTransactionType] = useState("all");
-    const [categories, setCategories] = useState([]);
-    const [startingDate, setStartingDate] = useState(null);
-    const [endingDate, setEndingDate] = useState(null);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [minValue, setMinValue] = useState(null);
-    const [maxValue, setMaxValue] = useState(null);
-    const [showForm, setShowForm] = useState(false);
-    const [addedTransaction, setAddedTransaction] = useState(null);
-    const [transaction, setTransaction] = useState(null);
-    const { walletId } = useParams();
+  const [transactions, setTransactions] = useState([]);
+  const [transactionType, setTransactionType] = useState("all");
+  const [categories, setCategories] = useState([]);
+  const [startingDate, setStartingDate] = useState(null);
+  const [endingDate, setEndingDate] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [minValue, setMinValue] = useState(null);
+  const [maxValue, setMaxValue] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [addedTransaction, setAddedTransaction] = useState(null);
+  const [transaction, setTransaction] = useState(null);
+  const [walletName, setWalletName] = useState(null);
+  const { walletId } = useParams();
 
 
 
@@ -249,16 +250,35 @@ const TransactionList = () => {
                     throw new Error("Network response was not ok");
                 }
 
-                const data = await response.json();
-                setCategories(data);
-            } catch (error) {
-                console.error("Error during fetching transactions:", error);
-            }
-        };
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error during fetching transactions:", error);
+      }
+    };
 
-        fetchCategories();
-        handleFilterClick();
-    }, [walletId]);
+    const fetchName = async () => {
+      try {
+          const response = await fetch(`api/transaction/walletName/${walletId}`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setWalletName(data);
+      } catch (error) {
+        console.error("Error during fetching transactions:", error);
+      }
+    };
+
+
+    fetchCategories();
+    fetchName();
+    handleFilterClick();
+  }, [walletId]);
 
     useEffect(() => {
         handleFilterClick();
@@ -272,9 +292,9 @@ const TransactionList = () => {
         }
     }, [addedTransaction]);
 
-    return (
-        <div className="container">
-            <h2>Transaction list for wallet {walletId}</h2>
+  return (
+    <div className="container">
+      <h2>Transaction list for {walletName}</h2>
 
             <div
                 className="row"
