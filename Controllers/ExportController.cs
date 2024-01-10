@@ -1,5 +1,6 @@
 using _2023pz_trrepo.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
@@ -43,6 +44,36 @@ namespace _2023pz_trrepo.Controllers
             return Ok();
         }
 
+
+        private void walletBalance(Wallet wallet){
+            
+            List<Income> walletIncomes = wallet.Incomes.ToList();
+            List<Expenditure> walletExpenditures = wallet.Expenditures.ToList();
+
+            double walletBalance = 0;
+
+            foreach(Income income in walletIncomes){
+                walletBalance += income.Amount;
+            }
+            
+            foreach(Expenditure expenditure in walletExpenditures){
+                walletBalance -= expenditure.Amount;
+            }
+            
+            wallet.AccountBalance = walletBalance;
+        }
+        //musi sie zgadzac wallet id 
+        private void addIncomesToWallet(Wallet wallet){
+            long id = wallet.Id;
+            List<Income> walletIncomes = _dbContext.Incomes.Where(x => x.WalletId.Equals(id)).ToList();
+            wallet.Incomes = walletIncomes;
+        }
+
+        private void addExpendituresToWallet(Wallet wallet){
+            long id = wallet.Id;
+            List<Expenditure> walletExpenditures = _dbContext.Expenditures.Where(x => x.WalletId.Equals(id)).ToList();
+            wallet.Expenditures = walletExpenditures;
+        }
         //get list of user wallets
         [HttpPost("Wallets")]
         public IActionResult GetUserWallets()
@@ -54,6 +85,13 @@ namespace _2023pz_trrepo.Controllers
             }   
             
             List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId.Equals(userId)).ToList();
+
+            //dla kazdego walleta musimy dopisac liste incomes i expenditures
+            foreach(Wallet wallet in userWalletList){
+                addIncomesToWallet(wallet);
+                addExpendituresToWallet(wallet);
+                walletBalance(wallet);
+            }
 
             if(userWalletList.Count() == 0){
                 return StatusCode(404, "Nie znaleziono portfeli!");

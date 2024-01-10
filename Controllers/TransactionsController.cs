@@ -13,6 +13,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using OfficeOpenXml;
+using PdfSharp.Charting;
 
 
 namespace _2023pz_trrepo.Controllers
@@ -61,6 +62,11 @@ namespace _2023pz_trrepo.Controllers
                 var inc = await _dbContext.Incomes.FirstOrDefaultAsync(t => t.Id == transaction.Id);
                 if (inc != null)
                 {
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == inc.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance += transaction.Amount;
+                    balance -= inc.Amount;
+                    wallet.AccountBalance = balance;
                     inc.Title = transaction.Title;
                     inc.CategoryId = transaction.CategoryId;
                     inc.Amount = transaction.Amount;
@@ -90,6 +96,11 @@ namespace _2023pz_trrepo.Controllers
                 var exp = await _dbContext.Expenditures.FirstOrDefaultAsync(t => t.Id == transaction.Id);
                 if (exp != null)
                 {
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == exp.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance -= transaction.Amount;
+                    balance += exp.Amount;
+                    wallet.AccountBalance = balance;
                     exp.Title = transaction.Title;
                     exp.CategoryId = transaction.CategoryId;
                     exp.Amount = transaction.Amount;
@@ -686,6 +697,95 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        /*[Authorize]
+        [HttpGet("monthlyComparison/{walletId}/{year}/{month}")]
+        public IActionResult GetMonthlyComparison(long walletId, int year, int month)
+        {
+            try
+            {
+                var comparisonData = new List<MonthlyComparison>(); // Klasa MonthlyComparison, która przechowuje porównania miesięczne
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var startDate = new DateTime(year, month - i, 1);
+                    var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                    var incomes = _dbContext.Incomes
+                        .Where(k => k.WalletId == walletId && k.Date >= startDate && k.Date <= endDate)
+                        .Sum(k => k.Amount);
+
+                    var expenditures = _dbContext.Expenditures
+                        .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                        .Sum(e => e.Amount);
+
+                    var previousMonth = startDate.AddMonths(-1);
+                    var comparison = new MonthlyComparison
+                    {
+                        Month = previousMonth.Month,
+                        Year = previousMonth.Year,
+                        Income = incomes,
+                        Expenditure = expenditures
+                    };
+
+                    comparisonData.Add(comparison);
+                }
+
+                return Ok(comparisonData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }*/
+
+        [Authorize]
+        [HttpGet("monthlyComparison/{walletId}/{year}/{month}")]
+        public IActionResult GetMonthlyComparison(int walletId, int year, int month)
+        {
+            try
+            {
+                var comparisonData = new List<MonthlyComparisonItem>();
+
+                // Zbierz dane porównawcze dla każdego z sześciu poprzednich miesięcy
+                for (int i = 0; i < 6; i++)
+                {
+                    var currentDate = new DateTime(year, month, 1).AddMonths(-i);
+                    var startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                    var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                    var incomes = _dbContext.Incomes
+                        .Where(i => i.WalletId == walletId && i.Date >= startDate && i.Date <= endDate)
+                        .Select(i => i.Amount)
+                        .Sum();
+
+                    var expenditures = _dbContext.Expenditures
+                        .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
+                        .Select(e => e.Amount)
+                        .Sum();
+
+                    
+
+                    // Dodaj dane do porównania
+                    comparisonData.Add(new MonthlyComparisonItem
+                    {
+                        Month = startDate.Month,
+                        Year = startDate.Year,
+                        Expenditure = expenditures,
+                        Income = incomes // Dodaj dane dotyczące wpływów
+                    });
+                }
+
+                return Ok(comparisonData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
+
+
 
         [Authorize]
         [HttpGet("generateMonthlyReportPDF/{walletId}/{year}/{month}")]
@@ -934,6 +1034,7 @@ namespace _2023pz_trrepo.Controllers
         }
 
 
+
         [Authorize]
         [HttpGet("allCategories")]
         public async Task<string> GetAllCategories()
@@ -1010,6 +1111,10 @@ namespace _2023pz_trrepo.Controllers
                 if (income != null)
                 {
                     _dbContext.Incomes.Remove(income);
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == income.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance -= income.Amount;
+                    wallet.AccountBalance = balance;
                     await _dbContext.SaveChangesAsync();
                     return Ok();
                 }
@@ -1017,6 +1122,10 @@ namespace _2023pz_trrepo.Controllers
                 if (expenditure != null)
                 {
                     _dbContext.Expenditures.Remove(expenditure);
+                    var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(t => t.Id == expenditure.WalletId);
+                    double balance = wallet.AccountBalance;
+                    balance += expenditure.Amount;
+                    wallet.AccountBalance = balance;
                     await _dbContext.SaveChangesAsync();
                     return Ok();
                 }
@@ -1072,5 +1181,21 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("walletName/{walletId}")]
+        public async Task<string> GetWalletName(long walletId)
+        {
+            try
+            {
+                var wallet = await _dbContext.Wallets.FindAsync(walletId);
+
+                return JsonSerializer.Serialize(wallet.Name);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return "";
+            }
+        }
     }
 }

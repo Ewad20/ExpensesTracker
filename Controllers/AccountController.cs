@@ -96,7 +96,7 @@ namespace _2023pz_trrepo.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                   
+
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
@@ -106,7 +106,7 @@ namespace _2023pz_trrepo.Controllers
             var tokenString = tokenHandler.WriteToken(token);
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            // Zwróæ token JWT w odpowiedzi
+            // Zwrï¿½ï¿½ token JWT w odpowiedzi
             return Ok(new { Token = tokenString });
         }
 
@@ -118,7 +118,7 @@ namespace _2023pz_trrepo.Controllers
             {
                 byte[] uintBuffer = new byte[sizeof(uint)];
 
-                for (int i = 0; i < 64; i++) // Generowanie klucza o d³ugoœci 64 znaków
+                for (int i = 0; i < 64; i++) // Generowanie klucza o dï¿½ugoï¿½ci 64 znakï¿½w
                 {
                     rng.GetBytes(uintBuffer);
                     uint num = BitConverter.ToUInt32(uintBuffer, 0);
@@ -233,8 +233,76 @@ namespace _2023pz_trrepo.Controllers
             {
                 return new JsonResult(Unauthorized("Session ended! Sign in again"));
             }
-            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
+            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();    
             return new JsonResult(wallets);
+        }
+
+        [Authorize]
+        [HttpDelete("removeWallet/{walletId}")]
+        public async Task<IActionResult> DeleteWallet(string walletId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("Session ended! Sign in again");
+            }
+
+
+            var user = await _dbContext.Users
+            .Include("Wallets")
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Unauthorized("Unable to find user with this id");
+            }
+
+            var wallet = user.Wallets.FirstOrDefault(w => w.Id == long.Parse(walletId));
+
+            if (wallet == null)
+            {
+                return NotFound("Wallet not found");
+            }
+
+            user.Wallets.Remove(wallet);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPut("updateWallet/{walletId}")]
+        public async Task<IActionResult> updateWallet(string walletId, [FromBody] string name)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("Session ended! Sign in again");
+            }
+
+
+            var user = await _dbContext.Users
+            .Include("Wallets")
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Unauthorized("Unable to find user with this id");
+            }
+
+            var wallet = user.Wallets.FirstOrDefault(w => w.Id == long.Parse(walletId));
+
+            if (wallet == null)
+            {
+                return NotFound("Wallet not found");
+            }
+
+            wallet.Name = name;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
         }
 
         [Authorize]
@@ -490,7 +558,7 @@ namespace _2023pz_trrepo.Controllers
 
             public UserUpdateModel()
             {
-                
+
             }
 
             [JsonProperty("userId")]
