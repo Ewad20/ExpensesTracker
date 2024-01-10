@@ -157,6 +157,45 @@ const MonthlySummary = () => {
     return (
         <div className='container'>
             {/* Tutaj dodajemy zak³adki dla raportu miesiêcznego i porównania miesiêcznego */}
+            
+            <div className="select-container">
+                <select
+                    className="form-select"
+                    value={walletId}
+                    onChange={(e) => setWalletId(e.target.value)}
+                    style={{ marginRight: '10px' }}
+                >
+                    {wallets.map((wallet) => (
+                        <option key={wallet.id} value={wallet.id}>
+                            {wallet.name}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    className="form-select"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    style={{ marginRight: '10px' }}
+                >
+                    {years.map((yearOption) => (
+                        <option key={yearOption} value={yearOption}>
+                            {yearOption}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    className="form-select"
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                >
+                    <option value="All">All</option>
+                    {months.map((month, index) => (
+                        <option key={index} value={index + 1}>
+                            {month}
+                        </option>
+                    ))}
+                </select>
+            </div>
             <div className="tabs">
                 <button className={activeTab === 'summary' ? 'active-tab' : 'inactive-tab'} onClick={() => setActiveTab('summary')}>Monthly Summary</button>
                 <div className="tab-divider" />
@@ -166,45 +205,6 @@ const MonthlySummary = () => {
             {activeTab === 'summary' && (
                 <div>
                     <h1 className="divider"></h1>
-
-                    <div className="select-container">
-                        <select
-                            className="form-select"
-                            value={walletId}
-                            onChange={(e) => setWalletId(e.target.value)}
-                            style={{ marginRight: '10px' }}
-                        >
-                            {wallets.map((wallet) => (
-                                <option key={wallet.id} value={wallet.id}>
-                                    {wallet.name}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            className="form-select"
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            style={{ marginRight: '10px' }}
-                        >
-                            {years.map((yearOption) => (
-                                <option key={yearOption} value={yearOption}>
-                                    {yearOption}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            className="form-select"
-                            value={month}
-                            onChange={(e) => setMonth(e.target.value)}
-                        >
-                            <option value="All">All</option>
-                            {months.map((month, index) => (
-                                <option key={index} value={index + 1}>
-                                    {month}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
 
                     <div className="btn-container">
                         {month === 'All' ? (
@@ -301,7 +301,7 @@ const MonthlySummary = () => {
                 <div>
                     <h1 className="divider"></h1>
 
-                    <Comparison walletId={walletId} />
+                    <Comparison walletId={walletId} year={year} month={month} />
                 </div>
             )}
         </div>

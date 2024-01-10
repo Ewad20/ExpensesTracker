@@ -1,16 +1,15 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 
-const Comparison = ({ walletId }) => {
+const Comparison = ({ walletId, year, month }) => {
     const chartRef = useRef(null);
     const [comparisonData, setComparisonData] = useState([]);
-    const targetYear = 2024; // Grudzień 2023
-    const targetMonth = 1; // Grudzień
+    const [chartInstance, setChartInstance] = useState(null);
 
     useEffect(() => {
         const fetchComparisonData = async () => {
             try {
-                const response = await fetch(`api/transaction/monthlyComparison/${walletId}/${targetYear}/${targetMonth}`, {
+                const response = await fetch(`api/transaction/monthlyComparison/${walletId}/${year}/${month}`, {
                     credentials: 'include',
                 });
                 if (response.ok) {
@@ -26,21 +25,21 @@ const Comparison = ({ walletId }) => {
         };
 
         fetchComparisonData();
-    }, [walletId, targetYear, targetMonth]);
+    }, [walletId, year, month]);
 
     useEffect(() => {
         if (comparisonData.length > 0) {
-            console.log(comparisonData)
+            if (chartInstance) {
+                chartInstance.destroy(); // Destroy existing chart instance
+            }
+
             const ctx = chartRef.current.getContext('2d');
 
             const months = comparisonData.map(item => `${item.month}-${item.year}`);
             const incomes = comparisonData.map(item => item.income);
             const expenditures = comparisonData.map(item => item.expenditure);
-            
-            console.log('Incomes:', incomes);
-            console.log(months, expenditures, incomes);
 
-            const chart = new Chart(ctx, {
+            const newChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: months,
@@ -51,8 +50,8 @@ const Comparison = ({ walletId }) => {
                             borderColor: 'green',
                             borderWidth: 1,
                             data: incomes,
-                            barPercentage: 0.9, // Grubość słupków
-                            categoryPercentage: 0.9, // Odległość między słupkami
+                            barPercentage: 0.9,
+                            categoryPercentage: 0.9,
                         },
                         {
                             label: 'Expenditures',
@@ -60,10 +59,9 @@ const Comparison = ({ walletId }) => {
                             borderColor: 'red',
                             borderWidth: 1,
                             data: expenditures,
-                            barPercentage: 0.9, // Grubość słupków
-                            categoryPercentage: 0.9, // Odległość między słupkami
+                            barPercentage: 0.9,
+                            categoryPercentage: 0.9,
                         },
-                        
                     ],
                 },
                 options: {
@@ -77,15 +75,17 @@ const Comparison = ({ walletId }) => {
                     },
                     scales: {
                         y: {
-                            beginAtZero: true, // Zacznij od zera
-                            suggestedMin: 0, // Sugerowana minimalna wartość
-                            suggestedMax: Math.max(...expenditures, ...incomes) + 100, // Maksymalna wartość (wartość wydatków + wartość wpływów + margines)
+                            beginAtZero: true,
+                            suggestedMin: 0,
+                            suggestedMax: Math.max(...expenditures, ...incomes) + 100,
                         },
                     },
                 },
             });
+
+            setChartInstance(newChartInstance);
         }
-    }, [comparisonData]);
+    }, [comparisonData, year, month]);
 
     return (
         <div className="card mx-auto my-5 h-auto background-my w-75">
