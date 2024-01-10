@@ -1,10 +1,15 @@
 ﻿import React, { useState } from 'react';
 
-const Comparison = () => {
+const Comparison = ({ handleGenerateReportClick }) => {
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedPeriod, setSelectedPeriod] = useState('');
 
-    const years = [2022, 2023, 2024]; // Przykładowe lata do wyboru
+    const years = [];
+    const currentYear = new Date().getFullYear();
+    const startYear = 2018;
+    for (let year = currentYear; year >= startYear; year--) {
+        years.push(year.toString());
+    }
 
     const quarters = ['I', 'II', 'III', 'IV'];
     const halfYear = 'Half Year';
@@ -20,9 +25,7 @@ const Comparison = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('Selected Year:', selectedYear);
-        console.log('Selected Period:', selectedPeriod);
-        // Tutaj możesz wykonać akcje na podstawie wybranych wartości
+        handleGenerateReportClick(selectedYear, selectedPeriod);
     };
 
     return (

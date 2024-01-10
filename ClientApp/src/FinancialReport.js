@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ChartReport from './ChartReport';
+import Comparison from './ChartComparison';
 import './styles/FinancialReport.css'; 
-import Comparison from './MonthlyComparison';
+//import Comparison from './MonthlyComparison';
 
 
 const MonthlySummary = () => {
@@ -298,8 +299,9 @@ const MonthlySummary = () => {
 
             {activeTab === 'comparison' && (
                 <div>
-                <h1 className="divider"></h1>
-                    <Comparison />
+                    <h1 className="divider"></h1>
+
+                    <Comparison walletId={walletId} />
                 </div>
             )}
         </div>
