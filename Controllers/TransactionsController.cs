@@ -697,46 +697,6 @@ namespace _2023pz_trrepo.Controllers
             }
         }
 
-        /*[Authorize]
-        [HttpGet("monthlyComparison/{walletId}/{year}/{month}")]
-        public IActionResult GetMonthlyComparison(long walletId, int year, int month)
-        {
-            try
-            {
-                var comparisonData = new List<MonthlyComparison>(); // Klasa MonthlyComparison, która przechowuje porównania miesięczne
-
-                for (int i = 0; i < 3; i++)
-                {
-                    var startDate = new DateTime(year, month - i, 1);
-                    var endDate = startDate.AddMonths(1).AddDays(-1);
-
-                    var incomes = _dbContext.Incomes
-                        .Where(k => k.WalletId == walletId && k.Date >= startDate && k.Date <= endDate)
-                        .Sum(k => k.Amount);
-
-                    var expenditures = _dbContext.Expenditures
-                        .Where(e => e.WalletId == walletId && e.Date >= startDate && e.Date <= endDate)
-                        .Sum(e => e.Amount);
-
-                    var previousMonth = startDate.AddMonths(-1);
-                    var comparison = new MonthlyComparison
-                    {
-                        Month = previousMonth.Month,
-                        Year = previousMonth.Year,
-                        Income = incomes,
-                        Expenditure = expenditures
-                    };
-
-                    comparisonData.Add(comparison);
-                }
-
-                return Ok(comparisonData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }*/
 
         [Authorize]
         [HttpGet("monthlyComparison/{walletId}/{year}/{month}")]
