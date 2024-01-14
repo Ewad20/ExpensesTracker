@@ -173,7 +173,7 @@ namespace _2023pz_trrepo.Controllers
             // Change password throw e-mail
             if (data.email == true)
             {
-                if(existingUser.ResetPasswordCode != data.code)
+                if(existingUser.ResetPasswordCode != data.code || existingUser.ResetPasswordCodeExpireTime <= DateTime.Now)
                 {
                     return BadRequest("Unsuccessful");
                 }
@@ -218,10 +218,11 @@ namespace _2023pz_trrepo.Controllers
                 string code = Convert.ToBase64String(bytes).Substring(0, 8);
                 _emailSender.SendEmail(existingUser.Email, code);
                 existingUser.ResetPasswordCode = code;
+                existingUser.ResetPasswordCodeExpireTime = DateTime.Now.AddMinutes(1);
                 await _dbContext.SaveChangesAsync();
                 return Ok("Sent");
             }
-            return BadRequest("Unsuccessful");
+            return NotFound("Not Found User");
         }
 
         [Authorize]

@@ -7,6 +7,7 @@ const PasswordRecovery = () => {
     const [username, setUsername] = useState("");
     const [code, setCode] = useState("");
     const [password, setPassword] = useState("");
+    const [loginInfo, setLoginInfo] = useState('');
 
     const sendEmail = async () => {
         try {
@@ -18,11 +19,20 @@ const PasswordRecovery = () => {
                 credentials: "include",
                 body: JSON.stringify(username),
             });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    setRecoveryState(0);
+                    setLoginInfo("Username doesn't exist");
+                }
+            }
+            else {
+                setRecoveryState(2);
+            }
+
         } catch (error) {
             console.error("Error:", error.message);
         }
-
-        setRecoveryState(2);
     }
 
     const use2FA = () => {
@@ -30,20 +40,20 @@ const PasswordRecovery = () => {
     };
 
     const changePassword = async () => {
+        var data = {
+            "username": username,
+            "newPassword": password,
+            "code": code,
+            "email": true,
+            "fa": true
+        }
+        if (recoveryState === 2) {
+            data.f2 = false;
+        }
+        else if (recoveryState === 3) {
+            data.email = false;
+        }
         try {
-            var data = {
-                "username": username,
-                "newPassword": password,
-                "code": code,
-                "email":true,
-                "fa":true
-            }
-            if (recoveryState === 2) {
-                data.f2 = false;
-            }
-            else if (recoveryState === 3) {
-                data.email = false;
-            }
             const response = await fetch("/api/account/changePassword", {
                 method: "POST",
                 headers: {
@@ -52,18 +62,17 @@ const PasswordRecovery = () => {
                 credentials: "include",
                 body: JSON.stringify(data),
             });
-            if (response.ok()) {
-                console.log(response);
+            if (response.ok) {
+                setLoginInfo("Password has been successfully changed");
+                setRecoveryState(0);
             }
             else {
-                console.log(response);
+                setLoginInfo("Username or code is wrong");
+                setRecoveryState(0);
             }
-
         } catch (error) {
             console.error("Error:", error.message);
         }
-
-        setRecoveryState(2);
     }
 
     return (
@@ -89,6 +98,8 @@ const PasswordRecovery = () => {
                                         <div className="col-12 mt-4">
                                             <button type="submit" className="btn btn-primary">Continue</button>
                                         </div>
+                                        {loginInfo && <div className="col-md-12 alert alert-info">{loginInfo}</div>}
+
                                     </form>
                                 );
                             case 1:
@@ -102,7 +113,7 @@ const PasswordRecovery = () => {
                             case 2:
                             case 3:
                                 return (
-                                    <form className="row g-3">
+                                    <form onSubmit={(e) => { e.preventDefault();}}  className="row g-3">
                                         <label htmlFor="code" className="form-label">Code:</label>
                                         <input
                                             type="text"
@@ -133,6 +144,7 @@ const PasswordRecovery = () => {
                         }
                     })()
                 }
+                <Link to="/" className="link d-inline-block mt-4 ">Press if you want return to login page</Link>
             </div>
         </div>
     );
