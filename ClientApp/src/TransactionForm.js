@@ -68,7 +68,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     const handleTypeSelection = (type) => {
         setTransactionType(type);
         setFormVisible(true);
-        fetchCategories(); 
+        fetchCategories();
     };
 
     const handleSubmit = async (e) => {
@@ -98,7 +98,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                 setTimeout(() => {
                     setConfirmationVisible(false);
                 }, 1500);
-                document.getElementById('FilterButton').click();
+                document.getElementById('helper').click();
             } else {
                 console.error(response);
                 setFormError('Invalid form data');
@@ -112,10 +112,16 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     return (
         <div>
             <div className="mb-3">
-                <button className="btn btn-secondary mx-1" onClick={() => handleTypeSelection('income')}>
+                <button
+                    className={`btn ${transactionType === 'income' ? 'btn-grey' : 'btn-secondary'} mx-1`}
+                    onClick={() => handleTypeSelection('income')}
+                >
                     Income
                 </button>
-                <button className="btn btn-secondary mx-1" onClick={() => handleTypeSelection('expenditure')}>
+                <button
+                    className={`btn ${transactionType === 'expenditure' ? 'btn-grey' : 'btn-secondary'} mx-1`}
+                    onClick={() => handleTypeSelection('expenditure')}
+                >
                     Expenditure
                 </button>
             </div>

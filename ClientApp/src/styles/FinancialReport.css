@@ -54,8 +54,24 @@
     background-color: #D4D2D5;
     border: none;
 }
+.btn-grey {
+    background-color: #6E6A6F;
+    border: none;
+}
+.btn-white {
+    background-color: #FFFFFF;
+    border: none;
+}
 
 /* Style dla stanu :hover */
+.btn-white:hover {
+    background-color: #FFFFFF;
+}
+
+.btn-grey:hover {
+    background-color: #6E6A6F;
+}
+
 .btn-primary:hover {
     background-color: #5f5c7e;
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ETDbContext>(options =>
 {
