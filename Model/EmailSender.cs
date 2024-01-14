@@ -23,6 +23,7 @@ namespace _2023pz_trrepo.Model
             mailBody.AppendFormat("<p>Password Reset</p>");
             mailBody.AppendFormat("<br />");
             mailBody.AppendFormat($"<p>Code:{subject}</p>");
+            mailBody.AppendFormat($"<p>Expire after 5 minute</p>");
             mailMessage.Body = mailBody.ToString();
             // Send email
             client.Send(mailMessage);

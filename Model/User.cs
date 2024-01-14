@@ -9,6 +9,7 @@ namespace _2023pz_trrepo.Model
         public ICollection<Wallet> Wallets { get; set; }
         public string? GoogleAuthKey { get; set; }
         public string? ResetPasswordCode { get; set; }
+        public DateTime? ResetPasswordCodeExpireTime { get; set; }
         public ICollection<Category>? UserCategories { get; set; }
     }
 }
