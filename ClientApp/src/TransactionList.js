@@ -3,21 +3,25 @@ import { useParams } from "react-router-dom";
 import TransactionForm from "./TransactionForm";
 
 const TransactionList = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [transactionType, setTransactionType] = useState("all");
-  const [categories, setCategories] = useState([]);
-  const [startingDate, setStartingDate] = useState(null);
-  const [endingDate, setEndingDate] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [minValue, setMinValue] = useState(null);
-  const [maxValue, setMaxValue] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [addedTransaction, setAddedTransaction] = useState(null);
-  const [transaction, setTransaction] = useState(null);
-  const [walletName, setWalletName] = useState(null);
-  const { walletId } = useParams();
+    const [transactions, setTransactions] = useState([]);
+    const [transactionType, setTransactionType] = useState("all");
+    const [categories, setCategories] = useState([]);
+    const [startingDate, setStartingDate] = useState(null);
+    const [endingDate, setEndingDate] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [minValue, setMinValue] = useState(null);
+    const [maxValue, setMaxValue] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [addedTransaction, setAddedTransaction] = useState(null);
+    const [transaction, setTransaction] = useState(null);
+    const [walletName, setWalletName] = useState(null);
+    const { walletId } = useParams();
+    const [showFilters, setShowFilters] = useState(false);
 
 
+    const handleToggleFilters = () => {
+        setShowFilters(!showFilters);
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -65,14 +69,14 @@ const TransactionList = () => {
         setMinValue(null);
         setMaxValue(null);
 
-        document.getElementById("categorySelect").value = ""; 
-        document.getElementsByName("maxValuePicker")[0].value = "";    
+        document.getElementById("categorySelect").value = "";
+        document.getElementsByName("maxValuePicker")[0].value = "";
         document.getElementsByName("minValuePicker")[0].value = "";
 
         fetchTransactions();
     };
 
-    const fetchTransactions = async () => {
+     const fetchTransactions = async () => {
         try {
             const url = `api/transaction/transactionsForWallet/${walletId}`;
             const response = await fetch(url, { credentials: "include" });
@@ -250,35 +254,35 @@ const TransactionList = () => {
                     throw new Error("Network response was not ok");
                 }
 
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error during fetching transactions:", error);
-      }
-    };
+                const data = await response.json();
+                setCategories(data);
+            } catch (error) {
+                console.error("Error during fetching transactions:", error);
+            }
+        };
 
-    const fetchName = async () => {
-      try {
-          const response = await fetch(`api/transaction/walletName/${walletId}`, {
-          credentials: "include",
-        });
+        const fetchName = async () => {
+            try {
+                const response = await fetch(`api/transaction/walletName/${walletId}`, {
+                    credentials: "include",
+                });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
 
-        const data = await response.json();
-        setWalletName(data);
-      } catch (error) {
-        console.error("Error during fetching transactions:", error);
-      }
-    };
+                const data = await response.json();
+                setWalletName(data);
+            } catch (error) {
+                console.error("Error during fetching transactions:", error);
+            }
+        };
 
 
-    fetchCategories();
-    fetchName();
-    handleFilterClick();
-  }, [walletId]);
+        fetchCategories();
+        fetchName();
+        handleFilterClick();
+    }, [walletId]);
 
     useEffect(() => {
         handleFilterClick();
@@ -292,16 +296,31 @@ const TransactionList = () => {
         }
     }, [addedTransaction]);
 
-  return (
-    <div className="container">
-      <h2>Transaction list for {walletName}</h2>
-
-            <div
-                className="row"
-            >
+    return (
+        <div className="container">
+            <h2>Transaction list for {walletName}</h2>
+            <div className="row my-3">
+                <button
+                    className="btn btn-primary h-25 w-25 mx-1 col my-1"
+                    onClick={() => setShowForm(!showForm)}
+                >
+                    {showForm ? "Cancel" : "Add Transaction"}
+                </button>
+            </div>
+            {showForm && (
+                <TransactionForm
+                    categories={categories}
+                    walletId={walletId}
+                    onSubmit={(newTransactionData) => {
+                        handleAddTransaction(newTransactionData);
+                    }}
+                    onCancel={() => setShowForm(false)}
+                />
+            )}
+            <div className="row my-4">
                 <button
                     className="btn btn-secondary h-25 w-25 mx-1 col my-1"
-                    onClick={() => handleTransactionTypeChange("all")}
+                    onClick={() => handleTransactionTypeChange("all")} 
                 >
                     All Transactions
                 </button>
@@ -314,110 +333,109 @@ const TransactionList = () => {
                 <button
                     className="btn btn-secondary h-25 w-25 mx-1 col my-1"
                     onClick={() => handleTransactionTypeChange("expenditure")}
+                    
                 >
                     Expenditures
                 </button>
-
-                <button
-                    className="btn btn-secondary h-25 w-25 mx-1 col my-1"
-                    onClick={() => setShowForm(!showForm)}
-                >
-                    {showForm ? "Cancel" : "Add Transaction"}
-                </button>
-
             </div>
-
-            {showForm && (
-                <TransactionForm
-                    categories={categories}
-                    walletId={walletId}
-                    onSubmit={(newTransactionData) => {
-                        handleAddTransaction(newTransactionData);
-                    }}
-                    onCancel={() => setShowForm(false)}
-                />
-            )}
-
             {addedTransaction && (
                 <div className="alert alert-success" role="alert">
                     Transaction added successfully!
                 </div>
             )}
-            <h3>Filter results:</h3>
-            <div className="row my-3">
-                <div className="col my-2">
-                    <div className="d-flex flex-column mx-2 align-items-start">
-                        <label className="mb-1">Starting date:</label>
-                        <input
-                            type="date"
-                            name="startingDatePicker"
-                            value={startingDate || ""}
-                            onChange={handleStartingDateChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="d-flex flex-column mx-2 align-items-start">
-                        <label className="mb-1">Ending date:</label>
-                        <input
-                            type="date"
-                            name="endingDatePicker"
-                            value={endingDate || ""}
-                            onChange={handleEndingDateChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="d-flex flex-column mx-2 align-items-start">
-                        <label className="mb-1">Category:</label>
-                        <select
-                            id="categorySelect"
-                            onChange={handleCategoryChange}
-                            className="form-control"
-                        >
-                            <option value="">No category</option>
-                            {categories.map((category) => (
-                                <option key={category.Id} value={category.Id}>
-                                    {category.Name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="d-flex flex-column mx-2 align-items-start">
-                        <label className="mb-1">Min value:</label>
-                        <input
-                            type="number"
-                            name="minValuePicker"
-                            step="any"
-                            onChange={handleMinValueChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <div className="d-flex flex-column mx-2 align-items-start">
-                        <label className="mb-1">Max value:</label>
-                        <input
-                            type="number"
-                            name="maxValuePicker"
-                            step="any"
-                            onChange={handleMaxValueChange}
-                            className="form-control"
-                        />
-                    </div>
-                    <button
-                        className="btn btn-secondary mx-2 my-2 align-self-end"
-                        onClick={handleFilterClick}
-                        id="FilterButton"
-                    >
-                        Filter
-                    </button>
-                    <button
-                        className="btn btn-secondary mx-2 my-2 align-self-end"
-                        onClick={handleClearFilters}
-                        id="ClearFiltersButton"
-                    >
-                        Clear Filters
-                    </button>
-                </div>
+            <div className="row my-4">
+                <button
+                    className="btn btn-dark h-25 w-25 mx-1 col-3 my-1"
+                    onClick={handleToggleFilters}
+                >
+                    {showFilters ? "Cancel" : "Add Filters"}
+                </button>
+                <div className="col-3"></div> 
+                <button
+                    className="btn btn-white h-25 w-25 mx-1 col-3 my-1"
+                    onClick={handleFilterClick}
+                    id="helper"
+                >
+                </button>
             </div>
-
+            {showFilters && (
+                <div>
+                    <h3>Filter results:</h3>
+                    <div className="row my-3">
+                        <div className="col my-2">
+                            <div className="d-flex flex-column mx-2 align-items-start">
+                                <label className="mb-1">Starting date:</label>
+                                <input
+                                    type="date"
+                                    name="startingDatePicker"
+                                    value={startingDate || ""}
+                                    onChange={handleStartingDateChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="d-flex flex-column mx-2 align-items-start">
+                                <label className="mb-1">Ending date:</label>
+                                <input
+                                    type="date"
+                                    name="endingDatePicker"
+                                    value={endingDate || ""}
+                                    onChange={handleEndingDateChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="d-flex flex-column mx-2 align-items-start">
+                                <label className="mb-1">Category:</label>
+                                <select
+                                    id="categorySelect"
+                                    onChange={handleCategoryChange}
+                                    className="form-control"
+                                >
+                                    <option value="">No category</option>
+                                    {categories.map((category) => (
+                                        <option key={category.Id} value={category.Id}>
+                                            {category.Name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="d-flex flex-column mx-2 align-items-start">
+                                <label className="mb-1">Min value:</label>
+                                <input
+                                    type="number"
+                                    name="minValuePicker"
+                                    step="any"
+                                    onChange={handleMinValueChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <div className="d-flex flex-column mx-2 align-items-start">
+                                <label className="mb-1">Max value:</label>
+                                <input
+                                    type="number"
+                                    name="maxValuePicker"
+                                    step="any"
+                                    onChange={handleMaxValueChange}
+                                    className="form-control"
+                                />
+                            </div>
+                            <button
+                                className="btn btn-secondary mx-2 my-2 align-self-end"
+                                onClick={handleFilterClick}
+                                id="FilterButton"
+                            >
+                                Filter
+                            </button>
+                            <button
+                                className="btn btn-secondary mx-2 my-2 align-self-end"
+                                onClick={handleClearFilters}
+                                id="ClearFiltersButton"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="row my-3">
                 {transactions.map((transaction, i) => (
                     <div
@@ -582,4 +600,4 @@ const TransactionList = () => {
     );
 };
 
-export default TransactionList;
+export default TransactionList; 

@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ETDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("KasiaConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EwaConnection"));
 });
 builder.Services.AddCors();
 builder.Services.AddAuthentication(options =>
