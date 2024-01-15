@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ETDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("KasiaConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OlaConnection"));
 });
 builder.Services.AddCors();
 builder.Services.AddAuthentication(options =>
