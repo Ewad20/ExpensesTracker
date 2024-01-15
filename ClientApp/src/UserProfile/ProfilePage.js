@@ -190,13 +190,7 @@ const ProfilePage = () => {
                             <td>
                                 {isEditing ? (
                                     <>
-                                        <input
-                                            type="text"
-                                            name="userName"
-                                            value={userData.user.userName}
-                                            onChange={handleInputChange}
-                                        />
-                                        <div className="error">{validationErrors.userName}</div>
+                                        {userData.user.userName}
                                     </>
                                 ) : (
                                     userData.user.userName
@@ -210,13 +204,7 @@ const ProfilePage = () => {
                             <td>
                                 {isEditing ? (
                                     <>
-                                        <input
-                                            type="text"
-                                            name="email"
-                                            value={userData.user.email}
-                                            onChange={handleInputChange}
-                                        />
-                                        <div className="error">{validationErrors.email}</div>
+                                        {userData.user.email}
                                     </>
                                 ) : (
                                     userData.user.email
