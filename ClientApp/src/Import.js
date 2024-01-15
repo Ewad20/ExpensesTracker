@@ -24,9 +24,9 @@ function Import() {
         });
 
         if (response.status === 401) {
-          setAlertDanger("Uzytkownik nie jest zalogowany!");
+          setAlertDanger("The user is not logged in!");
           console.error(
-            "Uzytkownik nie jest zalogowany!",
+            "The user is not logged in!",
             response.status,
             response.statusText
           );
@@ -136,7 +136,6 @@ function Import() {
 
   const sendselectedWalletsID = async () => {
     //selectedWallets
-
     const selectedWalletToImport = wallets.filter((wallet) =>
       selectedWalletsID.includes(wallet.Id)
     );
@@ -158,7 +157,7 @@ function Import() {
       }
 
       if (response === 401) {
-        setAlertDanger("Uzytkownik nie jest zalogowany!");
+        setAlertDanger("The user is not logged in!");
         setAlertSuccess(null);
       }
     } catch (error) {
@@ -196,8 +195,8 @@ function Import() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Icon</th>
+                    <th scope="col"></th>
+                    {/* <th scope="col">Icon</th> */}
                     <th scope="col">Name</th>
                     <th scope="col">AccountBalance</th>
                     <th scope="col">Incomes</th>
@@ -215,8 +214,14 @@ function Import() {
                       }
                       onClick={() => handleRowClick(wallet.Id)}
                     >
-                      <th>{index + 1}</th>
-                      <td>{wallet.IconId}</td>
+                      <th><input
+                  type="checkbox"
+                  className="form-check-input"
+                  onChange={() => handleRowClick(wallet.Id)}
+                  onClick={() => handleRowClick(wallet.Id)}
+                  checked={selectedWalletsID.includes(wallet.Id)}
+                /></th>
+                      {/* <td>{wallet.IconId}</td> */}
                       <td>{wallet.Name}</td>
                       <td>{wallet.AccountBalance}</td>
                       <td>{wallet.IncomesCount}</td>

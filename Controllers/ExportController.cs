@@ -21,7 +21,6 @@ namespace _2023pz_trrepo.Controllers
         [HttpPost("Wallet")]
         public IActionResult ExportWallet(string userName)
         {
-
             User user;
             try
             {
@@ -29,22 +28,18 @@ namespace _2023pz_trrepo.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine("Brak usera na liście!" + e.StackTrace);
-                return BadRequest("Brak usera na liście!");
+                Console.WriteLine("No user on the list!" + e.StackTrace);
+                return BadRequest("No user on the list!");
             }
 
             List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId == user.Id).ToList();
-
-            //if(!saveJsonFile(filePath, userWallets))
-            //    return BadRequest("Nie udało się wyeksortować");
+            Console.WriteLine("Wallets of " + user.UserName);
             foreach (Wallet wallet in userWalletList)
             {
                 Console.WriteLine(wallet.Name);
             }
             return Ok();
         }
-
-
         private void walletBalance(Wallet wallet){
             
             List<Income> walletIncomes = wallet.Incomes.ToList();
@@ -62,7 +57,6 @@ namespace _2023pz_trrepo.Controllers
             
             wallet.AccountBalance = walletBalance;
         }
-        //musi sie zgadzac wallet id 
         private void addIncomesToWallet(Wallet wallet){
             long id = wallet.Id;
             List<Income> walletIncomes = _dbContext.Incomes.Where(x => x.WalletId.Equals(id)).ToList();
@@ -74,19 +68,19 @@ namespace _2023pz_trrepo.Controllers
             List<Expenditure> walletExpenditures = _dbContext.Expenditures.Where(x => x.WalletId.Equals(id)).ToList();
             wallet.Expenditures = walletExpenditures;
         }
-        //get list of user wallets
+
         [HttpPost("Wallets")]
         public IActionResult GetUserWallets()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
-                return StatusCode(401, "Uzytkownik nie jest zalogowany!");
+                return StatusCode(401, "The user is not logged in!");
             }   
             
             List<Wallet> userWalletList = _dbContext.Wallets.Where(x => x.UserId.Equals(userId)).ToList();
 
-            //dla kazdego walleta musimy dopisac liste incomes i expenditures
+            //for each wallet we need to add incomes and expenditures
             foreach(Wallet wallet in userWalletList){
                 addIncomesToWallet(wallet);
                 addExpendituresToWallet(wallet);
@@ -94,7 +88,7 @@ namespace _2023pz_trrepo.Controllers
             }
 
             if(userWalletList.Count() == 0){
-                return StatusCode(404, "Nie znaleziono portfeli!");
+                return StatusCode(404, "No wallets found!");
             }
 
             string serializeWallets = JsonSerializer.Serialize(userWalletList);

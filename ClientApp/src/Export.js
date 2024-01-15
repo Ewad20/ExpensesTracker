@@ -42,15 +42,15 @@ function Export() {
           setNumberOfIncomesArr(numberOfIncomesArr);
           setNumberOfExpendituresArr(numberOfExpendituresArr);
         } else if (response.status === 401) {
-          setAlert("Uzytkownik nie jest zalogowany!");
+          setAlert("The user is not logged in!");
           console.error(
-            "Uzytkownik nie jest zalogowany",
+            "The user is not logged in!",
             response.status,
             response.statusText
           );
         } else {
           setAlert(
-            "Nie udało się pobrać portfeli uzytkownika. Sprobuj ponownie!"
+            "Failed to download the user's wallets. Please try again!"
           );
           console.error(
             "Failed to load user wallets:",
@@ -216,7 +216,7 @@ function Export() {
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">ID</th>
+                <th scope="col"></th>
                 <th scope="col">Name</th>
                 <th scope="col">AccountBalance</th>
                 <th scope="col">Incomes</th>
@@ -236,7 +236,13 @@ function Export() {
                   }
                   onClick={() => handleRowClick(wallet.Id)}
                 >
-                  <th>{index + 1}</th>
+                  <th><input
+                  type="checkbox"
+                  className="form-check-input"
+                  onChange={() => handleRowClick(wallet.Id)}
+                  onClick={() => handleRowClick(wallet.Id)}
+                  checked={selectedWallets.includes(wallet.Id)}
+                /></th>
                   <td>{wallet.Name}</td>
                   <td>{wallet.AccountBalance}</td>
                   <td>{numberOfIncomesArr[index]}</td>
@@ -260,7 +266,7 @@ function Export() {
         </button>
         {nothingSelected ? (
           <div className="alert alert-danger" role="alert">
-            Nie wybrano zadnego portfela do eksporu!
+            No portfolio has been selected for export!
           </div>
         ) : undefined}
         {alert != null ? (
