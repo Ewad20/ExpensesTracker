@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ChartReport from './ChartReport';
 import Comparison from './ChartComparison';
-import './styles/FinancialReport.css'; 
+import './styles/FinancialReport.css';
 //import Comparison from './MonthlyComparison';
 
 
@@ -11,7 +11,7 @@ const MonthlySummary = () => {
     const [walletId, setWalletId] = useState('');
     const [walletName, setWalletName] = useState('');
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; // getMonth() zwraca miesi¹ce od 0 do 11, wiêc dodajemy 1
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() zwraca miesiï¿½ce od 0 do 11, wiï¿½c dodajemy 1
     const [month, setMonth] = useState(currentMonth.toString());
     const currentYear = currentDate.getFullYear();
     const [year, setYear] = useState(currentYear.toString());
@@ -28,7 +28,7 @@ const MonthlySummary = () => {
         years.push(year.toString());
     }
     const [activeTab, setActiveTab] = useState('summary');
-    const [quarterOrHalfYear, setQuarterOrHalfYear] = useState('All'); // Dodaj nowy stan dla kwarta³u, pó³rocza lub ca³ego roku
+    const [quarterOrHalfYear, setQuarterOrHalfYear] = useState('All'); // Dodaj nowy stan dla kwartaï¿½u, pï¿½rocza lub caï¿½ego roku
 
     const fetchWallets = async () => {
         try {
@@ -43,7 +43,7 @@ const MonthlySummary = () => {
             if (response.ok) {
                 const walletData = await response.json();
                 setWallets(walletData);
-                // Ustaw domyœlny portfel na pierwszy na liœcie (jeœli istnieje)
+                // Ustaw domyï¿½lny portfel na pierwszy na liï¿½cie (jeï¿½li istnieje)
                 if (walletData.length > 0) {
                     setWalletId(walletData[0].id);
                 }
@@ -97,14 +97,14 @@ const MonthlySummary = () => {
                 throw new Error('Network response was not ok');
             }
 
-            // Pobierz zawartoœæ pliku PDF z odpowiedzi
+            // Pobierz zawartoï¿½ï¿½ pliku PDF z odpowiedzi
             const blob = await response.blob();
             const wallet = wallets.find((wallet) => wallet.id === walletId);
             const walletName = wallet ? wallet.name.replace(/ /g, '_') : 'wallet';
 
             const fileName = `monthly_report_${walletName}_${month}_${year}.pdf`;
 
-            // Utwórz link do pobrania pliku i rozpocznij pobieranie
+            // Utwï¿½rz link do pobrania pliku i rozpocznij pobieranie
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
@@ -130,14 +130,14 @@ const MonthlySummary = () => {
                 throw new Error('Network response was not ok');
             }
 
-            // Pobierz zawartoœæ pliku Excel z odpowiedzi
+            // Pobierz zawartoï¿½ï¿½ pliku Excel z odpowiedzi
             const blob = await response.blob();
             const wallet = wallets.find((wallet) => wallet.id === walletId);
             const walletName = wallet ? wallet.name.replace(/ /g, '_') : 'wallet';
 
             const fileName = `monthly_report_${walletName}_${month}_${year}.xlsx`;
 
-            // Utwórz link do pobrania pliku i rozpocznij pobieranie
+            // Utwï¿½rz link do pobrania pliku i rozpocznij pobieranie
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
@@ -156,8 +156,8 @@ const MonthlySummary = () => {
 
     return (
         <div className='container'>
-            {/* Tutaj dodajemy zak³adki dla raportu miesiêcznego i porównania miesiêcznego */}
-            
+            {/* Tutaj dodajemy zakï¿½adki dla raportu miesiï¿½cznego i porï¿½wnania miesiï¿½cznego */}
+
             <div className="select-container">
                 <select
                     className="form-select"
@@ -196,10 +196,10 @@ const MonthlySummary = () => {
                     ))}
                 </select>
             </div>
-            <div className="tabs">
-                <button className={activeTab === 'summary' ? 'active-tab' : 'inactive-tab'} onClick={() => setActiveTab('summary')}>Monthly Summary</button>
+            <div style={{overflow:"hidden"}}>
+                <button className={activeTab === 'summary' ? 'active-tab' : 'inactive-tab'} style={{width:"100%"}} onClick={() => setActiveTab('summary')}>Monthly Summary</button>
                 <div className="tab-divider" />
-                <button className={activeTab === 'comparison' ? 'active-tab' : 'inactive-tab'} onClick={() => setActiveTab('comparison')}>Monthly Comparison</button>
+                <button className={activeTab === 'comparison' ? 'active-tab' : 'inactive-tab'} style={{width:"100%"}} onClick={() => setActiveTab('comparison')}>Monthly Comparison</button>
 
             </div>
             {activeTab === 'summary' && (
@@ -233,7 +233,7 @@ const MonthlySummary = () => {
                                     <h3>Total Income: <span style={{ color: 'lightgreen' }}>{summary.totalIncome}</span></h3>
                                     <h3>Total Expenditure: <span style={{ color: 'lightcoral' }}>{summary.totalExpenditure}</span></h3>
                                 </div>
-                                <div style={{ textAlign: 'right'}}>
+                                <div style={{ textAlign: 'right' }}>
                                     <h3>Net Balance: {summary.netBalance}</h3>
                                 </div>
                             </div>
