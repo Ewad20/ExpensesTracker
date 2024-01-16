@@ -216,50 +216,107 @@ const ManageCategories = () => {
                 <button onClick={handleAddCategory} className="btn btn-primary">Add Category</button>
                 {information && <div className="error">{information}</div>}
             </div>
-            <div>
+
+            <div className="mb-4">
                 <h3>Existing Categories:</h3>
-                <ul className="list-group">
-                    {categories.map((category) => (
-                        <li key={category.Id} className="list-group-item d-flex justify-content-between align-items-center">
-                            {editingCategoryId === category.Id ? (
-                                <>
-                                    <div className="d-flex flex-column">
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={editingCategory.name}
-                                            onChange={(e) => handleInputChange(e, true)}
-                                            className="form-control mb-2"
-                                        />
-                                        <select
-                                            name="type"
-                                            value={editingCategory.type}
-                                            onChange={(e) => handleInputChange(e, true)}
-                                            className="form-select mb-2"
-                                        >
-                                            <option value="Expenditure">Expenditure</option>
-                                            <option value="Income">Income</option>
-                                        </select>
-                                    </div>
-                                    <div className="d-flex">
-                                        <button onClick={handleEditCategory} className="btn btn-success me-2">Save</button>
-                                        <button onClick={handleCancelEditingCategory} className="btn btn-secondary">Cancel</button>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="flex-grow-1">{category.Name} ({category.Type})</div>
-                                    {!category.IsDefault && (
-                                        <div className="btn-group">
-                                            <button onClick={() => handleStartEditingCategory(category)} className="btn btn-warning me-2">Edit</button>
-                                            <button onClick={() => handleDeleteCategory(category.Id)} className="btn btn-danger">Delete</button>
-                                        </div>
+            </div>
+
+            <div className="row">
+                <div className="col-md-6">
+                    <h3>Expenditures</h3>
+                    <ul className="list-group">
+                        {categories
+                            .filter((category) => category.Type === "Expenditure")
+                            .map((category) => (
+                                <li key={category.Id} className="list-group-item d-flex justify-content-between align-items-center">
+                                    {editingCategoryId === category.Id ? (
+                                        <>
+                                            <div className="d-flex flex-column">
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editingCategory.name}
+                                                    onChange={(e) => handleInputChange(e, true)}
+                                                    className="form-control mb-2"
+                                                />
+                                                <select
+                                                    name="type"
+                                                    value={editingCategory.type}
+                                                    onChange={(e) => handleInputChange(e, true)}
+                                                    className="form-select mb-2"
+                                                >
+                                                    <option value="Expenditure">Expenditure</option>
+                                                    <option value="Income">Income</option>
+                                                </select>
+                                            </div>
+                                            <div className="d-flex">
+                                                <button onClick={handleEditCategory} className="btn btn-success me-2">Save</button>
+                                                <button onClick={handleCancelEditingCategory} className="btn btn-secondary">Cancel</button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-grow-1">{category.Name}</div>
+                                            {!category.IsDefault && (
+                                                <div className="btn-group">
+                                                    <button onClick={() => handleStartEditingCategory(category)} className="btn btn-warning me-2">Edit</button>
+                                                    <button onClick={() => handleDeleteCategory(category.Id)} className="btn btn-danger">Delete</button>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+
+                <div className="col-md-6">
+                    <h3>Incomes</h3>
+                    <ul className="list-group">
+                        {categories
+                            .filter((category) => category.Type === "Income")
+                            .map((category) => (
+                                <li key={category.Id} className="list-group-item d-flex justify-content-between align-items-center">
+                                    {editingCategoryId === category.Id ? (
+                                        <>
+                                            <div className="d-flex flex-column">
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editingCategory.name}
+                                                    onChange={(e) => handleInputChange(e, true)}
+                                                    className="form-control mb-2"
+                                                />
+                                                <select
+                                                    name="type"
+                                                    value={editingCategory.type}
+                                                    onChange={(e) => handleInputChange(e, true)}
+                                                    className="form-select mb-2"
+                                                >
+                                                    <option value="Expenditure">Expenditure</option>
+                                                    <option value="Income">Income</option>
+                                                </select>
+                                            </div>
+                                            <div className="d-flex">
+                                                <button onClick={handleEditCategory} className="btn btn-success me-2">Save</button>
+                                                <button onClick={handleCancelEditingCategory} className="btn btn-secondary">Cancel</button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-grow-1">{category.Name}</div>
+                                            {!category.IsDefault && (
+                                                <div className="btn-group">
+                                                    <button onClick={() => handleStartEditingCategory(category)} className="btn btn-warning me-2">Edit</button>
+                                                    <button onClick={() => handleDeleteCategory(category.Id)} className="btn btn-danger">Delete</button>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </li>
+                            ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );
