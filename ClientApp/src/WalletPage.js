@@ -96,7 +96,8 @@ const WalletPage = () => {
         credentials: "include",
         body: JSON.stringify(cred),
       });
-      if (response.ok) {
+        if (response.ok) {
+        setWalletName("");
         fetchWallets(); // Fetch updated wallets after adding a new wallet
       } else {
         console.error(response);
