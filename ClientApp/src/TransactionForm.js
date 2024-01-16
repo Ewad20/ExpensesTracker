@@ -22,7 +22,6 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        if (name !== 'category') {
             setNewTransaction(prevTransaction => ({
                 ...prevTransaction,
                 [name]: value,
