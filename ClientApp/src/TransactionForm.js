@@ -21,10 +21,10 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     const [useCategoryInput, setUseCategoryInput] = useState(false);
     const [customCategory, setCustomCategory] = useState('');
     const [information, setInformation] = useState('');
-    const [newCategory, setNewCategory] = useState({
-        name: '',
-        type: '',
-    });
+
+    const handleCustomCategoryChange = (event) => {
+        setCustomCategory(event.target.value);
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -32,12 +32,6 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         if (name !== 'category') {
             setNewTransaction(prevTransaction => ({
                 ...prevTransaction,
-                [name]: value,
-            }));
-        }
-        if (name === 'name' && useCategoryInput) {
-            setNewCategory(prevCategory => ({
-                ...prevCategory,
                 [name]: value,
             }));
         }
@@ -61,6 +55,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
             categoryId: ''
         });
         setCustomCategory('');
+        setInformation('');
         setFormError('');
     };
 
@@ -85,8 +80,21 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         fetchCategories(); 
     };
 
-    const findCategoryId = (cat) => {
-        const foundCategory = categories.find(
+    const findCategoryId = async (cat) => {
+        let cats;
+        try {
+            const response = await fetch(`api/transaction/allCategories`, {
+                credentials: 'include',
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            cats = data;
+        } catch (error) {
+            console.error('Error during fetching categories:', error);
+        }
+        const foundCategory = cats.find(
             (category) => category.Name === cat
         );
         return foundCategory ? foundCategory.Id : 0;
@@ -94,21 +102,24 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let newCat = { name: customCategory, type: '' };
+        let newTrans = {
+            title: newTransaction.title,
+            description: newTransaction.description,
+            date: newTransaction.date,
+            amount: newTransaction.amount,
+            walletId: newTransaction.walletId,
+            categoryId: newTransaction.categoryId
+        }
 
         if (useCategoryInput) {
             if (transactionType === 'income') {
-                setNewCategory(prevCategory => ({
-                    ...prevCategory,
-                    type: "Income",
-                }));
+                newCat.type = "Income";
             } else {
-                setNewCategory(prevCategory => ({
-                    ...prevCategory,
-                    type: "Expenditure",
-                }));
+                newCat.type = "Expenditure";
             }
             const foundCategory = categories.find(
-                (category) => category.Name === newCategory.name
+                (category) => category.Name === newCat.name
             );
 
             if (foundCategory === null || foundCategory === undefined) {
@@ -118,7 +129,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(newCategory),
+                        body: JSON.stringify(newCat),
                         credentials: 'include',
                     });
 
@@ -137,12 +148,12 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                 setInformation('Category with that name already exists!');
             }
             fetchCategories();
-            setNewTransaction(prevTransaction => ({
-                ...prevTransaction,
-                categoryId: findCategoryId(customCategory),
-            }));
+
+            newTrans.categoryId = await findCategoryId(newCat.name);
         }
 
+
+        console.log(newTrans);
         try {
             let url = '';
             if (transactionType === 'income') {
@@ -156,7 +167,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newTransaction),
+                body: JSON.stringify(newTrans),
                 credentials: 'include',
             });
 
@@ -244,8 +255,8 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                                 type="text"
                                 className="form-control"
                                 name="name"
-                                value={newCategory.name}
-                                onChange={handleInputChange}
+                                value={customCategory}
+                                onChange={handleCustomCategoryChange}
                                 placeholder="Enter new category name"
                                 required={useCategoryInput}
                             />

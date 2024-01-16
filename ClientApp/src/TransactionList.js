@@ -278,7 +278,7 @@ const TransactionList = () => {
     fetchCategories();
     fetchName();
     handleFilterClick();
-  }, [walletId]);
+    }, [walletId]);
 
     useEffect(() => {
         handleFilterClick();
@@ -286,6 +286,7 @@ const TransactionList = () => {
 
     useEffect(() => {
         if (addedTransaction) {
+
             setTimeout(() => {
                 setAddedTransaction(null);
             }, 1500);
