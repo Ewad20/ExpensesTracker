@@ -29,6 +29,7 @@ namespace _2023pz_trrepo.Controllers
             _dbContext = dbContext;
         }
 
+        [Authorize]
         [HttpPost("addCategory")]
         public async Task<IActionResult> AddCategory([FromBody] Category category)
         {

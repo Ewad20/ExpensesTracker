@@ -10,7 +10,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         date: new Date().toISOString().split('T')[0],
         amount: '',
         walletId: walletId,
-        categoryId: ''
+        categoryId: '',
     });
 
     const [formError, setFormError] = useState('');
@@ -18,6 +18,13 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
     const [transactionType, setTransactionType] = useState('');
     const [confirmationVisible, setConfirmationVisible] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [useCategoryInput, setUseCategoryInput] = useState(false);
+    const [customCategory, setCustomCategory] = useState('');
+    const [information, setInformation] = useState('');
+    const [newCategory, setNewCategory] = useState({
+        name: '',
+        type: '',
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -28,13 +35,19 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                 [name]: value,
             }));
         }
+        if (name === 'name' && useCategoryInput) {
+            setNewCategory(prevCategory => ({
+                ...prevCategory,
+                [name]: value,
+            }));
+        }
     };
 
     const handleCategoryChange = (e) => {
         const { value } = e.target;
         setNewTransaction(prevTransaction => ({
             ...prevTransaction,
-            categoryId: value
+            categoryId: value,
         }));
     };
 
@@ -47,6 +60,7 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
             walletId: walletId,
             categoryId: ''
         });
+        setCustomCategory('');
         setFormError('');
     };
 
@@ -71,8 +85,63 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         fetchCategories();
     };
 
+    const findCategoryId = (cat) => {
+        const foundCategory = categories.find(
+            (category) => category.Name === cat
+        );
+        return foundCategory ? foundCategory.Id : 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (useCategoryInput) {
+            if (transactionType === 'income') {
+                setNewCategory(prevCategory => ({
+                    ...prevCategory,
+                    type: "Income",
+                }));
+            } else {
+                setNewCategory(prevCategory => ({
+                    ...prevCategory,
+                    type: "Expenditure",
+                }));
+            }
+            const foundCategory = categories.find(
+                (category) => category.Name === newCategory.name
+            );
+
+            if (foundCategory === null || foundCategory === undefined) {
+                try {
+                    const response = await fetch('/api/transaction/addCategory', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(newCategory),
+                        credentials: 'include',
+                    });
+
+                    if (!response.ok) {
+                        setInformation('Error during adding category.');
+                        throw new Error('Failed to add category');
+                    }
+
+                    setInformation('Category added successfully.');
+                } catch (error) {
+                    console.error('Error during adding category:', error);
+                    setInformation('Error during adding category.');
+                }
+            }
+            else {
+                setInformation('Category with that name already exists!');
+            }
+            fetchCategories();
+            setNewTransaction(prevTransaction => ({
+                ...prevTransaction,
+                categoryId: findCategoryId(customCategory),
+            }));
+        }
 
         try {
             let url = '';
@@ -164,13 +233,36 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                             onChange={handleInputChange}
                             required
                         />
-                        <select
-                            className="form-select"
-                            name="category"
-                            value={newTransaction.categoryId}
-                            onChange={handleCategoryChange}
-                            required
-                        >
+
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="checkbox"
+                                id="useCategoryInput"
+                                checked={useCategoryInput}
+                                onChange={() => setUseCategoryInput(!useCategoryInput)}
+                            />
+                            <label htmlFor="useCategoryInput" style={{ marginLeft: '8px' }}>
+                                Create new category
+                            </label>
+                        </div>
+                        {useCategoryInput ? (
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="name"
+                                value={newCategory.name}
+                                onChange={handleInputChange}
+                                placeholder="Enter new category name"
+                                required={useCategoryInput}
+                            />
+                        ) : (
+                            <select
+                                className="form-select"
+                                name="category"
+                                value={newTransaction.categoryId}
+                                onChange={handleCategoryChange}
+                                required={!useCategoryInput}
+                            >
                             <option value="">Select category</option>
                             {categories.map((category) => (
                                 (transactionType === 'income' && category.Type === 'Income') ||
@@ -181,8 +273,9 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
                                         </option>
                                     ) : null
                             ))}
-                        </select>
-
+                            </select>
+                        )}
+                        {information && <div className="error">{information}</div>}
                         {formError && <div className="col-md-12 error">{formError}</div>}
                         <button type="submit" className="btn btn-primary col-12">
                             Add
