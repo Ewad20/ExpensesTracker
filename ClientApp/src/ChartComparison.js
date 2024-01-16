@@ -88,7 +88,7 @@ const Comparison = ({ walletId, year, month }) => {
     }, [comparisonData, year, month]);
 
     return (
-        <div className="card mx-auto my-5 h-auto background-my w-75">
+        <div className="card mx-auto my-5 h-auto background-my col-12 col-md-8 col-lg-6" >
             <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Monthly Expenditure Comparison</p>
             <div style={{ height: '300px' }}>
                 <canvas ref={chartRef} width="400" height="400"></canvas>
