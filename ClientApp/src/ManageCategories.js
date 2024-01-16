@@ -317,6 +317,7 @@ const ManageCategories = () => {
                             ))}
                     </ul>
                 </div>
+                <div className="mb-4"></div>
             </div>
         </div>
     );
