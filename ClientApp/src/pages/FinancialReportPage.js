@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ChartReport from './ChartReport';
-import Comparison from './ChartComparison';
-import './styles/FinancialReport.css';
-//import Comparison from './MonthlyComparison';
+import ChartReport from '../components/ChartReport';
+import Comparison from '../components/ChartComparison'
+import '../styles/FinancialReport.css';
 
 
 const MonthlySummary = () => {

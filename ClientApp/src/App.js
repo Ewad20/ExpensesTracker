@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import RegisterForm from './RegisterForm';
-import RootElement from './RootElement';
+import RootElement from './components/Navbar';
 import TransactionList from './TransactionList';
-import LoginForm from './LoginForm';
-import WalletPage from './WalletPage';
-import Export from './Export';
-import Import from './Import';
-import FinancialReport from './FinancialReport';
-import ManageCategories from './ManageCategories';
+import WalletPage from './pages/WalletPage';
+import Export from './pages/ExportPage';
+import Import from './pages/ImportPage';
+import FinancialReport from './pages/FinancialReportPage';
+import ManageCategories from './pages/ManageCategoriesPage';
 import TwoFactorAuthentication from './account/settings/TwoFactorAuthentication';
-import ProfilePage from './UserProfile/ProfilePage'
-import PasswordRecoveryPage from './PasswordRecovery'
+import ProfilePage from './pages/ProfilePage'
+import PasswordRecoveryPage from './pages/PasswordRecoveryPage'
+import LandingPage from './pages/LandingPage';
+import DashboardPage from './pages/DashbordPage';
 
 const App = () => {
     return (
@@ -19,6 +20,8 @@ const App = () => {
         <Router>
             <RootElement />
             <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/transaction/:walletId" element={<TransactionList />} />
                 <Route path="/wallet" element={<WalletPage />} />
