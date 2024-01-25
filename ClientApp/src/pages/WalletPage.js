@@ -110,7 +110,7 @@ const WalletPage = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container mt-3">
       <div className="d-flex justify-content-center">
         <button
           className="btn btn-secondary mx-1 mh-50 w-25"

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Chart1 from '../components/Chart1';
-import Chart2 from '../components/Chart2';
+import Chart1 from '../components/AccountTrafficChart';
+import Chart2 from '../components/CategoriesChart';
 
 const DashboardPage = () => {
     const user = localStorage.getItem('user');

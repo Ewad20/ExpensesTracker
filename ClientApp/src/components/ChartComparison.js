@@ -14,7 +14,6 @@ const Comparison = ({ walletId, year, month }) => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setComparisonData(data);
                 } else {
                     throw new Error('Network response was not ok');

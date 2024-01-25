@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegisterForm from './RegisterForm';
-import RootElement from './components/Navbar';
-import TransactionList from './TransactionList';
+import RegisterForm from './pages/RegisterFormPage';
+import Navbar from './components/Navbar';
+import TransactionList from './pages/TransactionsPage';
 import WalletPage from './pages/WalletPage';
 import Export from './pages/ExportPage';
 import Import from './pages/ImportPage';
@@ -18,7 +18,7 @@ const App = () => {
     return (
 
         <Router>
-            <RootElement />
+            <Navbar />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />

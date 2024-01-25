@@ -35,7 +35,6 @@ const LoginForm = ({ onLogin }) => {
         // Redirect to Two-Factor authentication form
         setVisibleAuth(true);
       } else if (response.ok) {
-        console.log("Login successful!");
         onLogin({ username: loginIdentifier });
         navigate("/");
       } else if (visibleAuth) {

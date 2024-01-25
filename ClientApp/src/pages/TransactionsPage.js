@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import TransactionForm from "./TransactionForm";
+import TransactionForm from "../components/TransactionForm";
 
 const TransactionList = () => {
     const [transactions, setTransactions] = useState([]);
@@ -76,7 +76,7 @@ const TransactionList = () => {
         fetchTransactions();
     };
 
-     const fetchTransactions = async () => {
+    const fetchTransactions = async () => {
         try {
             const url = `api/transaction/transactionsForWallet/${walletId}`;
             const response = await fetch(url, { credentials: "include" });
@@ -168,7 +168,6 @@ const TransactionList = () => {
                     credentials: "include",
                 });
                 if (response.ok) {
-                    console.log("Income updated!");
                     document.getElementById("closeModalBtn").click();
                     handleFilterClick();
                 }
@@ -183,7 +182,6 @@ const TransactionList = () => {
                     credentials: "include",
                 });
                 if (response.ok) {
-                    console.log("Expenditure updated!");
                     document.getElementById("closeModalBtn").click();
                     handleFilterClick();
                 }
@@ -279,9 +277,9 @@ const TransactionList = () => {
         };
 
 
-    fetchCategories();
-    fetchName();
-    handleFilterClick();
+        fetchCategories();
+        fetchName();
+        handleFilterClick();
     }, [walletId]);
 
     useEffect(() => {
@@ -321,7 +319,7 @@ const TransactionList = () => {
             <div className="row my-4">
                 <button
                     className="btn btn-secondary h-25 w-25 mx-1 col my-1"
-                    onClick={() => handleTransactionTypeChange("all")} 
+                    onClick={() => handleTransactionTypeChange("all")}
                 >
                     All Transactions
                 </button>
@@ -334,7 +332,7 @@ const TransactionList = () => {
                 <button
                     className="btn btn-secondary h-25 w-25 mx-1 col my-1"
                     onClick={() => handleTransactionTypeChange("expenditure")}
-                    
+
                 >
                     Expenditures
                 </button>
@@ -351,7 +349,7 @@ const TransactionList = () => {
                 >
                     {showFilters ? "Cancel" : "Add Filters"}
                 </button>
-                <div className="col-3"></div> 
+                <div className="col-3"></div>
                 <button
                     className="btn btn-white h-25 w-25 mx-1 col-3 my-1"
                     onClick={handleFilterClick}

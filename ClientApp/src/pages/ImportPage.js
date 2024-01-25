@@ -58,7 +58,6 @@ function Import() {
         try {
           const parsedData = JSON.parse(fileContent);
           createWalletArray(parsedData);
-          console.log("Imported data:", parsedData);
         } catch (error) {
           console.error("Error parsing JSON:", error);
         }
@@ -96,8 +95,6 @@ function Import() {
         return [...prevselectedWalletsID, id];
       }
     });
-
-    console.log(selectedWalletsID);
   };
 
   const handleSelectAll = () => {
@@ -113,10 +110,8 @@ function Import() {
 
   useEffect(() => {
     if (selectedWalletsID.length === 0 && clearAll) {
-      console.log("No wallets selected!");
       setClearAll(false);
     } else if (selectedWalletsID.length > 0 && !clearAll) {
-      console.log("Wallets selected:", selectedWalletsID);
       setClearAll(true);
     }
   }, [selectedWalletsID, clearAll]);
@@ -124,13 +119,10 @@ function Import() {
   function handleImport() {
     if (selectedWalletsID.length === 0) {
       setAlertDanger("No wallets selected to import! Select some!");
-      console.log("No wallets selected!");
       return;
     }
 
     setAlertDanger(null);
-    console.log("Save selected wallets to new account!");
-    //call a backend to save new wallets to the database
     sendselectedWalletsID();
   }
 
@@ -140,7 +132,6 @@ function Import() {
       selectedWalletsID.includes(wallet.Id)
     );
 
-    console.log(selectedWalletToImport);
     try {
       const response = await fetch("/api/import/importWallets", {
         method: "POST",
@@ -215,12 +206,12 @@ function Import() {
                       onClick={() => handleRowClick(wallet.Id)}
                     >
                       <th><input
-                  type="checkbox"
-                  className="form-check-input"
-                  onChange={() => handleRowClick(wallet.Id)}
-                  onClick={() => handleRowClick(wallet.Id)}
-                  checked={selectedWalletsID.includes(wallet.Id)}
-                /></th>
+                        type="checkbox"
+                        className="form-check-input"
+                        onChange={() => handleRowClick(wallet.Id)}
+                        onClick={() => handleRowClick(wallet.Id)}
+                        checked={selectedWalletsID.includes(wallet.Id)}
+                      /></th>
                       {/* <td>{wallet.IconId}</td> */}
                       <td>{wallet.Name}</td>
                       <td>{wallet.AccountBalance}</td>

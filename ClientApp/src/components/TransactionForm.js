@@ -153,7 +153,6 @@ const TransactionForm = ({ onSubmit, onCancel, walletId }) => {
         }
 
 
-        console.log(newTrans);
         try {
             let url = '';
             if (transactionType === 'income') {

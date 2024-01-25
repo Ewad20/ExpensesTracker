@@ -25,7 +25,6 @@ function Export() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("All wallets were successfuly added.");
           setAlert(null);
           setWallets(data);
 
@@ -67,10 +66,8 @@ function Export() {
 
   useEffect(() => {
     if (selectedWallets.length === 0) {
-      console.log("No wallets selected!");
       setClearAll(false);
     } else {
-      console.log("Wallets selected:", selectedWallets);
       setClearAll(true);
     }
   }, [selectedWallets]);
@@ -101,7 +98,6 @@ function Export() {
 
     if (selectedWallets.length === 0) {
       setNothingSelected(true);
-      console.log("No wallets selected!");
     } else {
       const selectedWalletData = wallets.filter((wallet) =>
         selectedWallets.includes(wallet.Id)
@@ -146,12 +142,6 @@ function Export() {
       if (response.ok) {
         const data = await response.json();
         numberOfIncomesInWallet = parseInt(data);
-        console.log(
-          "Number of incomes in wallet " +
-            walletId +
-            " is: " +
-            numberOfIncomesInWallet
-        );
       } else {
         console.error("Server responded with an error:", response.statusText);
       }
@@ -177,12 +167,6 @@ function Export() {
       if (response.ok) {
         const data = await response.json();
         numberOfExpendituresInWallet = parseInt(data);
-        console.log(
-          "Number of Expenditures in wallet " +
-            walletId +
-            " is: " +
-            numberOfExpendituresInWallet
-        );
       } else {
         console.error("Server responded with an error:", response.statusText);
       }
