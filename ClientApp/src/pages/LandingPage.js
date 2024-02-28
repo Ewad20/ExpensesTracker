@@ -16,7 +16,7 @@ const LandingPage = () => {
 
 
     const handleLogin = async (token) => {
-        const response = await fetch('https://localhost:7088/api/account/getProfilePageData', {
+        const response = await fetch('api/account/getProfilePageData', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

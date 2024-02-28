@@ -44,7 +44,7 @@ if (!app.Environment.IsDevelopment())
 app.UseRouting();
 
 app.UseCors(options =>
-    options.WithOrigins("https://localhost:44485")
+    options.WithOrigins("https://localhost:44485", "https://frontend:44485")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()

@@ -27,7 +27,7 @@ const RootElement = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
 
-        const response = await fetch('https://localhost:7088/api/account/logout', {
+        const response = await fetch('/api/account/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

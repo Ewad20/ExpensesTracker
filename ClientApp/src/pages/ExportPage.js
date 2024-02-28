@@ -178,7 +178,7 @@ function Export() {
   }
 
   function seeMore(walletId) {
-    var newPageUrl = "https://localhost:44485/transaction/" + walletId;
+    var newPageUrl = "/api/transaction/" + walletId;
     window.open(newPageUrl, "_blank");
   }
 
